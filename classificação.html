@@ -7,7 +7,8 @@
   <title>Classificação de Tráfego</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/lucide@0.244.0/dist/lucide.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
   <style>
     body {
       margin: 0;
@@ -16,9 +17,9 @@
       display: flex;
       height: 100vh;
       color: white;
-      overflow: hidden;
     }
 
+    /* Sidebar */
     nav.sidebar {
       background: rgba(0, 0, 0, 0.8);
       width: 220px;
@@ -27,13 +28,13 @@
       padding: 20px;
       box-sizing: border-box;
       gap: 25px;
+      transition: transform 0.3s ease;
     }
 
     nav.sidebar h2 {
       margin: 0 0 30px 0;
       font-size: 22px;
       text-align: center;
-      color: white;
     }
 
     nav.sidebar button {
@@ -60,6 +61,7 @@
       height: 20px;
     }
 
+    /* Conteúdo */
     main.container {
       flex-grow: 1;
       background-color: rgba(0, 0, 0, 0.8);
@@ -68,104 +70,84 @@
       border-radius: 20px;
       overflow-y: auto;
       box-sizing: border-box;
+      position: relative;
     }
 
     h1 {
       text-align: center;
       margin-bottom: 30px;
-      user-select: none;
-      width: 100%;
-      color: white;
     }
 
     .grafico-pequeno {
-      width: 100%;
-      max-width: 350px;
-      height: auto;
-      max-height: 350px;
+      width: 350px;
+      height: 350px;
     }
 
-    /* Menu Hamburguer */
-    .hamburger-menu {
+    /* Botão hamburguer */
+    .menu-toggle {
       display: none;
-      background-color: transparent;
-      border: none;
-      cursor: pointer;
-      padding: 10px;
       position: absolute;
-      top: 20px;
-      right: 20px;
-      z-index: 10;
+      top: 15px;
+      left: 15px;
+      background: rgba(0, 0, 0, 0.8);
+      border: none;
+      color: white;
+      padding: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 1000;
     }
 
-    .hamburger-menu div {
-      width: 25px;
-      height: 3px;
-      background-color: white;
-      margin: 5px;
-      transition: transform 0.3s;
-    }
+    /* Mobile */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
 
-    @media screen and (max-width: 768px) {
       nav.sidebar {
         position: fixed;
         top: 0;
-        left: -220px;
-        height: 100%;
-        transition: left 0.3s ease;
-      }
-
-      nav.sidebar.open {
         left: 0;
+        height: 100%;
+        transform: translateX(-100%);
+        z-index: 999;
       }
 
-      .hamburger-menu {
+      nav.sidebar.active {
+        transform: translateX(0);
+      }
+
+      .menu-toggle {
         display: block;
-      }
-
-      nav.sidebar h2 {
-        font-size: 20px;
-      }
-
-      nav.sidebar button {
-        font-size: 16px;
-        padding: 8px 10px;
       }
 
       main.container {
         margin: 20px;
         padding: 20px;
       }
+
+      .grafico-pequeno {
+        width: 250px;
+        height: 250px;
+      }
     }
   </style>
 </head>
 
 <body>
-  <!-- Menu Hambúrguer -->
-  <button class="hamburger-menu" onclick="toggleSidebar()">
-    <div></div>
-    <div></div>
-    <div></div>
+  <!-- Botão hamburguer -->
+  <button class="menu-toggle" onclick="toggleMenu()">
+    <i data-lucide="menu"></i>
   </button>
 
   <!-- Sidebar -->
-  <nav class="sidebar">
+  <nav class="sidebar" id="sidebar">
     <h2>Painel</h2>
-    <button onclick="goToHome()">
-      <i data-lucide="home"></i> Início
-    </button>
-    <button onclick="verLogs()">
-      <i data-lucide="file-text"></i> Logs
-    </button>
-    <button onclick="verClassificacao()">
-      <i data-lucide="bar-chart-2"></i> Classificação
-    </button>
-    <button onclick="verPerfil()">
-      <i data-lucide="user"></i> Perfil
-    </button>
-    <button onclick="logout()">
-      <i data-lucide="log-out"></i> Logout
-    </button>
+    <button onclick="goToHome()"><i data-lucide="home"></i> Início</button>
+    <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
+    <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Classificação</button>
+    <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
+    <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
   </nav>
 
   <!-- Conteúdo Principal -->
@@ -175,22 +157,25 @@
   </main>
 
   <script>
-    const {createClient} = window.supabase;
+    const { createClient } = window.supabase;
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs';
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    function toggleMenu() {
+      document.getElementById("sidebar").classList.toggle("active");
+    }
+
     async function carregarDados() {
-      const {data, error} = await supabase
+      const { data, error } = await supabase
         .from('trafego')
         .select('timestamp, tipo, porta')
-        .order('timestamp', {ascending: false});
+        .order('timestamp', { ascending: false });
 
       if (error) {
         console.error("Erro ao buscar dados:", error);
         return;
       }
-
       desenharGrafico(data);
     }
 
@@ -202,7 +187,6 @@
       });
 
       const ctx = document.getElementById('graficoTrafego').getContext('2d');
-
       new Chart(ctx, {
         type: 'pie',
         data: {
@@ -210,9 +194,7 @@
           datasets: [{
             label: 'Tipos de Tráfego',
             data: Object.values(contagem),
-            backgroundColor: [
-              '#4e9cff', '#f54291', '#33cc33', '#ffa500', '#cc33ff', '#ff3333', '#00cccc'
-            ],
+            backgroundColor: ['#4e9cff', '#f54291', '#33cc33', '#ffa500', '#cc33ff', '#ff3333', '#00cccc'],
             borderColor: 'white',
             borderWidth: 2
           }]
@@ -220,17 +202,10 @@
         options: {
           responsive: true,
           plugins: {
-            legend: {
-              display: false, // Não mostra legenda fixa
-            },
+            legend: { display: false },
             tooltip: {
-              enabled: true,
               callbacks: {
-                label: function (context) {
-                  const label = context.label || '';
-                  const value = context.parsed || 0;
-                  return `${label}: ${value}`;
-                }
+                label: (context) => `${context.label}: ${context.parsed}`
               }
             }
           }
@@ -238,29 +213,10 @@
       });
     }
 
-    // Função para abrir/fechar a sidebar
-    function toggleSidebar() {
-      const sidebar = document.querySelector('nav.sidebar');
-      sidebar.classList.toggle('open');
-    }
-
-    // Navegação do menu lateral
-    function goToHome() {
-      window.location.href = 'base.html';
-    }
-
-    function verLogs() {
-      window.location.href = 'logs.html';
-    }
-
-    function verClassificacao() {
-      window.location.href = 'classificação.html';
-    }
-
-    function verPerfil() {
-      window.location.href = 'perfil.html';
-    }
-
+    function goToHome() { window.location.href = 'base.html'; }
+    function verLogs() { window.location.href = 'logs.html'; }
+    function verClassificacao() { window.location.href = 'classificação.html'; }
+    function verPerfil() { window.location.href = 'perfil.html'; }
     function logout() {
       supabase.auth.signOut().then(() => {
         window.location.href = 'index.html';
@@ -269,7 +225,7 @@
 
     window.onload = () => {
       carregarDados();
-      lucide.replace();
+      lucide.createIcons();
     };
   </script>
 </body>
