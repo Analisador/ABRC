@@ -5,19 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Speed Test</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     body {
-      margin: 0;
       font-family: Arial, Helvetica, sans-serif;
       background-image: linear-gradient(45deg, rgb(32, 94, 217), rgb(201, 4, 70));
+      margin: 0;
+      padding: 0;
+      color: white;
       display: flex;
       height: 100vh;
-      color: white;
+      overflow: hidden;
     }
 
-    /* Sidebar */
     nav.sidebar {
       background: rgba(0, 0, 0, 0.8);
       width: 220px;
@@ -26,14 +28,14 @@
       padding: 20px;
       box-sizing: border-box;
       gap: 25px;
-      transition: transform 0.3s ease;
+      transition: width 0.3s;
     }
 
     nav.sidebar h2 {
       margin: 0 0 30px 0;
       font-size: 22px;
       text-align: center;
-      font-weight: bold;
+      color: white;
     }
 
     nav.sidebar button {
@@ -60,7 +62,6 @@
       height: 20px;
     }
 
-    /* Conteúdo */
     main.container {
       flex-grow: 1;
       background-color: rgba(0, 0, 0, 0.8);
@@ -69,91 +70,216 @@
       border-radius: 20px;
       overflow-y: auto;
       box-sizing: border-box;
-      position: relative;
     }
 
     h1 {
       text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .card-container {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
       margin-bottom: 30px;
-      font-size: 28px;
+    }
+
+    .card {
+      background-color: #ffffff;
+      color: black;
+      border-radius: 15px;
+      padding: 25px 30px;
+      font-size: 20px;
       font-weight: bold;
-    }
-
-    .grafico-pequeno {
-      width: 350px;
-      height: 350px;
-    }
-
-    /* Botão hamburguer */
-    .menu-toggle {
-      display: none;
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      background: rgba(0, 0, 0, 0.8);
-      border: none;
-      color: white;
-      padding: 8px;
-      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease;
       cursor: pointer;
-      z-index: 1000;
     }
 
-    /* Mobile */
+    .card:hover {
+      transform: scale(1.05);
+      cursor: pointer;
+    }
+
+    .chart-block {
+      margin-top: 20px;
+    }
+
+    canvas {
+      background-color: white;
+      border-radius: 10px;
+      padding: 15px;
+      max-height: 400px;
+      width: 100% !important;
+    }
+
+    /* Menu Hamburguer */
+    .hamburger-menu {
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .hamburger-menu div {
+      width: 30px;
+      height: 4px;
+      background-color: white;
+    }
+
+    .menu-open nav.sidebar {
+      width: 220px;
+    }
+
+    .menu-close nav.sidebar {
+      width: 0;
+    }
+
     @media (max-width: 768px) {
-      body {
-        flex-direction: column;
-      }
-
       nav.sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 100%;
-        transform: translateX(-100%);
-        z-index: 999;
+        width: 0;
       }
-
-      nav.sidebar.active {
-        transform: translateX(0);
+      .hamburger-menu {
+        display: flex;
       }
-
-      .menu-toggle {
-        display: block;
-      }
-
-      main.container {
-        margin: 20px;
-        padding: 20px;
-      }
-
-      .grafico-pequeno {
-        width: 250px;
-        height: 250px;
+      .menu-open nav.sidebar {
+        width: 220px;
       }
     }
   </style>
 </head>
-
 <body>
-  <!-- Botão hamburguer -->
-  <button class="menu-toggle" onclick="toggleMenu()">
-    <i data-lucide="menu"></i>
-  </button>
+  <!-- Hamburger Menu Button -->
+  <div class="hamburger-menu" onclick="toggleSidebar()">
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
 
   <!-- Sidebar -->
-  <nav class="sidebar" id="sidebar">
+  <nav class="sidebar">
     <h2>Painel</h2>
-    <button onclick="goToHome()"><i data-lucide="home"></i> Início</button>
-    <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
-    <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Classificação</button>
-    <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
-    <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
+    <button onclick="goToHome()">
+      <i data-lucide="home"></i> Início
+    </button>
+    <button onclick="verLogs()">
+      <i data-lucide="file-text"></i> Logs
+    </button>
+    <button onclick="verClassificacao()">
+      <i data-lucide="bar-chart-2"></i> Classificação
+    </button>
+    <button onclick="verPerfil()">
+      <i data-lucide="user"></i> Perfil
+    </button>
+    <button onclick="logout()">
+      <i data-lucide="log-out"></i> Logout
+    </button>
   </nav>
 
-  <!-- Conteúdo Principal -->
   <main class="container">
     <h1>Speed Test</h1>
+
     <div class="card-container">
       <div class="card" id="downloadCard">Download: -- Mbps</div>
-      <div class="card"
+      <div class="card" id="uploadCard">Upload: -- Mbps</div>
+    </div>
+
+    <div class="chart-block">
+      <canvas id="speedChart"></canvas>
+    </div>
+  </main>
+
+  <script>
+    const { createClient } = window.supabase;
+    const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs';
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    let speedChartInstance;
+
+    async function fetchSpeedtest() {
+      const { data, error } = await supabase
+        .from('speedtest')
+        .select('timestamp, download, upload')
+        .order('timestamp', { ascending: true });
+
+      if (error) {
+        console.error('Erro ao buscar speedtest:', error);
+        return [];
+      }
+
+      updateLatestCards(data);
+      return data;
+    }
+
+    function updateLatestCards(data) {
+      if (!data.length) return;
+
+      const latest = data[data.length - 1];
+      document.getElementById('downloadCard').textContent = `Download: ${latest.download} Mbps`;
+      document.getElementById('uploadCard').textContent = `Upload: ${latest.upload} Mbps`;
+    }
+
+    function renderSpeedChart(data) {
+      const labels = data.map(d => new Date(d.timestamp).toLocaleString());
+      const download = data.map(d => d.download);
+      const upload = data.map(d => d.upload);
+
+      if (speedChartInstance) speedChartInstance.destroy();
+
+      speedChartInstance = new Chart(document.getElementById('speedChart'), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            { label: 'Download (Mbps)', data: download, borderColor: 'red', fill: false },
+            { label: 'Upload (Mbps)', data: upload, borderColor: 'blue', fill: false }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { labels: { color: 'black' } }
+          },
+          scales: {
+            x: { ticks: { color: 'black' } },
+            y: { ticks: { color: 'black' } }
+          }
+        }
+      });
+    }
+
+    function verLogs() {
+      window.location.href = 'logs.html';
+    }
+
+    function verClassificacao() {
+      window.location.href = 'classificação.html';
+    }
+
+    function verPerfil() {
+      window.location.href = 'perfil.html';
+    }
+
+    function logout() {
+      supabase.auth.signOut().then(() => {
+        window.location.href = 'LoginProjet.html';
+      });
+    }
+
+    function goToHome() {
+      fetchSpeedtest().then(data => renderSpeedChart(data));
+    }
+
+    window.onload = () => {
+      fetchSpeedtest().then(data => renderSpeedChart(data));
+      lucide.replace();
+    };
+
+    function toggleSidebar() {
+      const sidebar = document.querySelector('nav.sidebar');
+      sidebar.classList.toggle('menu-open');
+    }
+  </script>
+</body>
+</html>
