@@ -25,7 +25,11 @@
       box-sizing: border-box;
       gap: 25px;
     }
-    nav.sidebar h2 { margin: 0 0 30px 0; font-size: 22px; text-align: center;}
+    nav.sidebar h2 {
+      margin: 0 0 30px 0;
+      font-size: 22px;
+      text-align: center;
+    }
     nav.sidebar button {
       background: none;
       border: none;
@@ -40,7 +44,8 @@
       transition: background-color 0.3s ease;
     }
     nav.sidebar button:hover { background-color: #ff4e4e; }
-    nav.sidebar button svg {stroke: white; width: 20px; height: 20px;}
+    nav.sidebar button svg { stroke: white; width: 20px; height: 20px; }
+    
     main.container {
       flex-grow: 1;
       background-color: rgba(0, 0, 0, 0.8);
@@ -49,8 +54,15 @@
       border-radius: 20px;
       overflow-y: auto;
       box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    h1 { text-align: center; margin-bottom: 20px; }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
     .profile-section {
       display: flex;
       flex-direction: column;
@@ -76,20 +88,25 @@
       transition: background 0.3s ease;
     }
     .upload-label:hover { background-color: #cccccc; }
+    
     .form-group {
       max-width: 100%;
-      margin: 0 auto 20px;
+      width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 12px;
+      align-items: center;
     }
-    label { font-weight: bold;}
+    label {
+      font-weight: bold;
+      text-align: center;
+    }
     input[type="time"] {
       padding: 10px;
       border: none;
       border-radius: 8px;
       font-size: 16px;
-      width: 100%;
+      width: 80%;
     }
     button.save-btn {
       background-color: #ffffff;
@@ -101,10 +118,11 @@
       font-weight: bold;
       cursor: pointer;
       transition: background 0.3s ease;
+      width: 80%;
       margin-top: 20px;
-      width: 100%;
     }
-    button.save-btn:hover { background-color: #cccccc;}
+    button.save-btn:hover { background-color: #cccccc; }
+    
     .explanation {
       max-width: 600px;
       margin: 20px auto;
@@ -142,6 +160,29 @@
       }
       .explanation {
         font-size: 14px;
+      }
+      button.save-btn {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 18px;
+      }
+      .profile-pic {
+        width: 100px;
+        height: 100px;
+      }
+      .form-group {
+        width: 90%;
+      }
+      button.save-btn {
+        font-size: 14px;
+        padding: 10px;
+      }
+      .upload-label {
+        padding: 6px 12px;
       }
     }
   </style>
