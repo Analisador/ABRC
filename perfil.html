@@ -168,12 +168,14 @@
         window.location.href = "LoginProjet.html";
         return;
       }
-      userId = user.id;  // Usar o ID do usuário logado
+      userId = user.id;  // Garantir que estamos pegando o ID correto do usuário logado
+      console.log("User ID:", userId);  // Verificando se estamos recebendo o ID corretamente
 
+      // Agora vamos verificar se o usuário existe na tabela
       const { data, error } = await supabaseClient
         .from('cadastro')
         .select('primeiro, segundo, terceiro')
-        .eq('id', userId)  // Buscar o usuário pelo ID
+        .eq('id', userId)  // Buscando pelo ID
         .single();
 
       if (error) {
@@ -182,6 +184,7 @@
         return;
       }
 
+      // Atualizando os campos com os dados do usuário
       if (data) {
         document.getElementById('primeiro').value = data.primeiro || '';
         document.getElementById('segundo').value = data.segundo || '';
@@ -196,11 +199,13 @@
       const segundo = document.getElementById('segundo').value || null;
       const terceiro = document.getElementById('terceiro').value || null;
 
-      // Atualizar os horários na linha do usuário usando o ID
+      console.log("Salvando horários para o usuário com ID:", userId);  // Verificação
+
+      // Atualizando os horários na linha do usuário usando o ID
       const { updateError } = await supabaseClient
         .from('cadastro')
         .update({ primeiro, segundo, terceiro })
-        .eq('id', userId); // Usando o ID do usuário para garantir a atualização correta
+        .eq('id', userId);  // Usando o ID do usuário para garantir a atualização correta
 
       if (updateError) {
         console.error("Erro ao atualizar horários:", updateError);
