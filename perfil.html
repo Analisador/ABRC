@@ -159,7 +159,7 @@
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs';
     const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
-    let userEmail = null;
+    let userId = null;
 
     async function carregarUsuario() {
       const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
@@ -168,12 +168,12 @@
         window.location.href = "LoginProjet.html";
         return;
       }
-      userEmail = user.email;
+      userId = user.id;  // Usar o ID do usuário logado
 
       const { data, error } = await supabaseClient
         .from('cadastro')
-        .select('primeiro, segundo, terceiro, id')
-        .eq('email', userEmail)
+        .select('primeiro, segundo, terceiro')
+        .eq('id', userId)  // Buscar o usuário pelo ID
         .single();
 
       if (error) {
@@ -196,23 +196,11 @@
       const segundo = document.getElementById('segundo').value || null;
       const terceiro = document.getElementById('terceiro').value || null;
 
-      // Verificar se o e-mail existe na tabela
-      const { data, error } = await supabaseClient
-        .from('cadastro')
-        .select('id')
-        .eq('email', userEmail)
-        .single();
-
-      if (error || !data) {
-        alert('Usuário não encontrado no banco de dados!');
-        return;
-      }
-
       // Atualizar os horários na linha do usuário usando o ID
       const { updateError } = await supabaseClient
         .from('cadastro')
         .update({ primeiro, segundo, terceiro })
-        .eq('id', data.id); // Usando o ID para identificar o usuário corretamente
+        .eq('id', userId); // Usando o ID do usuário para garantir a atualização correta
 
       if (updateError) {
         console.error("Erro ao atualizar horários:", updateError);
