@@ -29,6 +29,7 @@
       box-sizing: border-box;
       gap: 25px;
       transition: transform 0.3s ease;
+      justify-content: space-between; /* Mantém itens em cima e logo embaixo */
     }
 
     nav.sidebar h2 {
@@ -64,6 +65,24 @@
       stroke: white;
       width: 20px;
       height: 20px;
+    }
+
+    /* Logo no rodapé */
+    .sidebar-logo {
+      margin-top: auto;
+      text-align: center;
+    }
+
+    .sidebar-logo .logo {
+      max-width: 150px;
+      width: 100%;
+      height: auto;
+      opacity: 0.9;
+      transition: opacity 0.3s ease;
+    }
+
+    .sidebar-logo .logo:hover {
+      opacity: 1;
     }
 
     /* Conteúdo */
@@ -184,12 +203,17 @@
 
   <!-- Sidebar -->
   <nav class="sidebar" id="sidebar">
-    <h2>Painel</h2>
-    <button onclick="goToHome()"><i data-lucide="home"></i> Início</button>
-    <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
-    <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Classificação</button>
-    <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
-    <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
+    <div>
+      <h2>Painel</h2>
+      <button onclick="goToHome()"><i data-lucide="home"></i> Início</button>
+      <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
+      <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Classificação</button>
+      <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
+      <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
+    </div>
+    <div class="sidebar-logo">
+      <img src="images/logo-abrc.png" alt="Logo" class="logo">
+    </div>
   </nav>
 
   <!-- Conteúdo -->
@@ -235,7 +259,6 @@
 
     function updateLatestCards(data) {
       if (!data.length) return;
-
       const latest = data[data.length - 1];
       document.getElementById('downloadCard').textContent = `Download: ${latest.download} Mbps`;
       document.getElementById('uploadCard').textContent = `Upload: ${latest.upload} Mbps`;
