@@ -12,6 +12,7 @@
       font-family: Arial, Helvetica, sans-serif;
       background-image: linear-gradient(45deg, rgb(32, 94, 217), rgb(201, 4, 70));
       display: flex;
+      flex-direction: column;
       height: 100vh;
       color: white;
     }
@@ -23,14 +24,6 @@
       padding: 20px;
       box-sizing: border-box;
       gap: 25px;
-      position: fixed;
-      height: 100%;
-      top: 0;
-      left: -220px; /* Esconde a barra inicialmente */
-      transition: left 0.3s ease;
-    }
-    nav.sidebar.open {
-      left: 0; /* Mostra a barra lateral quando a classe 'open' é aplicada */
     }
     nav.sidebar h2 {
       margin: 0 0 30px 0;
@@ -54,7 +47,6 @@
     nav.sidebar button svg { stroke: white; width: 20px; height: 20px; }
     
     main.container {
-      margin-left: 0;
       flex-grow: 1;
       background-color: rgba(0, 0, 0, 0.8);
       margin: 20px;
@@ -65,10 +57,6 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      transition: margin-left 0.3s ease;
-    }
-    main.container.open {
-      margin-left: 240px; /* Desloca o conteúdo quando a barra lateral está aberta */
     }
     h1 {
       text-align: center;
@@ -152,14 +140,11 @@
         flex-direction: row;
         justify-content: space-around;
         padding: 10px 0;
-        position: static;
-        height: auto;
       }
       nav.sidebar h2 {
         font-size: 18px;
       }
       main.container {
-        margin-left: 0;
         margin: 10px;
         padding: 15px;
       }
@@ -305,20 +290,10 @@
       });
     }
 
-    // Função para abrir e fechar a barra lateral
-    function toggleSidebar() {
-      const sidebar = document.querySelector('.sidebar');
-      const container = document.querySelector('.container');
-      sidebar.classList.toggle('open');
-      container.classList.toggle('open');
-    }
-
     window.onload = () => {
       carregarUsuario();
       lucide.createIcons();
     };
   </script>
-
-  <button onclick="toggleSidebar()">Toggle Sidebar</button>
 </body>
 </html>
