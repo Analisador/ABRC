@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -188,9 +189,10 @@
       const segundo = document.getElementById('segundo').value || null;
       const terceiro = document.getElementById('terceiro').value || null;
 
-      const { data, error } = await supabaseClient
+      const { error } = await supabaseClient
         .from('cadastro')
-        .upsert({ email: userEmail, primeiro, segundo, terceiro }, { onConflict: ['email'] });  // Garantir que o email seja usado para identificar o usuário
+        .update({ primeiro, segundo, terceiro })
+        .eq('email', userEmail);
 
       if (error) {
         console.error("Erro Supabase:", error);
