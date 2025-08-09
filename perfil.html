@@ -12,7 +12,6 @@
       font-family: Arial, Helvetica, sans-serif;
       background-image: linear-gradient(45deg, rgb(32, 94, 217), rgb(201, 4, 70));
       display: flex;
-      flex-direction: column;
       height: 100vh;
       color: white;
     }
@@ -25,11 +24,7 @@
       box-sizing: border-box;
       gap: 25px;
     }
-    nav.sidebar h2 {
-      margin: 0 0 30px 0;
-      font-size: 22px;
-      text-align: center;
-    }
+    nav.sidebar h2 {margin: 0 0 30px 0; font-size: 22px; text-align: center;}
     nav.sidebar button {
       background: none;
       border: none;
@@ -43,26 +38,18 @@
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
-    nav.sidebar button:hover { background-color: #ff4e4e; }
-    nav.sidebar button svg { stroke: white; width: 20px; height: 20px; }
-    
+    nav.sidebar button:hover {background-color: #ff4e4e;}
+    nav.sidebar button svg {stroke: white; width: 20px; height: 20px;}
     main.container {
       flex-grow: 1;
       background-color: rgba(0, 0, 0, 0.8);
-      margin: 20px;
-      padding: 20px;
+      margin: 40px;
+      padding: 40px;
       border-radius: 20px;
       overflow-y: auto;
       box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
     }
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 24px;
-    }
+    h1 {text-align: center; margin-bottom: 20px;}
     .profile-section {
       display: flex;
       flex-direction: column;
@@ -77,7 +64,7 @@
       border: 4px solid white;
       margin-bottom: 10px;
     }
-    input[type="file"] { display: none; }
+    input[type="file"] {display: none;}
     .upload-label {
       background-color: #ffffff;
       color: black;
@@ -87,26 +74,20 @@
       font-weight: bold;
       transition: background 0.3s ease;
     }
-    .upload-label:hover { background-color: #cccccc; }
-    
+    .upload-label:hover {background-color: #cccccc;}
     .form-group {
-      max-width: 100%;
-      width: 100%;
+      max-width: 400px;
+      margin: 0 auto 20px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      align-items: center;
+      gap: 8px;
     }
-    label {
-      font-weight: bold;
-      text-align: center;
-    }
+    label {font-weight: bold;}
     input[type="time"] {
       padding: 10px;
       border: none;
       border-radius: 8px;
       font-size: 16px;
-      width: 80%;
     }
     button.save-btn {
       background-color: #ffffff;
@@ -118,11 +99,9 @@
       font-weight: bold;
       cursor: pointer;
       transition: background 0.3s ease;
-      width: 80%;
       margin-top: 20px;
     }
-    button.save-btn:hover { background-color: #cccccc; }
-    
+    button.save-btn:hover {background-color: #cccccc;}
     .explanation {
       max-width: 600px;
       margin: 20px auto;
@@ -131,59 +110,6 @@
       background-color: rgba(255, 255, 255, 0.1);
       padding: 15px;
       border-radius: 12px;
-    }
-
-    /* Responsividade para telas menores */
-    @media (max-width: 768px) {
-      nav.sidebar {
-        width: 100%;
-        flex-direction: row;
-        justify-content: space-around;
-        padding: 10px 0;
-      }
-      nav.sidebar h2 {
-        font-size: 18px;
-      }
-      main.container {
-        margin: 10px;
-        padding: 15px;
-      }
-      h1 {
-        font-size: 22px;
-      }
-      .profile-pic {
-        width: 120px;
-        height: 120px;
-      }
-      .form-group {
-        width: 100%;
-      }
-      .explanation {
-        font-size: 14px;
-      }
-      button.save-btn {
-        width: 100%;
-      }
-    }
-
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 18px;
-      }
-      .profile-pic {
-        width: 100px;
-        height: 100px;
-      }
-      .form-group {
-        width: 90%;
-      }
-      button.save-btn {
-        font-size: 14px;
-        padding: 10px;
-      }
-      .upload-label {
-        padding: 6px 12px;
-      }
     }
   </style>
 </head>
@@ -262,10 +188,9 @@
       const segundo = document.getElementById('segundo').value || null;
       const terceiro = document.getElementById('terceiro').value || null;
 
-      const { error } = await supabaseClient
+      const { data, error } = await supabaseClient
         .from('cadastro')
-        .update({ primeiro, segundo, terceiro })
-        .eq('email', userEmail);
+        .upsert({ email: userEmail, primeiro, segundo, terceiro }, { onConflict: ['email'] });  // Garantir que o email seja usado para identificar o usuário
 
       if (error) {
         console.error("Erro Supabase:", error);
