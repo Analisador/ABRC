@@ -4,24 +4,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Speed Test</title>
+  <title>Classificação de Tráfego</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/lucide@0.244.0/dist/lucide.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
   <style>
     body {
+      margin: 0;
       font-family: Arial, Helvetica, sans-serif;
       background-image: linear-gradient(45deg, rgb(32, 94, 217), rgb(201, 4, 70));
-      margin: 0;
-      padding: 0;
-      color: white;
       display: flex;
       height: 100vh;
-      overflow: hidden;
-      /* Para celular vamos ajustar depois */
+      color: white;
     }
 
+    /* Sidebar */
     nav.sidebar {
       background: rgba(0, 0, 0, 0.8);
       width: 220px;
@@ -30,18 +28,13 @@
       padding: 20px;
       box-sizing: border-box;
       gap: 25px;
-      flex-shrink: 0;
-      overflow-y: auto;
-      /* importante para scroll em celular */
+      transition: transform 0.3s ease;
     }
 
     nav.sidebar h2 {
       margin: 0 0 30px 0;
-      font-weight: 700;
       font-size: 22px;
       text-align: center;
-      color: white;
-      user-select: none;
     }
 
     nav.sidebar button {
@@ -49,15 +42,13 @@
       border: none;
       color: white;
       font-size: 18px;
-      text-align: left;
-      cursor: pointer;
       display: flex;
       align-items: center;
       gap: 12px;
       padding: 10px 12px;
       border-radius: 8px;
+      cursor: pointer;
       transition: background-color 0.3s ease;
-      user-select: none;
     }
 
     nav.sidebar button:hover {
@@ -68,9 +59,9 @@
       stroke: white;
       width: 20px;
       height: 20px;
-      flex-shrink: 0;
     }
 
+    /* Conteúdo */
     main.container {
       flex-grow: 1;
       background-color: rgba(0, 0, 0, 0.8);
@@ -79,246 +70,162 @@
       border-radius: 20px;
       overflow-y: auto;
       box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
+      position: relative;
     }
 
     h1 {
       text-align: center;
       margin-bottom: 30px;
-      user-select: none;
     }
 
-    .card-container {
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-      margin-bottom: 30px;
-      flex-wrap: wrap;
+    .grafico-pequeno {
+      width: 350px;
+      height: 350px;
     }
 
-    .card {
-      background-color: #ffffff;
-      color: black;
-      border-radius: 15px;
-      padding: 25px 30px;
-      font-size: 20px;
-      font-weight: bold;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-      transition: transform 0.3s ease;
+    /* Botão hamburguer */
+    .menu-toggle {
+      display: none;
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: rgba(0, 0, 0, 0.8);
+      border: none;
+      color: white;
+      padding: 8px;
+      border-radius: 8px;
       cursor: pointer;
-      min-width: 150px;
-      text-align: center;
-      flex: 1 1 200px;
-      max-width: 300px;
+      z-index: 1000;
     }
 
-    .card:hover {
-      transform: scale(1.05);
-      cursor: pointer;
-    }
-
-    .chart-block {
-      margin-top: 20px;
-      width: 100%;
-    }
-
-    canvas {
-      background-color: white;
-      border-radius: 10px;
-      padding: 15px;
-      max-height: 400px;
-      width: 100% !important;
-      height: auto !important;
-    }
-
-    /* Media queries para celular */
+    /* Mobile */
     @media (max-width: 768px) {
       body {
         flex-direction: column;
-        height: 100%;
-        overflow: visible;
       }
 
       nav.sidebar {
-        width: 100%;
-        flex-direction: row;
-        padding: 10px 5px;
-        gap: 10px;
-        overflow-x: auto;
-        overflow-y: hidden;
-        box-sizing: border-box;
-        margin-bottom: 10px;
-        border-radius: 0;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        transform: translateX(-100%);
+        z-index: 999;
       }
 
-      nav.sidebar h2 {
-        display: none;
+      nav.sidebar.active {
+        transform: translateX(0);
       }
 
-      nav.sidebar button {
-        font-size: 14px;
-        padding: 8px 10px;
-        white-space: nowrap;
-        flex: none;
-      }
-
-      nav.sidebar button svg {
-        width: 16px;
-        height: 16px;
+      .menu-toggle {
+        display: block;
       }
 
       main.container {
-        margin: 0 10px 20px 10px;
-        padding: 20px;
-        border-radius: 15px;
-        height: auto;
-        overflow: visible;
-      }
-
-      .card-container {
-        flex-direction: column;
-        gap: 15px;
-        margin-bottom: 20px;
-      }
-
-      .card {
-        max-width: 100%;
-        flex: none;
-        font-size: 18px;
+        margin: 20px;
         padding: 20px;
       }
 
-      .chart-block {
-        margin-top: 10px;
-      }
-
-      canvas {
-        max-height: 300px;
+      .grafico-pequeno {
+        width: 250px;
+        height: 250px;
       }
     }
   </style>
 </head>
 
 <body>
-  <nav class="sidebar">
+  <!-- Botão hamburguer -->
+  <button class="menu-toggle" onclick="toggleMenu()">
+    <i data-lucide="menu"></i>
+  </button>
+
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
     <h2>Painel</h2>
-    <button onclick="goToHome()">
-      <i data-lucide="home"></i> Início
-    </button>
-    <button onclick="verLogs()">
-      <i data-lucide="file-text"></i> Logs
-    </button>
-    <button onclick="verClassificacao()">
-      <i data-lucide="bar-chart-2"></i> Classificação
-    </button>
-    <button onclick="verPerfil()">
-      <i data-lucide="user"></i> Perfil
-    </button>
-    <button onclick="logout()">
-      <i data-lucide="log-out"></i> Logout
-    </button>
+    <button onclick="goToHome()"><i data-lucide="home"></i> Início</button>
+    <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
+    <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Classificação</button>
+    <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
+    <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
   </nav>
 
+  <!-- Conteúdo Principal -->
   <main class="container">
-    <h1>Speed Test</h1>
-
-    <div class="card-container">
-      <div class="card" id="downloadCard">Download: -- Mbps</div>
-      <div class="card" id="uploadCard">Upload: -- Mbps</div>
-    </div>
-
-    <div class="chart-block">
-      <canvas id="speedChart"></canvas>
-    </div>
+    <h1>Classificação de Tráfego</h1>
+    <canvas id="graficoTrafego" class="grafico-pequeno"></canvas>
   </main>
 
   <script>
-    const {createClient} = window.supabase;
+    const { createClient } = window.supabase;
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs';
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    let speedChartInstance;
+    function toggleMenu() {
+      document.getElementById("sidebar").classList.toggle("active");
+    }
 
-    async function fetchSpeedtest() {
-      const {data, error} = await supabase
-        .from('speedtest')
-        .select('timestamp, download, upload')
-        .order('timestamp', {ascending: true});
+    async function carregarDados() {
+      const { data, error } = await supabase
+        .from('trafego')
+        .select('timestamp, tipo, porta')
+        .order('timestamp', { ascending: false });
 
       if (error) {
-        console.error('Erro ao buscar speedtest:', error);
-        return [];
+        console.error("Erro ao buscar dados:", error);
+        return;
       }
-
-      updateLatestCards(data);
-      return data;
+      desenharGrafico(data);
     }
 
-    function updateLatestCards(data) {
-      if (!data.length) return;
+    function desenharGrafico(data) {
+      const contagem = {};
+      data.forEach(registro => {
+        const tipo = registro.tipo || 'Desconhecido';
+        contagem[tipo] = (contagem[tipo] || 0) + 1;
+      });
 
-      const latest = data[data.length - 1];
-      document.getElementById('downloadCard').textContent = `Download: ${latest.download} Mbps`;
-      document.getElementById('uploadCard').textContent = `Upload: ${latest.upload} Mbps`;
-    }
-
-    function renderSpeedChart(data) {
-      const labels = data.map(d => new Date(d.timestamp).toLocaleString());
-      const download = data.map(d => d.download);
-      const upload = data.map(d => d.upload);
-
-      if (speedChartInstance) speedChartInstance.destroy();
-
-      speedChartInstance = new Chart(document.getElementById('speedChart'), {
-        type: 'line',
+      const ctx = document.getElementById('graficoTrafego').getContext('2d');
+      new Chart(ctx, {
+        type: 'pie',
         data: {
-          labels,
-          datasets: [
-            {label: 'Download (Mbps)', data: download, borderColor: 'red', fill: false},
-            {label: 'Upload (Mbps)', data: upload, borderColor: 'blue', fill: false}
-          ]
+          labels: Object.keys(contagem),
+          datasets: [{
+            label: 'Tipos de Tráfego',
+            data: Object.values(contagem),
+            backgroundColor: ['#4e9cff', '#f54291', '#33cc33', '#ffa500', '#cc33ff', '#ff3333', '#00cccc'],
+            borderColor: 'white',
+            borderWidth: 2
+          }]
         },
         options: {
           responsive: true,
           plugins: {
-            legend: {labels: {color: 'black'}}
-          },
-          scales: {
-            x: {ticks: {color: 'black'}},
-            y: {ticks: {color: 'black'}}
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (context) => `${context.label}: ${context.parsed}`
+              }
+            }
           }
         }
       });
     }
 
-    function verLogs() {
-      window.location.href = 'logs.html';
-    }
-
-    function verClassificacao() {
-      window.location.href = 'classificação.html';
-    }
-
-    function verPerfil() {
-      window.location.href = 'perfil.html';
-    }
-
+    function goToHome() { window.location.href = 'base.html'; }
+    function verLogs() { window.location.href = 'logs.html'; }
+    function verClassificacao() { window.location.href = 'classificação.html'; }
+    function verPerfil() { window.location.href = 'perfil.html'; }
     function logout() {
       supabase.auth.signOut().then(() => {
         window.location.href = 'index.html';
       });
     }
 
-    function goToHome() {
-      fetchSpeedtest().then(data => renderSpeedChart(data));
-    }
-
     window.onload = () => {
-      fetchSpeedtest().then(data => renderSpeedChart(data));
-      lucide.replace();
+      carregarDados();
+      lucide.createIcons();
     };
   </script>
 </body>
