@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -189,10 +188,22 @@
       const segundo = document.getElementById('segundo').value || null;
       const terceiro = document.getElementById('terceiro').value || null;
 
+      // Buscar o usuário pelo email
+      const { data: userData, error: userError } = await supabaseClient
+        .from('cadastro')
+        .select('id')
+        .eq('email', userEmail)
+        .single();
+
+      if (userError || !userData) {
+        alert('Usuário não encontrado!');
+        return;
+      }
+
       const { error } = await supabaseClient
         .from('cadastro')
         .update({ primeiro, segundo, terceiro })
-        .eq('email', userEmail);
+        .eq('id', userData.id); // Atualizar com base no ID do usuário
 
       if (error) {
         console.error("Erro Supabase:", error);
