@@ -1,119 +1,222 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel - Classificação de Tráfego</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            display: flex;
-            min-height: 100vh;
-            background-color: #0d0d1a;
-            color: white;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Classificação de Tráfego</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.244.0/dist/lucide.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background-image: linear-gradient(45deg, rgb(32, 94, 217), rgb(201, 4, 70));
+      margin: 0;
+      padding: 0;
+      color: white;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
 
-        /* Menu lateral */
-        .sidebar {
-            width: 220px;
-            background: linear-gradient(to bottom, #0d0d1a, #1e1e2f);
-            padding-top: 20px;
-            flex-shrink: 0;
-            transition: width 0.3s;
-        }
-        .sidebar h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 1.4rem;
-        }
-        .sidebar a {
-            display: flex;
-            align-items: center;
-            padding: 12px 20px;
-            color: white;
-            text-decoration: none;
-            font-size: 1rem;
-            transition: background 0.2s;
-        }
-        .sidebar a:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        .sidebar i {
-            margin-right: 10px;
-            font-size: 1.2rem;
-        }
+    nav.sidebar {
+      background: rgba(0, 0, 0, 0.8);
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      box-sizing: border-box;
+      gap: 25px;
+    }
 
-        /* Conteúdo */
-        .content {
-            flex: 1;
-            padding: 20px;
-        }
+    nav.sidebar h2 {
+      margin: 0 0 30px 0;
+      font-weight: 700;
+      font-size: 22px;
+      text-align: center;
+      color: white;
+      user-select: none;
+    }
 
-        /* Título centralizado */
-        .content h1 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+    nav.sidebar button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 18px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
 
-        /* Responsividade */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 60px;
-            }
-            .sidebar h2 {
-                display: none;
-            }
-            .sidebar a span {
-                display: none;
-            }
-            .sidebar i {
-                margin-right: 0;
-                font-size: 1.4rem;
-            }
-        }
-    </style>
+    nav.sidebar button:hover {
+      background-color: #ff4e4e;
+    }
+
+    nav.sidebar button svg {
+      stroke: white;
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    main.container {
+      flex-grow: 1;
+      background-color: rgba(0, 0, 0, 0.8);
+      margin: 40px;
+      padding: 40px;
+      border-radius: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      user-select: none;
+      width: 100%;
+      color: white;
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .grafico-pequeno {
+      width: 350px;
+      height: 350px;
+    }
+  </style>
 </head>
+
 <body>
-    <div class="sidebar">
-        <h2>Painel</h2>
-        <a href="#"><i class="fas fa-home"></i><span>Início</span></a>
-        <a href="#"><i class="fas fa-file-alt"></i><span>Logs</span></a>
-        <a href="#"><i class="fas fa-chart-bar"></i><span>Classificação</span></a>
-        <a href="#"><i class="fas fa-user"></i><span>Perfil</span></a>
-        <a href="#"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
-    </div>
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <h2>Painel</h2>
+    <button onclick="goToHome()">
+      <i data-lucide="home"></i> Início
+    </button>
+    <button onclick="verLogs()">
+      <i data-lucide="file-text"></i> Logs
+    </button>
+    <button onclick="verClassificacao()">
+      <i data-lucide="bar-chart-2"></i> Classificação
+    </button>
+    <button onclick="verPerfil()">
+      <i data-lucide="user"></i> Perfil
+    </button>
+    <button onclick="logout()">
+      <i data-lucide="log-out"></i> Logout
+    </button>
+  </nav>
 
-    <div class="content">
-        <h1>Classificação de Tráfego</h1>
-        <canvas id="trafficChart"></canvas>
-    </div>
+  <!-- Conteúdo Principal -->
+  <main class="container">
+    <h1>Classificação de Tráfego</h1>
+    <canvas id="graficoTrafego" class="grafico-pequeno"></canvas>
+  </main>
 
-    <script>
-        const ctx = document.getElementById('trafficChart').getContext('2d');
-        const trafficChart = new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: ['Web - HTTP (Navegação não segura)', 'Outros', 'Seguros', 'Apps', 'Diversos'],
-                datasets: [{
-                    data: [12, 30, 20, 15, 8],
-                    backgroundColor: ['#4e79a7', '#f28e2b', '#e15759', '#76b7b2', '#59a14f']
-                }]
+  <script>
+    const {createClient} = window.supabase;
+    const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs';
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    async function carregarDados() {
+      const {data, error} = await supabase
+        .from('trafego')
+        .select('timestamp, tipo, porta')
+        .order('timestamp', {ascending: false});
+
+      if (error) {
+        console.error("Erro ao buscar dados:", error);
+        return;
+      }
+
+      desenharGrafico(data);
+    }
+
+    function desenharGrafico(data) {
+      const contagem = {};
+      data.forEach(registro => {
+        const tipo = registro.tipo || 'Desconhecido';
+        contagem[tipo] = (contagem[tipo] || 0) + 1;
+      });
+
+      const ctx = document.getElementById('graficoTrafego').getContext('2d');
+
+      new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(contagem),
+          datasets: [{
+            label: 'Tipos de Tráfego',
+            data: Object.values(contagem),
+            backgroundColor: [
+              '#4e9cff', '#f54291', '#33cc33', '#ffa500', '#cc33ff', '#ff3333', '#00cccc'
+            ],
+            borderColor: 'white',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: false, // Não mostra legenda fixa
             },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            color: 'white'
-                        }
-                    }
+            tooltip: {
+              enabled: true,
+              callbacks: {
+                label: function (context) {
+                  const label = context.label || '';
+                  const value = context.parsed || 0;
+                  return `${label}: ${value}`;
                 }
+              }
             }
-        });
-    </script>
+          }
+        }
+      });
+    }
+
+    // Navegação do menu lateral
+    function goToHome() {
+      window.location.href = 'base.html';
+    }
+
+    function verLogs() {
+      window.location.href = 'logs.html';
+    }
+
+    function verClassificacao() {
+      window.location.href = 'classificação.html';
+    }
+
+    function verPerfil() {
+      window.location.href = 'perfil.html';
+    }
+
+    function logout() {
+      supabase.auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      });
+    }
+
+    window.onload = () => {
+      carregarDados();
+      lucide.replace();
+    };
+  </script>
 </body>
+
+
 </html>
