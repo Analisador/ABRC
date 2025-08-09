@@ -7,7 +7,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.244.0/dist/lucide.min.js"></script>
   <style>
     body {
       font-family: Arial, Helvetica, sans-serif;
@@ -16,12 +16,12 @@
       padding: 0;
       color: white;
       display: flex;
+      flex-direction: column;
       height: 100vh;
-      overflow: hidden;
     }
 
     nav.sidebar {
-      background: rgba(0,0,0,0.8);
+      background: rgba(0, 0, 0, 0.8);
       width: 220px;
       display: flex;
       flex-direction: column;
@@ -32,11 +32,9 @@
 
     nav.sidebar h2 {
       margin: 0 0 30px 0;
-      font-weight: 700;
       font-size: 22px;
       text-align: center;
-      color: white;
-      user-select: none;
+      font-weight: bold;
     }
 
     nav.sidebar button {
@@ -44,27 +42,17 @@
       border: none;
       color: white;
       font-size: 18px;
-      text-align: left;
-      cursor: pointer;
       display: flex;
       align-items: center;
       gap: 12px;
       padding: 10px 12px;
       border-radius: 8px;
+      cursor: pointer;
       transition: background-color 0.3s ease;
-      user-select: none;
     }
 
-    nav.sidebar button:hover {
-      background-color: #ff4e4e;
-    }
-
-    nav.sidebar button svg {
-      stroke: white;
-      width: 20px;
-      height: 20px;
-      flex-shrink: 0;
-    }
+    nav.sidebar button:hover {background-color: #ff4e4e;}
+    nav.sidebar button svg {stroke: white; width: 20px; height: 20px;}
 
     main.container {
       flex-grow: 1;
@@ -78,8 +66,9 @@
 
     h1 {
       text-align: center;
-      margin-bottom: 30px;
-      user-select: none;
+      margin-bottom: 20px;
+      font-size: 28px;
+      font-weight: bold;
     }
 
     .card-container {
@@ -117,9 +106,59 @@
       max-height: 400px;
       width: 100% !important;
     }
+
+    /* Menu hambúrguer */
+    .hamburger-menu {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      width: 30px;
+      height: 25px;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .hamburger-menu div {
+      width: 100%;
+      height: 5px;
+      background-color: white;
+      border-radius: 5px;
+    }
+
+    @media (max-width: 768px) {
+      nav.sidebar {
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: -100%;
+        height: 100%;
+        transition: left 0.3s ease;
+      }
+
+      nav.sidebar.open {
+        left: 0;
+      }
+
+      .hamburger-menu {
+        display: flex;
+        margin: 15px;
+      }
+
+      main.container {
+        margin-left: 0;
+      }
+    }
   </style>
 </head>
 <body>
+  <!-- Menu hambúrguer -->
+  <div class="hamburger-menu" onclick="toggleMenu()">
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
+
   <nav class="sidebar">
     <h2>Painel</h2>
     <button onclick="goToHome()">
@@ -212,16 +251,12 @@
       });
     }
 
-    function verLogs() {
-      window.location.href = 'logs.html';
-    }
-
-    function verClassificacao() {
-      window.location.href = 'classificação.html';
-    }
-
-    function verPerfil() {
-      window.location.href = 'perfil.html';
+    function navigateTo(page) {
+      if (page === 'home') {
+        fetchSpeedtest().then(data => renderSpeedChart(data));
+      } else {
+        window.location.href = `${page}.html`;
+      }
     }
 
     function logout() {
@@ -230,13 +265,14 @@
       });
     }
 
-    function goToHome() {
-      fetchSpeedtest().then(data => renderSpeedChart(data));
+    function toggleMenu() {
+      const sidebar = document.querySelector('nav.sidebar');
+      sidebar.classList.toggle('open');
     }
 
     window.onload = () => {
       fetchSpeedtest().then(data => renderSpeedChart(data));
-      lucide.replace();  // Gera os ícones conforme esperado
+      lucide.replace();
     };
   </script>
 </body>
