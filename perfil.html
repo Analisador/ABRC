@@ -25,6 +25,12 @@
       gap: 25px;
       position: fixed;
       height: 100%;
+      top: 0;
+      left: -220px; /* Esconde a barra inicialmente */
+      transition: left 0.3s ease;
+    }
+    nav.sidebar.open {
+      left: 0; /* Mostra a barra lateral quando a classe 'open' é aplicada */
     }
     nav.sidebar h2 {
       margin: 0 0 30px 0;
@@ -48,7 +54,7 @@
     nav.sidebar button svg { stroke: white; width: 20px; height: 20px; }
     
     main.container {
-      margin-left: 240px; /* Adjusted to make room for the sidebar */
+      margin-left: 0;
       flex-grow: 1;
       background-color: rgba(0, 0, 0, 0.8);
       margin: 20px;
@@ -59,6 +65,10 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      transition: margin-left 0.3s ease;
+    }
+    main.container.open {
+      margin-left: 240px; /* Desloca o conteúdo quando a barra lateral está aberta */
     }
     h1 {
       text-align: center;
@@ -233,7 +243,82 @@
   </main>
 
   <script>
-    // JavaScript do seu código
+    const { createClient } = supabase;
+    const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs';
+    const supabaseClient = createClient(supabaseUrl, supabaseKey);
+
+    let userEmail = null;
+
+    async function carregarUsuario() {
+      const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+      if (userError || !user) {
+        alert("Usuário não autenticado");
+        window.location.href = "LoginProjet.html";
+        return;
+      }
+      userEmail = user.email;
+
+      const { data, error } = await supabaseClient
+        .from('cadastro')
+        .select('primeiro, segundo, terceiro')
+        .eq('email', userEmail)
+        .single();
+
+      if (!error && data) {
+        document.getElementById('primeiro').value = data.primeiro || '';
+        document.getElementById('segundo').value = data.segundo || '';
+        document.getElementById('terceiro').value = data.terceiro || '';
+      }
+    }
+
+    async function salvarHorarios() {
+      const primeiro = document.getElementById('primeiro').value || null;
+      const segundo = document.getElementById('segundo').value || null;
+      const terceiro = document.getElementById('terceiro').value || null;
+
+      const { error } = await supabaseClient
+        .from('cadastro')
+        .update({ primeiro, segundo, terceiro })
+        .eq('email', userEmail);
+
+      if (error) {
+        console.error("Erro Supabase:", error);
+        alert('Erro ao salvar horários: ' + error.message);
+      } else {
+        alert('Horários salvos com sucesso!');
+      }
+    }
+
+    function mostrarPreview(event) {
+      const img = document.getElementById('preview');
+      img.src = URL.createObjectURL(event.target.files[0]);
+    }
+
+    function goToHome() { window.location.href = 'base.html'; }
+    function verLogs() { window.location.href = 'logs.html'; }
+    function verClassificacao() { window.location.href = 'classificação.html'; }
+    function verPerfil() { window.location.href = 'perfil.html'; }
+    function logout() {
+      supabaseClient.auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      });
+    }
+
+    // Função para abrir e fechar a barra lateral
+    function toggleSidebar() {
+      const sidebar = document.querySelector('.sidebar');
+      const container = document.querySelector('.container');
+      sidebar.classList.toggle('open');
+      container.classList.toggle('open');
+    }
+
+    window.onload = () => {
+      carregarUsuario();
+      lucide.createIcons();
+    };
   </script>
+
+  <button onclick="toggleSidebar()">Toggle Sidebar</button>
 </body>
 </html>
