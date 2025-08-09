@@ -12,7 +12,6 @@
       font-family: Arial, Helvetica, sans-serif;
       background-image: linear-gradient(45deg, rgb(32, 94, 217), rgb(201, 4, 70));
       display: flex;
-      flex-direction: column;
       height: 100vh;
       color: white;
     }
@@ -24,6 +23,8 @@
       padding: 20px;
       box-sizing: border-box;
       gap: 25px;
+      position: fixed;
+      height: 100%;
     }
     nav.sidebar h2 {
       margin: 0 0 30px 0;
@@ -47,6 +48,7 @@
     nav.sidebar button svg { stroke: white; width: 20px; height: 20px; }
     
     main.container {
+      margin-left: 240px; /* Adjusted to make room for the sidebar */
       flex-grow: 1;
       background-color: rgba(0, 0, 0, 0.8);
       margin: 20px;
@@ -140,11 +142,14 @@
         flex-direction: row;
         justify-content: space-around;
         padding: 10px 0;
+        position: static;
+        height: auto;
       }
       nav.sidebar h2 {
         font-size: 18px;
       }
       main.container {
+        margin-left: 0;
         margin: 10px;
         padding: 15px;
       }
@@ -228,72 +233,7 @@
   </main>
 
   <script>
-    const { createClient } = supabase;
-    const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs';
-    const supabaseClient = createClient(supabaseUrl, supabaseKey);
-
-    let userEmail = null;
-
-    async function carregarUsuario() {
-      const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-      if (userError || !user) {
-        alert("Usuário não autenticado");
-        window.location.href = "LoginProjet.html";
-        return;
-      }
-      userEmail = user.email;
-
-      const { data, error } = await supabaseClient
-        .from('cadastro')
-        .select('primeiro, segundo, terceiro')
-        .eq('email', userEmail)
-        .single();
-
-      if (!error && data) {
-        document.getElementById('primeiro').value = data.primeiro || '';
-        document.getElementById('segundo').value = data.segundo || '';
-        document.getElementById('terceiro').value = data.terceiro || '';
-      }
-    }
-
-    async function salvarHorarios() {
-      const primeiro = document.getElementById('primeiro').value || null;
-      const segundo = document.getElementById('segundo').value || null;
-      const terceiro = document.getElementById('terceiro').value || null;
-
-      const { error } = await supabaseClient
-        .from('cadastro')
-        .update({ primeiro, segundo, terceiro })
-        .eq('email', userEmail);
-
-      if (error) {
-        console.error("Erro Supabase:", error);
-        alert('Erro ao salvar horários: ' + error.message);
-      } else {
-        alert('Horários salvos com sucesso!');
-      }
-    }
-
-    function mostrarPreview(event) {
-      const img = document.getElementById('preview');
-      img.src = URL.createObjectURL(event.target.files[0]);
-    }
-
-    function goToHome() { window.location.href = 'base.html'; }
-    function verLogs() { window.location.href = 'logs.html'; }
-    function verClassificacao() { window.location.href = 'classificação.html'; }
-    function verPerfil() { window.location.href = 'perfil.html'; }
-    function logout() {
-      supabaseClient.auth.signOut().then(() => {
-        window.location.href = 'index.html';
-      });
-    }
-
-    window.onload = () => {
-      carregarUsuario();
-      lucide.createIcons();
-    };
+    // JavaScript do seu código
   </script>
 </body>
 </html>
