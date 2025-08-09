@@ -172,14 +172,22 @@
 
       const { data, error } = await supabaseClient
         .from('cadastro')
-        .select('primeiro, segundo, terceiro')
+        .select('primeiro, segundo, terceiro, id')
         .eq('email', userEmail)
         .single();
 
-      if (!error && data) {
+      if (error) {
+        console.error("Erro ao carregar dados:", error);
+        alert('Erro ao carregar dados do usuário.');
+        return;
+      }
+
+      if (data) {
         document.getElementById('primeiro').value = data.primeiro || '';
         document.getElementById('segundo').value = data.segundo || '';
         document.getElementById('terceiro').value = data.terceiro || '';
+      } else {
+        alert('Usuário não encontrado.');
       }
     }
 
@@ -188,26 +196,27 @@
       const segundo = document.getElementById('segundo').value || null;
       const terceiro = document.getElementById('terceiro').value || null;
 
-      // Buscar o usuário pelo email
-      const { data: userData, error: userError } = await supabaseClient
+      // Verificar se o e-mail existe na tabela
+      const { data, error } = await supabaseClient
         .from('cadastro')
         .select('id')
         .eq('email', userEmail)
         .single();
 
-      if (userError || !userData) {
-        alert('Usuário não encontrado!');
+      if (error || !data) {
+        alert('Usuário não encontrado no banco de dados!');
         return;
       }
 
-      const { error } = await supabaseClient
+      // Atualizar os horários na linha do usuário usando o ID
+      const { updateError } = await supabaseClient
         .from('cadastro')
         .update({ primeiro, segundo, terceiro })
-        .eq('id', userData.id); // Atualizar com base no ID do usuário
+        .eq('id', data.id); // Usando o ID para identificar o usuário corretamente
 
-      if (error) {
-        console.error("Erro Supabase:", error);
-        alert('Erro ao salvar horários: ' + error.message);
+      if (updateError) {
+        console.error("Erro ao atualizar horários:", updateError);
+        alert('Erro ao salvar horários: ' + updateError.message);
       } else {
         alert('Horários salvos com sucesso!');
       }
