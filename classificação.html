@@ -10,13 +10,12 @@
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.244.0/dist/lucide.min.js"></script>
   <style>
     body {
+      margin: 0;
       font-family: Arial, Helvetica, sans-serif;
       background-image: linear-gradient(45deg, rgb(32, 94, 217), rgb(201, 4, 70));
-      margin: 0;
-      padding: 0;
-      color: white;
       display: flex;
       height: 100vh;
+      color: white;
       overflow: hidden;
     }
 
@@ -32,11 +31,9 @@
 
     nav.sidebar h2 {
       margin: 0 0 30px 0;
-      font-weight: 700;
       font-size: 22px;
       text-align: center;
       color: white;
-      user-select: none;
     }
 
     nav.sidebar button {
@@ -44,15 +41,13 @@
       border: none;
       color: white;
       font-size: 18px;
-      text-align: left;
-      cursor: pointer;
       display: flex;
       align-items: center;
       gap: 12px;
       padding: 10px 12px;
       border-radius: 8px;
+      cursor: pointer;
       transition: background-color 0.3s ease;
-      user-select: none;
     }
 
     nav.sidebar button:hover {
@@ -63,7 +58,6 @@
       stroke: white;
       width: 20px;
       height: 20px;
-      flex-shrink: 0;
     }
 
     main.container {
@@ -72,9 +66,7 @@
       margin: 40px;
       padding: 40px;
       border-radius: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      overflow-y: auto;
       box-sizing: border-box;
     }
 
@@ -84,20 +76,78 @@
       user-select: none;
       width: 100%;
       color: white;
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
     }
 
     .grafico-pequeno {
-      width: 350px;
-      height: 350px;
+      width: 100%;
+      max-width: 350px;
+      height: auto;
+      max-height: 350px;
+    }
+
+    /* Menu Hamburguer */
+    .hamburger-menu {
+      display: none;
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 10px;
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 10;
+    }
+
+    .hamburger-menu div {
+      width: 25px;
+      height: 3px;
+      background-color: white;
+      margin: 5px;
+      transition: transform 0.3s;
+    }
+
+    @media screen and (max-width: 768px) {
+      nav.sidebar {
+        position: fixed;
+        top: 0;
+        left: -220px;
+        height: 100%;
+        transition: left 0.3s ease;
+      }
+
+      nav.sidebar.open {
+        left: 0;
+      }
+
+      .hamburger-menu {
+        display: block;
+      }
+
+      nav.sidebar h2 {
+        font-size: 20px;
+      }
+
+      nav.sidebar button {
+        font-size: 16px;
+        padding: 8px 10px;
+      }
+
+      main.container {
+        margin: 20px;
+        padding: 20px;
+      }
     }
   </style>
 </head>
 
 <body>
+  <!-- Menu Hambúrguer -->
+  <button class="hamburger-menu" onclick="toggleSidebar()">
+    <div></div>
+    <div></div>
+    <div></div>
+  </button>
+
   <!-- Sidebar -->
   <nav class="sidebar">
     <h2>Painel</h2>
@@ -188,6 +238,12 @@
       });
     }
 
+    // Função para abrir/fechar a sidebar
+    function toggleSidebar() {
+      const sidebar = document.querySelector('nav.sidebar');
+      sidebar.classList.toggle('open');
+    }
+
     // Navegação do menu lateral
     function goToHome() {
       window.location.href = 'base.html';
@@ -217,6 +273,5 @@
     };
   </script>
 </body>
-
 
 </html>
