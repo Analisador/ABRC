@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -6,37 +7,177 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cadastro</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
       font-family: Arial, Helvetica, sans-serif;
       background-image: linear-gradient(to right, rgb(32, 94, 217), rgb(201, 4, 70));
-      min-height: 100vh; padding: 20px; display: flex; justify-content: center; align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
-    .box { background-color: rgba(0, 0, 0, 0.7); color: white; padding: 30px; border-radius: 15px; width: 100%; max-width: 500px; }
-    fieldset { border: 2px solid dodgerblue; border-radius: 10px; padding: 20px; }
-    legend { background-color: dodgerblue; padding: 10px; border-radius: 8px; font-weight: bold; text-align: center; color: white; font-size: 20px; }
-    .inputBox { margin-bottom: 20px; position: relative; }
-    .dataBox { margin-bottom: 30px; }
-    .inputUser { background: none; border: none; border-bottom: 1px solid white; outline: none; color: white; font-size: 15px; width: 100%; padding: 5px 0; }
-    .labelInput { position: absolute; top: 0; left: 0; pointer-events: none; transition: 0.5s; }
-    .inputUser:focus~.labelInput, .inputUser:valid~.labelInput { top: -18px; font-size: 12px; color: dodgerblue; }
-    input[type="date"] { padding: 8px; border-radius: 8px; border: none; outline: none; font-size: 15px; width: 100%; margin-top: 5px; }
-    #submit { background-image: linear-gradient(to right, rgb(52, 58, 255), rgb(132, 192, 251)); border: none; width: 100%; padding: 15px; color: white; font-size: 15px; cursor: pointer; border-radius: 10px; margin-top: 20px; }
-    #submit:hover { background-image: linear-gradient(to right, rgb(37, 42, 174), rgb(86, 129, 172)); }
-    .back-login { text-align: center; margin-top: 15px; }
-    .back-login a { color: dodgerblue; text-decoration: none; }
-    .radio-group { margin: 10px 0; }
-    .senha-feedback { font-size: 14px; color: red; margin-top: 5px; margin-bottom: 5px; }
-    .forca-senha { font-size: 14px; margin-top: 5px; margin-bottom: 10px; display: block; }
-    .forca-senha.fraca { color: red; }
-    .forca-senha.media { color: orange; }
-    .forca-senha.forte { color: limegreen; }
-    .toggle-olho { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: white; }
+
+    .box {
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 30px;
+      border-radius: 15px;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    fieldset {
+      border: 2px solid dodgerblue;
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    legend {
+      background-color: dodgerblue;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      text-align: center;
+      color: white;
+      font-size: 20px;
+    }
+
+    .inputBox {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .dataBox {
+      margin-bottom: 30px;
+    }
+
+    .inputUser {
+      background: none;
+      border: none;
+      border-bottom: 1px solid white;
+      outline: none;
+      color: white;
+      font-size: 15px;
+      width: 100%;
+      padding: 5px 0;
+    }
+
+    .labelInput {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      transition: 0.5s;
+    }
+
+    .inputUser:focus~.labelInput,
+    .inputUser:valid~.labelInput {
+      top: -18px;
+      font-size: 12px;
+      color: dodgerblue;
+    }
+
+    input[type="date"] {
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      font-size: 15px;
+      width: 100%;
+      margin-top: 5px;
+    }
+
+    #submit {
+      background-image: linear-gradient(to right, rgb(52, 58, 255), rgb(132, 192, 251));
+      border: none;
+      width: 100%;
+      padding: 15px;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
+    #submit:hover {
+      background-image: linear-gradient(to right, rgb(37, 42, 174), rgb(86, 129, 172));
+    }
+
+    .back-login {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .back-login a {
+      color: dodgerblue;
+      text-decoration: none;
+    }
+
+    .radio-group {
+      margin: 10px 0;
+    }
+
+    .senha-feedback {
+      font-size: 14px;
+      color: red;
+      margin-top: 5px;
+      margin-bottom: 5px;
+    }
+
+    .forca-senha {
+      font-size: 14px;
+      margin-top: 5px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .forca-senha.fraca {
+      color: red;
+    }
+
+    .forca-senha.media {
+      color: orange;
+    }
+
+    .forca-senha.forte {
+      color: limegreen;
+    }
+
+    .toggle-olho {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: white;
+    }
+
     @media (max-width: 600px) {
-      .box { padding: 20px; }
-      legend { font-size: 18px; }
-      .inputUser, input[type="date"] { font-size: 14px; }
-      #submit { font-size: 14px; padding: 12px; }
+      .box {
+        padding: 20px;
+      }
+
+      legend {
+        font-size: 18px;
+      }
+
+      .inputUser,
+      input[type="date"] {
+        font-size: 14px;
+      }
+
+      #submit {
+        font-size: 14px;
+        padding: 12px;
+      }
     }
   </style>
 </head>
@@ -117,10 +258,10 @@
   </div>
 
   <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // sua anon key
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // Chave encurtada
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const form = document.getElementById('cadastro-form');
@@ -129,6 +270,7 @@
     const senhaFeedback = document.getElementById('senha-feedback');
     const forcaSenha = document.getElementById('forca-senha');
 
+    // Permitir enviar com Enter
     form.addEventListener('keypress', function (event) {
       if (event.key === 'Enter') {
         event.preventDefault();
@@ -139,57 +281,51 @@
     form.addEventListener('submit', async function (event) {
       event.preventDefault();
 
-      const email = document.getElementById('email').value.trim();
+      const email = document.getElementById('email').value;
       const senha = senhaInput.value;
       const confirmarSenha = confirmarInput.value;
-      const nome = document.getElementById('nome').value.trim();
-      const telefone = document.getElementById('telefone').value.trim();
+      const nome = document.getElementById('nome').value;
+      const telefone = document.getElementById('telefone').value;
       const sexo = document.querySelector('input[name="genero"]:checked')?.value;
-      const data_nascimento = document.getElementById('data_nascimento').value; // yyyy-mm-dd
-      const cidade = document.getElementById('cidade').value.trim();
-      const estado = document.getElementById('estado').value.trim();
-      const endereco = document.getElementById('endereco').value.trim();
+      const data_nascimento = document.getElementById('data_nascimento').value;
+      const cidade = document.getElementById('cidade').value;
+      const estado = document.getElementById('estado').value;
+      const endereco = document.getElementById('endereco').value;
 
       if (senha !== confirmarSenha) {
         senhaFeedback.textContent = "As senhas não coincidem.";
         return;
       }
+
       if (senha.length < 8 || !/[A-Z]/.test(senha) || !/[0-9]/.test(senha)) {
         senhaFeedback.textContent = "A senha deve ter no mínimo 8 caracteres, com letra maiúscula e número.";
         return;
       }
+
       senhaFeedback.textContent = "";
 
-      // 1) Criar usuário de autenticação
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email, password: senha });
+      const {error: signUpError} = await supabase.auth.signUp({email, password: senha});
+
       if (signUpError) {
         alert('Erro ao criar conta: ' + signUpError.message);
         return;
       }
 
-      const userId = signUpData?.user?.id; // mesmo se exigir confirmação de e-mail, o id existe
+      const {error: insertError} = await supabase.from('cadastro').insert([{
+        email,
+        nome,
+        telefone,
+        sexo,
+        data_de_nascimento: data_nascimento,
+        cidade,
+        estado,
+        endereco
+      }]);
 
-      // 2) Inserir/atualizar linha na tabela "cadastro" AMARRADA ao user_id
-      //    Use upsert para evitar duplicação se o usuário tentar cadastrar de novo
-      const { error: upsertError } = await supabase
-        .from('cadastro')
-        .upsert({
-          user_id: userId,
-          email,
-          nome,
-          telefone,
-          sexo,
-          data_de_nascimento: data_nascimento, // mantenha o nome da sua coluna
-          cidade,
-          estado,
-          endereco
-          // as colunas de horário (primeiro, segundo, terceiro) ficam NULL por enquanto
-        }, { onConflict: 'user_id' });
-
-      if (upsertError) {
-        alert('Erro ao salvar dados: ' + upsertError.message);
+      if (insertError) {
+        alert('Erro ao salvar dados: ' + insertError.message);
       } else {
-        alert('Cadastro realizado com sucesso! Verifique seu e-mail para confirmar a conta (se aplicável).');
+        alert('Cadastro realizado com sucesso!');
         window.location.href = 'index.html';
       }
     });
@@ -197,6 +333,7 @@
     senhaInput.addEventListener('input', () => {
       const senha = senhaInput.value;
       let forca = 0;
+
       if (senha.length >= 8) forca++;
       if (/[A-Z]/.test(senha)) forca++;
       if (/[0-9]/.test(senha)) forca++;
@@ -220,4 +357,5 @@
     };
   </script>
 </body>
+
 </html>
