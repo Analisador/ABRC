@@ -7,29 +7,180 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    body { margin:0; font-family:Arial,Helvetica,sans-serif; background-image:linear-gradient(45deg,rgb(32,94,217),rgb(201,4,70)); display:flex; height:100vh; color:white; }
-    nav.sidebar { background:rgba(0,0,0,0.8); width:220px; display:flex; flex-direction:column; padding:20px; box-sizing:border-box; gap:25px; }
-    nav.sidebar h2 { margin:0 0 30px 0; font-size:22px; text-align:center; }
-    nav.sidebar button { background:none; border:none; color:white; font-size:18px; display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:8px; cursor:pointer; transition:background-color .3s; }
-    nav.sidebar button:hover { background-color:#ff4e4e; }
-    nav.sidebar button svg { stroke:white; width:20px; height:20px; }
-    main.container { flex-grow:1; background-color:rgba(0,0,0,0.8); margin:40px; padding:40px; border-radius:20px; overflow-y:auto; box-sizing:border-box; }
-    h1 { text-align:center; margin-bottom:20px; }
-    .profile-section { display:flex; flex-direction:column; align-items:center; margin-bottom:30px; }
-    .profile-pic { border-radius:50%; width:140px; height:140px; object-fit:cover; border:4px solid white; margin-bottom:10px; }
-    input[type="file"] { display:none; }
-    .upload-label { background-color:#ffffff; color:black; padding:8px 16px; border-radius:10px; cursor:pointer; font-weight:bold; transition:background .3s; }
-    .upload-label:hover { background-color:#cccccc; }
-    .form-group { max-width:400px; margin:0 auto 20px; display:flex; flex-direction:column; gap:8px; }
-    label { font-weight:bold; }
-    input[type="time"] { padding:10px; border:none; border-radius:8px; font-size:16px; }
-    .save-btn { background-color:#ffffff; color:black; border:none; padding:12px 20px; border-radius:12px; font-size:16px; font-weight:bold; cursor:pointer; transition:background .3s; margin-top:20px; }
-    .save-btn:hover { background-color:#cccccc; }
-    .explanation { max-width:600px; margin:20px auto; text-align:center; font-size:16px; background-color:rgba(255,255,255,0.1); padding:15px; border-radius:12px; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background-image: linear-gradient(45deg, rgb(32, 94, 217), rgb(201, 4, 70));
+      display: flex;
+      height: 100vh;
+      color: white;
+    }
+    nav.sidebar {
+      background: rgba(0, 0, 0, 0.8);
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      box-sizing: border-box;
+      gap: 25px;
+    }
+    nav.sidebar h2 { margin: 0 0 30px 0; font-size: 22px; text-align: center; }
+    nav.sidebar button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    nav.sidebar button:hover { background-color: #ff4e4e; }
+    nav.sidebar button svg { stroke: white; width: 20px; height: 20px; }
+
+    main.container {
+      flex-grow: 1;
+      background-color: rgba(0, 0, 0, 0.8);
+      margin: 40px;
+      padding: 40px;
+      border-radius: 20px;
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+    h1 { text-align: center; margin-bottom: 20px; }
+    .profile-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    .profile-pic {
+      border-radius: 50%;
+      width: 140px;
+      height: 140px;
+      object-fit: cover;
+      border: 4px solid white;
+      margin-bottom: 10px;
+    }
+    input[type="file"] { display: none; }
+    .upload-label {
+      background-color: #ffffff;
+      color: black;
+      padding: 8px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+    .upload-label:hover { background-color: #cccccc; }
+    .form-group {
+      max-width: 400px;
+      margin: 0 auto 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    label { font-weight: bold; }
+    input[type="time"] {
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    button.save-btn {
+      background-color: #ffffff;
+      color: black;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin-top: 20px;
+    }
+    button.save-btn:hover { background-color: #cccccc; }
+    .explanation {
+      max-width: 600px;
+      margin: 20px auto;
+      text-align: center;
+      font-size: 16px;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 12px;
+    }
+
+    /* ====== Responsividade: barra lateral móvel ====== */
+
+    /* Botão hambúrguer (só mobile) */
+    #mobileMenuBtn {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      z-index: 1001;
+      background: rgba(0,0,0,0.85);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      padding: 10px 12px;
+      cursor: pointer;
+      display: none; /* desktop some */
+    }
+
+    /* Backdrop por trás da sidebar (só quando aberto) */
+    #backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      display: none;
+    }
+
+    /* Classe para esconder a sidebar no mobile (off-canvas) */
+    nav.sidebar.mobile-hidden { transform: translateX(-100%); }
+
+    @media (max-width: 768px) {
+      #mobileMenuBtn { display: inline-flex; align-items: center; gap: 8px; }
+
+      nav.sidebar {
+        position: fixed;
+        top: 0; left: 0; bottom: 0;
+        height: 100vh;
+        z-index: 1002;
+        transform: translateX(0);
+        transition: transform .3s ease;
+        width: 80vw;
+        max-width: 300px;
+        border-right: 1px solid rgba(255,255,255,0.1);
+      }
+      nav.sidebar.mobile-hidden { transform: translateX(-100%); }
+
+      main.container {
+        margin: 70px 12px 12px 12px; /* espaço pro botão/topo */
+        padding: 16px;
+        border-radius: 14px;
+      }
+    }
+
+    @media (min-width: 769px) {
+      #mobileMenuBtn, #backdrop { display: none !important; }
+      nav.sidebar { position: relative; transform: none !important; }
+    }
   </style>
 </head>
 
 <body>
+  <!-- Botão hamburguer (mobile) -->
+  <button id="mobileMenuBtn" aria-label="Abrir menu">
+    <i data-lucide="menu"></i>
+  </button>
+
+  <!-- Backdrop (clica e fecha) -->
+  <div id="backdrop"></div>
+
   <nav class="sidebar">
     <h2>Painel</h2>
     <button onclick="goToHome()"><i data-lucide="home"></i> Início</button>
@@ -55,13 +206,15 @@
     <div class="form-group">
       <label for="primeiro">Horário 1:</label>
       <input type="time" id="primeiro" />
+
       <label for="segundo">Horário 2:</label>
       <input type="time" id="segundo" />
+
       <label for="terceiro">Horário 3:</label>
       <input type="time" id="terceiro" />
     </div>
 
-    <div style="text-align:center;">
+    <div style="text-align: center;">
       <button class="save-btn" onclick="salvarHorarios()">Salvar Horários</button>
     </div>
   </main>
@@ -75,12 +228,12 @@
     let userEmail = null;
     let linhaId = null; // id da linha de cadastro que vamos atualizar
 
-    // Converte "HH:MM" -> "HH:MM:SS" (coluna TIME aceita ambos; por segurança padronizo)
+    // Converte "HH:MM" -> "HH:MM:SS" (coluna TIME aceita ambos; padroniza)
     function padHHMMSS(v) {
       if (!v) return null;
       return /^\d{2}:\d{2}$/.test(v) ? v + ':00' : v;
     }
-    // Converte "HH:MM:SS" -> "HH:MM" para exibir no <input type="time">
+    // Converte "HH:MM:SS" -> "HH:MM" para mostrar no input time
     function toHHMM(v) {
       return (typeof v === 'string' && /^\d{2}:\d{2}:\d{2}$/.test(v)) ? v.slice(0,5) : (v || '');
     }
@@ -110,7 +263,6 @@
       if (rows && rows.length > 0) {
         const row = rows[0];
         linhaId = row.id;
-
         document.getElementById('primeiro').value = toHHMM(row.primeiro);
         document.getElementById('segundo').value  = toHHMM(row.segundo);
         document.getElementById('terceiro').value = toHHMM(row.terceiro);
@@ -139,13 +291,11 @@
         return;
       }
 
-      // Fallback: se por algum motivo não pegou o id (p.ex. cadastro muito antigo),
-      // atualiza por e-mail (pode atingir mais de 1 linha antiga, mas resolve legado).
+      // Fallback legado: atualiza por e-mail (pode pegar mais de 1 linha antiga)
       if (!userEmail) {
         alert('Usuário não autenticado.');
         return;
       }
-
       const { data, error: updErr } = await supabaseClient
         .from('cadastro')
         .update({ primeiro, segundo, terceiro })
@@ -157,12 +307,10 @@
         alert('Erro ao salvar horários: ' + updErr.message);
         return;
       }
-
       if (!data || data.length === 0) {
         alert('Seu cadastro ainda não existe. Conclua o cadastro primeiro.');
         return;
       }
-
       alert('Horários salvos com sucesso!');
     }
 
@@ -171,10 +319,30 @@
       img.src = URL.createObjectURL(event.target.files[0]);
     }
 
-    function goToHome() { window.location.href = 'base.html'; }
-    function verLogs() { window.location.href = 'logs.html'; }
-    function verClassificacao() { window.location.href = 'classificação.html'; }
-    function verPerfil() { window.location.href = 'perfil.html'; }
+    /* ====== Controle do menu mobile ====== */
+    function toggleSidebar(open) {
+      const sidebar = document.querySelector('nav.sidebar');
+      const backdrop = document.getElementById('backdrop');
+      if (open) {
+        sidebar.classList.remove('mobile-hidden');
+        backdrop.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+      } else {
+        sidebar.classList.add('mobile-hidden');
+        backdrop.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    }
+    function closeMenuOnNavigate() {
+      if (window.matchMedia('(max-width: 768px)').matches) toggleSidebar(false);
+    }
+
+    // Navegação (fecha menu no mobile)
+    function goToHome() { closeMenuOnNavigate(); window.location.href = 'base.html'; }
+    function verLogs() { closeMenuOnNavigate(); window.location.href = 'logs.html'; }
+    function verClassificacao() { closeMenuOnNavigate(); window.location.href = 'classificação.html'; }
+    function verPerfil() { closeMenuOnNavigate(); window.location.href = 'perfil.html'; }
+
     function logout() {
       supabaseClient.auth.signOut().then(() => {
         window.location.href = 'index.html';
@@ -184,6 +352,20 @@
     window.onload = () => {
       carregarUsuario();
       lucide.createIcons();
+
+      // Estado inicial da sidebar no mobile: escondida
+      if (window.matchMedia('(max-width: 768px)').matches) {
+        document.querySelector('nav.sidebar').classList.add('mobile-hidden');
+      }
+
+      // Botão hamburguer
+      document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+        const isHidden = document.querySelector('nav.sidebar').classList.contains('mobile-hidden');
+        toggleSidebar(isHidden);
+      });
+
+      // Clicar no backdrop fecha
+      document.getElementById('backdrop').addEventListener('click', () => toggleSidebar(false));
     };
   </script>
 </body>
