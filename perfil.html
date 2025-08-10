@@ -159,7 +159,7 @@
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs';
     const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
-    let userEmail = null;
+    let currentUserId = null;
 
     async function carregarUsuario() {
       const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
@@ -168,36 +168,53 @@
         window.location.href = "LoginProjet.html";
         return;
       }
-      userEmail = user.email;
+      currentUserId = user.id;
 
+      // Carrega horários já salvos na MESMA LINHA do usuário
       const { data, error } = await supabaseClient
         .from('cadastro')
         .select('primeiro, segundo, terceiro')
-        .eq('email', userEmail)
+        .eq('user_id', currentUserId)
         .single();
 
       if (!error && data) {
         document.getElementById('primeiro').value = data.primeiro || '';
         document.getElementById('segundo').value = data.segundo || '';
         document.getElementById('terceiro').value = data.terceiro || '';
+      } else {
+        // Se não encontrou linha, significa que o usuário ainda não concluiu o cadastro
+        console.warn('Nenhuma linha de cadastro encontrada para este usuário.');
       }
     }
 
     async function salvarHorarios() {
+      if (!currentUserId) {
+        alert('Usuário não autenticado.');
+        return;
+      }
+
+      // type="time" retorna "HH:MM" — o Postgres aceita em coluna TIME
       const primeiro = document.getElementById('primeiro').value || null;
-      const segundo = document.getElementById('segundo').value || null;
+      const segundo  = document.getElementById('segundo').value  || null;
       const terceiro = document.getElementById('terceiro').value || null;
 
-      const { error } = await supabaseClient
+      const { data, error } = await supabaseClient
         .from('cadastro')
         .update({ primeiro, segundo, terceiro })
-        .eq('email', userEmail);
+        .eq('user_id', currentUserId)
+        .select('id, user_id, primeiro, segundo, terceiro')
+        .single();
 
       if (error) {
         console.error("Erro Supabase:", error);
-        alert('Erro ao salvar horários: ' + error.message);
+        if (error.code === 'PGRST116' || error.message?.includes('No rows found')) {
+          alert('Seu cadastro não foi encontrado. Conclua o cadastro antes de definir os horários.');
+        } else {
+          alert('Erro ao salvar horários: ' + error.message);
+        }
       } else {
         alert('Horários salvos com sucesso!');
+        console.log('Linha atualizada:', data);
       }
     }
 
