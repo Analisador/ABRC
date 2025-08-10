@@ -7,110 +7,25 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background-image: linear-gradient(45deg, rgb(32, 94, 217), rgb(201, 4, 70));
-      display: flex;
-      height: 100vh;
-      color: white;
-    }
-    nav.sidebar {
-      background: rgba(0, 0, 0, 0.8);
-      width: 220px;
-      display: flex;
-      flex-direction: column;
-      padding: 20px;
-      box-sizing: border-box;
-      gap: 25px;
-    }
-    nav.sidebar h2 {margin: 0 0 30px 0; font-size: 22px; text-align: center;}
-    nav.sidebar button {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 18px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    nav.sidebar button:hover {background-color: #ff4e4e;}
-    nav.sidebar button svg {stroke: white; width: 20px; height: 20px;}
-    main.container {
-      flex-grow: 1;
-      background-color: rgba(0, 0, 0, 0.8);
-      margin: 40px;
-      padding: 40px;
-      border-radius: 20px;
-      overflow-y: auto;
-      box-sizing: border-box;
-    }
-    h1 {text-align: center; margin-bottom: 20px;}
-    .profile-section {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 30px;
-    }
-    .profile-pic {
-      border-radius: 50%;
-      width: 140px;
-      height: 140px;
-      object-fit: cover;
-      border: 4px solid white;
-      margin-bottom: 10px;
-    }
-    input[type="file"] {display: none;}
-    .upload-label {
-      background-color: #ffffff;
-      color: black;
-      padding: 8px 16px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.3s ease;
-    }
-    .upload-label:hover {background-color: #cccccc;}
-    .form-group {
-      max-width: 400px;
-      margin: 0 auto 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    label {font-weight: bold;}
-    input[type="time"] {
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-    }
-    button.save-btn {
-      background-color: #ffffff;
-      color: black;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s ease;
-      margin-top: 20px;
-    }
-    button.save-btn:hover {background-color: #cccccc;}
-    .explanation {
-      max-width: 600px;
-      margin: 20px auto;
-      text-align: center;
-      font-size: 16px;
-      background-color: rgba(255, 255, 255, 0.1);
-      padding: 15px;
-      border-radius: 12px;
-    }
+    body { margin:0; font-family:Arial,Helvetica,sans-serif; background-image:linear-gradient(45deg,rgb(32,94,217),rgb(201,4,70)); display:flex; height:100vh; color:white; }
+    nav.sidebar { background:rgba(0,0,0,0.8); width:220px; display:flex; flex-direction:column; padding:20px; box-sizing:border-box; gap:25px; }
+    nav.sidebar h2 { margin:0 0 30px 0; font-size:22px; text-align:center; }
+    nav.sidebar button { background:none; border:none; color:white; font-size:18px; display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:8px; cursor:pointer; transition:background-color .3s; }
+    nav.sidebar button:hover { background-color:#ff4e4e; }
+    nav.sidebar button svg { stroke:white; width:20px; height:20px; }
+    main.container { flex-grow:1; background-color:rgba(0,0,0,0.8); margin:40px; padding:40px; border-radius:20px; overflow-y:auto; box-sizing:border-box; }
+    h1 { text-align:center; margin-bottom:20px; }
+    .profile-section { display:flex; flex-direction:column; align-items:center; margin-bottom:30px; }
+    .profile-pic { border-radius:50%; width:140px; height:140px; object-fit:cover; border:4px solid white; margin-bottom:10px; }
+    input[type="file"] { display:none; }
+    .upload-label { background-color:#ffffff; color:black; padding:8px 16px; border-radius:10px; cursor:pointer; font-weight:bold; transition:background .3s; }
+    .upload-label:hover { background-color:#cccccc; }
+    .form-group { max-width:400px; margin:0 auto 20px; display:flex; flex-direction:column; gap:8px; }
+    label { font-weight:bold; }
+    input[type="time"] { padding:10px; border:none; border-radius:8px; font-size:16px; }
+    .save-btn { background-color:#ffffff; color:black; border:none; padding:12px 20px; border-radius:12px; font-size:16px; font-weight:bold; cursor:pointer; transition:background .3s; margin-top:20px; }
+    .save-btn:hover { background-color:#cccccc; }
+    .explanation { max-width:600px; margin:20px auto; text-align:center; font-size:16px; background-color:rgba(255,255,255,0.1); padding:15px; border-radius:12px; }
   </style>
 </head>
 
@@ -140,15 +55,13 @@
     <div class="form-group">
       <label for="primeiro">Horário 1:</label>
       <input type="time" id="primeiro" />
-
       <label for="segundo">Horário 2:</label>
       <input type="time" id="segundo" />
-
       <label for="terceiro">Horário 3:</label>
       <input type="time" id="terceiro" />
     </div>
 
-    <div style="text-align: center;">
+    <div style="text-align:center;">
       <button class="save-btn" onclick="salvarHorarios()">Salvar Horários</button>
     </div>
   </main>
@@ -159,7 +72,18 @@
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs';
     const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
-    let currentUserId = null;
+    let userEmail = null;
+    let linhaId = null; // id da linha de cadastro que vamos atualizar
+
+    // Converte "HH:MM" -> "HH:MM:SS" (coluna TIME aceita ambos; por segurança padronizo)
+    function padHHMMSS(v) {
+      if (!v) return null;
+      return /^\d{2}:\d{2}$/.test(v) ? v + ':00' : v;
+    }
+    // Converte "HH:MM:SS" -> "HH:MM" para exibir no <input type="time">
+    function toHHMM(v) {
+      return (typeof v === 'string' && /^\d{2}:\d{2}:\d{2}$/.test(v)) ? v.slice(0,5) : (v || '');
+    }
 
     async function carregarUsuario() {
       const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
@@ -168,54 +92,78 @@
         window.location.href = "LoginProjet.html";
         return;
       }
-      currentUserId = user.id;
+      userEmail = user.email;
 
-      // Carrega horários já salvos na MESMA LINHA do usuário
-      const { data, error } = await supabaseClient
+      // Busca a linha mais recente desse e-mail (id DESC) e pega o id para atualizar com precisão
+      const { data: rows, error } = await supabaseClient
         .from('cadastro')
-        .select('primeiro, segundo, terceiro')
-        .eq('user_id', currentUserId)
-        .single();
+        .select('id, primeiro, segundo, terceiro')
+        .eq('email', userEmail)
+        .order('id', { ascending: false })
+        .limit(1);
 
-      if (!error && data) {
-        document.getElementById('primeiro').value = data.primeiro || '';
-        document.getElementById('segundo').value = data.segundo || '';
-        document.getElementById('terceiro').value = data.terceiro || '';
+      if (error) {
+        console.error('Erro ao carregar cadastro:', error);
+        return;
+      }
+
+      if (rows && rows.length > 0) {
+        const row = rows[0];
+        linhaId = row.id;
+
+        document.getElementById('primeiro').value = toHHMM(row.primeiro);
+        document.getElementById('segundo').value  = toHHMM(row.segundo);
+        document.getElementById('terceiro').value = toHHMM(row.terceiro);
       } else {
-        // Se não encontrou linha, significa que o usuário ainda não concluiu o cadastro
-        console.warn('Nenhuma linha de cadastro encontrada para este usuário.');
+        console.warn('Nenhuma linha de cadastro encontrada para este e-mail.');
       }
     }
 
     async function salvarHorarios() {
-      if (!currentUserId) {
+      const primeiro = padHHMMSS(document.getElementById('primeiro').value || null);
+      const segundo  = padHHMMSS(document.getElementById('segundo').value  || null);
+      const terceiro = padHHMMSS(document.getElementById('terceiro').value || null);
+
+      if (linhaId) {
+        const { error } = await supabaseClient
+          .from('cadastro')
+          .update({ primeiro, segundo, terceiro })
+          .eq('id', linhaId);
+
+        if (error) {
+          console.error("Erro ao salvar horários:", error);
+          alert('Erro ao salvar horários: ' + error.message);
+          return;
+        }
+        alert('Horários salvos com sucesso!');
+        return;
+      }
+
+      // Fallback: se por algum motivo não pegou o id (p.ex. cadastro muito antigo),
+      // atualiza por e-mail (pode atingir mais de 1 linha antiga, mas resolve legado).
+      if (!userEmail) {
         alert('Usuário não autenticado.');
         return;
       }
 
-      // type="time" retorna "HH:MM" — o Postgres aceita em coluna TIME
-      const primeiro = document.getElementById('primeiro').value || null;
-      const segundo  = document.getElementById('segundo').value  || null;
-      const terceiro = document.getElementById('terceiro').value || null;
-
-      const { data, error } = await supabaseClient
+      const { data, error: updErr } = await supabaseClient
         .from('cadastro')
         .update({ primeiro, segundo, terceiro })
-        .eq('user_id', currentUserId)
-        .select('id, user_id, primeiro, segundo, terceiro')
-        .single();
+        .eq('email', userEmail)
+        .select('id');
 
-      if (error) {
-        console.error("Erro Supabase:", error);
-        if (error.code === 'PGRST116' || error.message?.includes('No rows found')) {
-          alert('Seu cadastro não foi encontrado. Conclua o cadastro antes de definir os horários.');
-        } else {
-          alert('Erro ao salvar horários: ' + error.message);
-        }
-      } else {
-        alert('Horários salvos com sucesso!');
-        console.log('Linha atualizada:', data);
+      if (updErr) {
+        console.error('Erro ao salvar horários:', updErr);
+        alert('Erro ao salvar horários: ' + updErr.message);
+        return;
       }
+
+      if (!data || data.length === 0) {
+        alert('Seu cadastro ainda não existe. Conclua o cadastro primeiro.');
+        return;
+      }
+
+      alert('Horários salvos com sucesso!');
     }
 
     function mostrarPreview(event) {
