@@ -1,3 +1,5 @@
+PERFIL 
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -159,7 +161,7 @@
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs';
     const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
-    let userId = null;
+    let userEmail = null;
 
     async function carregarUsuario() {
       const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
@@ -168,29 +170,18 @@
         window.location.href = "LoginProjet.html";
         return;
       }
-      userId = user.id;  // Garantir que estamos pegando o ID correto do usuário logado
-      console.log("User ID:", userId);  // Verificando se estamos recebendo o ID corretamente
+      userEmail = user.email;
 
-      // Agora vamos verificar se o usuário existe na tabela
       const { data, error } = await supabaseClient
         .from('cadastro')
         .select('primeiro, segundo, terceiro')
-        .eq('id', userId)  // Buscando pelo ID
+        .eq('email', userEmail)
         .single();
 
-      if (error) {
-        console.error("Erro ao carregar dados:", error);
-        alert('Erro ao carregar dados do usuário.');
-        return;
-      }
-
-      // Atualizando os campos com os dados do usuário
-      if (data) {
+      if (!error && data) {
         document.getElementById('primeiro').value = data.primeiro || '';
         document.getElementById('segundo').value = data.segundo || '';
         document.getElementById('terceiro').value = data.terceiro || '';
-      } else {
-        alert('Usuário não encontrado.');
       }
     }
 
@@ -199,17 +190,14 @@
       const segundo = document.getElementById('segundo').value || null;
       const terceiro = document.getElementById('terceiro').value || null;
 
-      console.log("Salvando horários para o usuário com ID:", userId);  // Verificação
-
-      // Atualizando os horários na linha do usuário usando o ID
-      const { updateError } = await supabaseClient
+      const { error } = await supabaseClient
         .from('cadastro')
         .update({ primeiro, segundo, terceiro })
-        .eq('id', userId);  // Usando o ID do usuário para garantir a atualização correta
+        .eq('email', userEmail);
 
-      if (updateError) {
-        console.error("Erro ao atualizar horários:", updateError);
-        alert('Erro ao salvar horários: ' + updateError.message);
+      if (error) {
+        console.error("Erro Supabase:", error);
+        alert('Erro ao salvar horários: ' + error.message);
       } else {
         alert('Horários salvos com sucesso!');
       }
