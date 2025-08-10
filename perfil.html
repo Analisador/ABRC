@@ -45,17 +45,31 @@
       flex-grow: 1;
       background-color: rgba(0, 0, 0, 0.8);
       margin: 40px;
-      padding: 40px;
+      padding: 28px 24px 40px;
       border-radius: 20px;
       overflow-y: auto;
       box-sizing: border-box;
     }
-    h1 { text-align: center; margin-bottom: 20px; }
+
+    /* Cabeçalho/título bem centralizado e com espaço */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .page-header h1 {
+      margin: 0;
+      text-align: center;
+      line-height: 1.2;
+    }
+
     .profile-section {
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-bottom: 30px;
+      margin: 16px auto 30px;
+      gap: 10px;
     }
     .profile-pic {
       border-radius: 50%;
@@ -63,7 +77,8 @@
       height: 140px;
       object-fit: cover;
       border: 4px solid white;
-      margin-bottom: 10px;
+      background: rgba(255,255,255,0.06);
+      display: block;
     }
     input[type="file"] { display: none; }
     .upload-label {
@@ -76,6 +91,17 @@
       transition: background 0.3s ease;
     }
     .upload-label:hover { background-color: #cccccc; }
+
+    .explanation {
+      max-width: 600px;
+      margin: 12px auto 20px;
+      text-align: center;
+      font-size: 16px;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 12px;
+    }
+
     .form-group {
       max-width: 400px;
       margin: 0 auto 20px;
@@ -103,19 +129,8 @@
       margin-top: 20px;
     }
     button.save-btn:hover { background-color: #cccccc; }
-    .explanation {
-      max-width: 600px;
-      margin: 20px auto;
-      text-align: center;
-      font-size: 16px;
-      background-color: rgba(255, 255, 255, 0.1);
-      padding: 15px;
-      border-radius: 12px;
-    }
 
     /* ====== Responsividade: barra lateral móvel ====== */
-
-    /* Botão hambúrguer (só mobile) */
     #mobileMenuBtn {
       position: fixed;
       top: 14px;
@@ -129,8 +144,6 @@
       cursor: pointer;
       display: none; /* desktop some */
     }
-
-    /* Backdrop por trás da sidebar (só quando aberto) */
     #backdrop {
       position: fixed;
       inset: 0;
@@ -138,13 +151,10 @@
       z-index: 1000;
       display: none;
     }
-
-    /* Classe para esconder a sidebar no mobile (off-canvas) */
     nav.sidebar.mobile-hidden { transform: translateX(-100%); }
 
     @media (max-width: 768px) {
       #mobileMenuBtn { display: inline-flex; align-items: center; gap: 8px; }
-
       nav.sidebar {
         position: fixed;
         top: 0; left: 0; bottom: 0;
@@ -157,14 +167,12 @@
         border-right: 1px solid rgba(255,255,255,0.1);
       }
       nav.sidebar.mobile-hidden { transform: translateX(-100%); }
-
       main.container {
-        margin: 70px 12px 12px 12px; /* espaço pro botão/topo */
+        margin: 70px 12px 12px 12px;
         padding: 16px;
         border-radius: 14px;
       }
     }
-
     @media (min-width: 769px) {
       #mobileMenuBtn, #backdrop { display: none !important; }
       nav.sidebar { position: relative; transform: none !important; }
@@ -191,11 +199,14 @@
   </nav>
 
   <main class="container">
-    <h1>Seu Perfil</h1>
+    <div class="page-header">
+      <h1>Seu Perfil</h1>
+    </div>
+
     <div class="profile-section">
-      <img src="https://via.placeholder.com/140" id="preview" class="profile-pic" alt="Foto de Perfil" />
+      <img id="preview" class="profile-pic" alt="Foto de Perfil" />
       <label for="foto" class="upload-label">Escolher Foto</label>
-      <input type="file" id="foto" accept="image/*" onchange="mostrarPreview(event)" />
+      <input type="file" id="foto" accept="image/*" />
     </div>
 
     <div class="explanation">
@@ -206,10 +217,8 @@
     <div class="form-group">
       <label for="primeiro">Horário 1:</label>
       <input type="time" id="primeiro" />
-
       <label for="segundo">Horário 2:</label>
       <input type="time" id="segundo" />
-
       <label for="terceiro">Horário 3:</label>
       <input type="time" id="terceiro" />
     </div>
@@ -225,8 +234,18 @@
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs';
     const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
+    // Placeholder seguro (SVG) pra evitar ícone "?" no iOS
+    const DEFAULT_AVATAR = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="140" height="140">
+        <rect width="100%" height="100%" fill="#273142"/>
+        <circle cx="70" cy="55" r="28" fill="#ffffff"/>
+        <rect x="25" y="95" width="90" height="30" rx="15" fill="#ffffff"/>
+      </svg>
+    `);
+
     let userEmail = null;
     let linhaId = null; // id da linha de cadastro que vamos atualizar
+    let currentUser = null;
 
     // Converte "HH:MM" -> "HH:MM:SS" (coluna TIME aceita ambos; padroniza)
     function padHHMMSS(v) {
@@ -245,15 +264,19 @@
         window.location.href = "LoginProjet.html";
         return;
       }
+      currentUser = user;
       userEmail = user.email;
 
-      // Busca a linha mais recente desse e-mail (id DESC) e pega o id para atualizar com precisão
+      // Perfil (linha mais recente por e-mail)
       const { data: rows, error } = await supabaseClient
         .from('cadastro')
-        .select('id, primeiro, segundo, terceiro')
+        .select('id, primeiro, segundo, terceiro, avatar_url')
         .eq('email', userEmail)
         .order('id', { ascending: false })
         .limit(1);
+
+      const preview = document.getElementById('preview');
+      preview.src = DEFAULT_AVATAR; // default sempre
 
       if (error) {
         console.error('Erro ao carregar cadastro:', error);
@@ -266,8 +289,9 @@
         document.getElementById('primeiro').value = toHHMM(row.primeiro);
         document.getElementById('segundo').value  = toHHMM(row.segundo);
         document.getElementById('terceiro').value = toHHMM(row.terceiro);
-      } else {
-        console.warn('Nenhuma linha de cadastro encontrada para este e-mail.');
+
+        // Se tiver avatar salvo, usa
+        if (row.avatar_url) preview.src = row.avatar_url;
       }
     }
 
@@ -314,12 +338,53 @@
       alert('Horários salvos com sucesso!');
     }
 
-    function mostrarPreview(event) {
-      const img = document.getElementById('preview');
-      img.src = URL.createObjectURL(event.target.files[0]);
-    }
+    // ===== Upload da fotinha para Supabase Storage (bucket: "avatars") =====
+    document.getElementById('foto').addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if (!file || !currentUser) return;
 
-    /* ====== Controle do menu mobile ====== */
+      const preview = document.getElementById('preview');
+      // Preview imediato no cliente
+      preview.src = URL.createObjectURL(file);
+
+      try {
+        // Caminho do arquivo no bucket
+        const path = `${currentUser.id}/${Date.now()}_${file.name}`;
+
+        // Faz upload (bucket deve existir: "avatars", público)
+        const { error: upErr } = await supabaseClient.storage
+          .from('avatars')
+          .upload(path, file, { upsert: true });
+
+        if (upErr) throw upErr;
+
+        // Pega URL pública
+        const { data: pub } = supabaseClient.storage
+          .from('avatars')
+          .getPublicUrl(path);
+
+        const avatarUrl = pub?.publicUrl;
+        if (!avatarUrl) return;
+
+        // Salva o link na tabela (se a coluna avatar_url existir)
+        if (linhaId) {
+          await supabaseClient
+            .from('cadastro')
+            .update({ avatar_url: avatarUrl })
+            .eq('id', linhaId);
+        } else if (userEmail) {
+          await supabaseClient
+            .from('cadastro')
+            .update({ avatar_url: avatarUrl })
+            .eq('email', userEmail);
+        }
+      } catch (err) {
+        console.error('Erro no upload do avatar:', err);
+        // mantém o preview local mesmo que não salve no banco
+      }
+    });
+
+    /* ===== Menu mobile ===== */
     function toggleSidebar(open) {
       const sidebar = document.querySelector('nav.sidebar');
       const backdrop = document.getElementById('backdrop');
@@ -357,13 +422,11 @@
       if (window.matchMedia('(max-width: 768px)').matches) {
         document.querySelector('nav.sidebar').classList.add('mobile-hidden');
       }
-
       // Botão hamburguer
       document.getElementById('mobileMenuBtn').addEventListener('click', () => {
         const isHidden = document.querySelector('nav.sidebar').classList.contains('mobile-hidden');
         toggleSidebar(isHidden);
       });
-
       // Clicar no backdrop fecha
       document.getElementById('backdrop').addEventListener('click', () => toggleSidebar(false));
     };
