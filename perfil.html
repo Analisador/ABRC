@@ -51,7 +51,6 @@
       box-sizing: border-box;
     }
 
-    /* Cabeçalho/título bem centralizado e com espaço */
     .page-header {
       display: flex;
       align-items: center;
@@ -235,7 +234,7 @@
     const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
     let userEmail = null;
-    let linhaId = null;
+    let linhaId = null; // id da linha de cadastro que vamos atualizar
     let currentUser = null;
 
     // Carregar o usuário e os horários
@@ -293,17 +292,6 @@
         }
         alert('Horários salvos com sucesso!');
       }
-    }
-
-    // Funções de navegação
-    function goToHome() { window.location.href = 'base.html'; }
-    function verLogs() { window.location.href = 'logs.html'; }
-    function verClassificacao() { window.location.href = 'classificação.html'; }
-    function verPerfil() { window.location.href = 'perfil.html'; }
-    function logout() {
-      supabaseClient.auth.signOut().then(() => {
-        window.location.href = 'index.html';
-      });
     }
 
     window.onload = () => {
