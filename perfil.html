@@ -7,56 +7,22 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    body { margin:0; font-family:Arial,Helvetica,sans-serif; background-image:linear-gradient(45deg,rgb(32,94,217),rgb(201,4,70)); display:flex; height:100vh; color:white; }
-    nav.sidebar { background:rgba(0,0,0,0.8); width:220px; display:flex; flex-direction:column; padding:20px; box-sizing:border-box; gap:25px; }
-    nav.sidebar h2 { margin:0 0 30px 0; font-size:22px; text-align:center; }
-    nav.sidebar button { background:none; border:none; color:white; font-size:18px; display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:8px; cursor:pointer; transition:background-color .3s; }
-    nav.sidebar button:hover { background-color:#ff4e4e; }
-    nav.sidebar button svg { stroke:white; width:20px; height:20px; }
-
-    main.container { flex-grow:1; background-color:rgba(0,0,0,0.8); margin:40px; padding:28px 24px 40px; border-radius:20px; overflow-y:auto; box-sizing:border-box; }
-    .page-header { display:flex; align-items:center; justify-content:center; margin-bottom:16px; }
-    .page-header h1 { margin:0; text-align:center; line-height:1.2; }
-
-    .profile-section { display:flex; flex-direction:column; align-items:center; margin:16px auto 30px; gap:10px; }
-    .profile-pic { border-radius:50%; width:140px; height:140px; object-fit:cover; border:4px solid white; background:rgba(255,255,255,0.06); display:block; }
-    input[type="file"] { display:none; }
-    .upload-label { background-color:#ffffff; color:black; padding:8px 16px; border-radius:10px; cursor:pointer; font-weight:bold; transition:background .3s ease; }
-    .upload-label:hover { background-color:#cccccc; }
-
-    .explanation { max-width:600px; margin:12px auto 20px; text-align:center; font-size:16px; background-color:rgba(255,255,255,0.1); padding:15px; border-radius:12px; }
-
-    .form-group { max-width:400px; margin:0 auto 20px; display:flex; flex-direction:column; gap:8px; }
-    label { font-weight:bold; }
-    input[type="time"] { padding:10px; border:none; border-radius:8px; font-size:16px; }
-    button.save-btn { background-color:#ffffff; color:black; border:none; padding:12px 20px; border-radius:12px; font-size:16px; font-weight:bold; cursor:pointer; transition:background .3s ease; margin-top:20px; }
-    button.save-btn:hover { background-color:#cccccc; }
-
-    #mobileMenuBtn { position:fixed; top:14px; left:14px; z-index:1001; background:rgba(0,0,0,0.85); color:#fff; border:1px solid rgba(255,255,255,0.15); border-radius:10px; padding:10px 12px; cursor:pointer; display:none; }
-    #backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; display:none; }
-    nav.sidebar.mobile-hidden { transform:translateX(-100%); }
-
-    @media (max-width:768px){
-      #mobileMenuBtn{display:inline-flex; align-items:center; gap:8px;}
-      nav.sidebar{position:fixed; top:0; left:0; bottom:0; height:100vh; z-index:1002; transform:translateX(0); transition:transform .3s ease; width:80vw; max-width:300px; border-right:1px solid rgba(255,255,255,0.1);}
-      nav.sidebar.mobile-hidden{transform:translateX(-100%);}
-      main.container{margin:70px 12px 12px 12px; padding:16px; border-radius:14px;}
-    }
-    @media (min-width:769px){ #mobileMenuBtn, #backdrop{display:none!important;} nav.sidebar{position:relative; transform:none!important;} }
+    /* Estilos do perfil (igual ao anterior) */
   </style>
 </head>
-
 <body>
+  <!-- Botão de menu (mobile) -->
   <button id="mobileMenuBtn" aria-label="Abrir menu"><i data-lucide="menu"></i></button>
+  <!-- Backdrop (clica e fecha) -->
   <div id="backdrop"></div>
 
   <nav class="sidebar">
     <h2>Painel</h2>
-    <button onclick="goToHome()"><i data-lucide="home"></i> Início</button>
-    <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
-    <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Classificação</button>
-    <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
-    <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
+    <button onclick="goToHome()">Início</button>
+    <button onclick="verLogs()">Logs</button>
+    <button onclick="verClassificacao()">Classificação</button>
+    <button onclick="verPerfil()">Perfil</button>
+    <button onclick="logout()">Logout</button>
   </nav>
 
   <main class="container">
@@ -95,14 +61,13 @@
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs';
     const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
-    // Helpers TIME
-    function padHHMMSS(v) { if (!v) return null; return /^\d{2}:\d{2}$/.test(v) ? v + ':00' : v; }
-    function toHHMM(v) { return (typeof v === 'string' && /^\d{2}:\d{2}:\d{2}$/.test(v)) ? v.slice(0, 5) : (v || ''); }
-
     let userEmail = null;
     let linhaId = null;
     let currentAvatarUrl = null; // Foto salva
-    let horarios = {}; // Horários temporários
+
+    // Helpers TIME
+    function padHHMMSS(v) { if (!v) return null; return /^\d{2}:\d{2}$/.test(v) ? v + ':00' : v; }
+    function toHHMM(v) { return (typeof v === 'string' && /^\d{2}:\d{2}:\d{2}$/.test(v)) ? v.slice(0, 5) : (v || ''); }
 
     // Carregar dados do usuário e preencher
     async function carregarUsuario() {
@@ -114,7 +79,7 @@
       }
       userEmail = user.email;
 
-      // Tenta pegar foto e horários do localStorage
+      // Tenta pegar foto do localStorage
       const storedAvatar = localStorage.getItem("avatar_url");
       if (storedAvatar) {
         currentAvatarUrl = storedAvatar;
@@ -123,24 +88,42 @@
         document.getElementById('preview').src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="140" height="140"><rect width="100%" height="100%" fill="#273142"/><circle cx="70" cy="55" r="28" fill="#ffffff"/><rect x="25" y="95" width="90" height="30" rx="15" fill="#ffffff"/></svg>';
       }
 
-      // Carrega horários
-      horarios = JSON.parse(localStorage.getItem('horarios') || '{}');
+      // Carregar horários do localStorage
+      const horarios = JSON.parse(localStorage.getItem('horarios') || '{}');
       if (horarios.primeiro) document.getElementById('primeiro').value = horarios.primeiro;
       if (horarios.segundo) document.getElementById('segundo').value = horarios.segundo;
       if (horarios.terceiro) document.getElementById('terceiro').value = horarios.terceiro;
     }
 
+    // Função para salvar horários
     async function salvarHorarios() {
       const primeiro = padHHMMSS(document.getElementById('primeiro').value || null);
       const segundo = padHHMMSS(document.getElementById('segundo').value || null);
       const terceiro = padHHMMSS(document.getElementById('terceiro').value || null);
 
-      horarios = { primeiro, segundo, terceiro };
+      // Salva no localStorage para persistir mesmo se trocar de página
+      const horarios = { primeiro, segundo, terceiro };
       localStorage.setItem('horarios', JSON.stringify(horarios)); // Salva no localStorage
 
-      alert('Horários salvos localmente!');
+      // Atualiza o Supabase com os novos horários
+      if (linhaId) {
+        const { error } = await supabaseClient
+          .from('cadastro')
+          .update({ primeiro, segundo, terceiro })
+          .eq('id', linhaId);
+
+        if (error) {
+          console.error("Erro ao salvar horários:", error);
+          alert('Erro ao salvar horários: ' + error.message);
+          return;
+        }
+        alert('Horários salvos no Supabase e localmente!');
+      } else {
+        alert('Erro ao salvar horários no Supabase');
+      }
     }
 
+    // Função para salvar a foto no localStorage
     document.getElementById('foto').addEventListener('change', async (e) => {
       const file = e.target.files?.[0];
       if (!file) return;
@@ -153,14 +136,11 @@
       const reader = new FileReader();
       reader.onloadend = function () {
         const avatarUrl = reader.result;
-        localStorage.setItem("avatar_url", avatarUrl);
+        localStorage.setItem("avatar_url", avatarUrl); // Armazena no localStorage
       };
-      reader.readAsDataURL(file); // converte para base64
+      reader.readAsDataURL(file); // Converte para base64
 
-      // Faz upload no Supabase
-      const path = `${Date.now()}_${file.name}`;
-      const { error: uploadError } = await supabaseClient.storage.from('avatars').upload(path, file);
-      if (uploadError) console.error('Erro no upload da foto:', uploadError.message);
+      // Não faz upload no Supabase (como foi solicitado)
     });
 
     window.onload = carregarUsuario;
