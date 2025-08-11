@@ -51,6 +51,7 @@
       box-sizing: border-box;
     }
 
+    /* Cabeçalho/título bem centralizado e com espaço */
     .page-header {
       display: flex;
       align-items: center;
@@ -128,23 +129,73 @@
       margin-top: 20px;
     }
     button.save-btn:hover { background-color: #cccccc; }
+
+    /* ====== Responsividade: barra lateral móvel ====== */
+    #mobileMenuBtn {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      z-index: 1001;
+      background: rgba(0,0,0,0.85);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      padding: 10px 12px;
+      cursor: pointer;
+      display: none; /* desktop some */
+    }
+    #backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      display: none;
+    }
+    nav.sidebar.mobile-hidden { transform: translateX(-100%); }
+
+    @media (max-width: 768px) {
+      #mobileMenuBtn { display: inline-flex; align-items: center; gap: 8px; }
+      nav.sidebar {
+        position: fixed;
+        top: 0; left: 0; bottom: 0;
+        height: 100vh;
+        z-index: 1002;
+        transform: translateX(0);
+        transition: transform .3s ease;
+        width: 80vw;
+        max-width: 300px;
+        border-right: 1px solid rgba(255,255,255,0.1);
+      }
+      nav.sidebar.mobile-hidden { transform: translateX(-100%); }
+      main.container {
+        margin: 70px 12px 12px 12px;
+        padding: 16px;
+        border-radius: 14px;
+      }
+    }
+    @media (min-width: 769px) {
+      #mobileMenuBtn, #backdrop { display: none !important; }
+      nav.sidebar { position: relative; transform: none !important; }
+    }
   </style>
 </head>
 
 <body>
+  <!-- Botão hamburguer (mobile) -->
   <button id="mobileMenuBtn" aria-label="Abrir menu">
     <i data-lucide="menu"></i>
   </button>
 
+  <!-- Backdrop (clica e fecha) -->
   <div id="backdrop"></div>
 
   <nav class="sidebar">
     <h2>A.B.R.C</h2>
-    <button onclick="goToHome()">Home</button>
-    <button onclick="verLogs()">Logs</button>
-    <button onclick="verClassificacao()">Classificação</button>
-    <button onclick="verPerfil()">Perfil</button>
-    <button onclick="logout()">Logout</button>
+    <button onclick="goToHome()"><i data-lucide="home"></i> Speed Test</button>
+    <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
+    <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Classificação</button>
+    <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
+    <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
   </nav>
 
   <main class="container">
@@ -183,6 +234,7 @@
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs';
     const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
+    // Placeholder seguro (SVG) pra evitar ícone "?" no iOS
     const DEFAULT_AVATAR = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" width="140" height="140">
         <rect width="100%" height="100%" fill="#273142"/>
@@ -192,14 +244,15 @@
     `);
 
     let userEmail = null;
-    let linhaId = null;
+    let linhaId = null; // id da linha de cadastro que vamos atualizar
     let currentUser = null;
 
+    // Converte "HH:MM" -> "HH:MM:SS" (coluna TIME aceita ambos; padroniza)
     function padHHMMSS(v) {
       if (!v) return null;
       return /^\d{2}:\d{2}$/.test(v) ? v + ':00' : v;
     }
-
+    // Converte "HH:MM:SS" -> "HH:MM" para mostrar no input time
     function toHHMM(v) {
       return (typeof v === 'string' && /^\d{2}:\d{2}:\d{2}$/.test(v)) ? v.slice(0,5) : (v || '');
     }
@@ -214,15 +267,7 @@
       currentUser = user;
       userEmail = user.email;
 
-      // Tentar carregar os horários do localStorage
-      const horario1 = localStorage.getItem('horario1');
-      const horario2 = localStorage.getItem('horario2');
-      const horario3 = localStorage.getItem('horario3');
-
-      if (horario1) document.getElementById('primeiro').value = toHHMM(horario1);
-      if (horario2) document.getElementById('segundo').value = toHHMM(horario2);
-      if (horario3) document.getElementById('terceiro').value = toHHMM(horario3);
-
+      // Perfil (linha mais recente por e-mail)
       const { data: rows, error } = await supabaseClient
         .from('cadastro')
         .select('id, primeiro, segundo, terceiro, avatar_url')
@@ -231,7 +276,7 @@
         .limit(1);
 
       const preview = document.getElementById('preview');
-      preview.src = DEFAULT_AVATAR;
+      preview.src = DEFAULT_AVATAR; // default sempre
 
       if (error) {
         console.error('Erro ao carregar cadastro:', error);
@@ -241,28 +286,19 @@
       if (rows && rows.length > 0) {
         const row = rows[0];
         linhaId = row.id;
-
-        localStorage.setItem('horario1', row.primeiro);
-        localStorage.setItem('horario2', row.segundo);
-        localStorage.setItem('horario3', row.terceiro);
-
         document.getElementById('primeiro').value = toHHMM(row.primeiro);
-        document.getElementById('segundo').value = toHHMM(row.segundo);
+        document.getElementById('segundo').value  = toHHMM(row.segundo);
         document.getElementById('terceiro').value = toHHMM(row.terceiro);
 
+        // Se tiver avatar salvo, usa
         if (row.avatar_url) preview.src = row.avatar_url;
       }
     }
 
     async function salvarHorarios() {
       const primeiro = padHHMMSS(document.getElementById('primeiro').value || null);
-      const segundo = padHHMMSS(document.getElementById('segundo').value || null);
+      const segundo  = padHHMMSS(document.getElementById('segundo').value  || null);
       const terceiro = padHHMMSS(document.getElementById('terceiro').value || null);
-
-      // Salvar horários no localStorage
-      localStorage.setItem('horario1', primeiro);
-      localStorage.setItem('horario2', segundo);
-      localStorage.setItem('horario3', terceiro);
 
       if (linhaId) {
         const { error } = await supabaseClient
@@ -279,6 +315,7 @@
         return;
       }
 
+      // Fallback legado: atualiza por e-mail (pode pegar mais de 1 linha antiga)
       if (!userEmail) {
         alert('Usuário não autenticado.');
         return;
@@ -301,21 +338,48 @@
       alert('Horários salvos com sucesso!');
     }
 
+    window.onload = () => {
+      carregarUsuario();
+      lucide.createIcons();
+
+      // Estado inicial da sidebar no mobile: escondida
+      if (window.matchMedia('(max-width: 768px)').matches) {
+        document.querySelector('nav.sidebar').classList.add('mobile-hidden');
+      }
+      // Botão hamburguer
+      document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+        const isHidden = document.querySelector('nav.sidebar').classList.contains('mobile-hidden');
+        toggleSidebar(isHidden);
+      });
+      // Clicar no backdrop fecha
+      document.getElementById('backdrop').addEventListener('click', () => toggleSidebar(false));
+    };
+
+    /* ===== Menu mobile ===== */
+    function toggleSidebar(open) {
+      const sidebar = document.querySelector('nav.sidebar');
+      const backdrop = document.getElementById('backdrop');
+      if (open) {
+        sidebar.classList.remove('mobile-hidden');
+        backdrop.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+      } else {
+        sidebar.classList.add('mobile-hidden');
+        backdrop.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    }
+
     // Funções de navegação
-    function goToHome() { window.location.href = 'home.html'; }
+    function goToHome() { window.location.href = 'base.html'; }
     function verLogs() { window.location.href = 'logs.html'; }
-    function verClassificacao() { window.location.href = 'classificacao.html'; }
+    function verClassificacao() { window.location.href = 'classificação.html'; }
     function verPerfil() { window.location.href = 'perfil.html'; }
     function logout() {
       supabaseClient.auth.signOut().then(() => {
         window.location.href = 'index.html';
       });
     }
-
-    window.onload = () => {
-      carregarUsuario();
-      lucide.createIcons();
-    };
   </script>
 </body>
 </html>
