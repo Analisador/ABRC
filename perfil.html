@@ -128,6 +128,54 @@
       margin-top: 20px;
     }
     button.save-btn:hover { background-color: #cccccc; }
+
+    /* ====== Responsividade: barra lateral móvel ====== */
+    #mobileMenuBtn {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      z-index: 1001;
+      background: rgba(0,0,0,0.85);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      padding: 10px 12px;
+      cursor: pointer;
+      display: none; /* desktop some */
+    }
+    #backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      display: none;
+    }
+    nav.sidebar.mobile-hidden { transform: translateX(-100%); }
+
+    @media (max-width: 768px) {
+      #mobileMenuBtn { display: inline-flex; align-items: center; gap: 8px; }
+      nav.sidebar {
+        position: fixed;
+        top: 0; left: 0; bottom: 0;
+        height: 100vh;
+        z-index: 1002;
+        transform: translateX(0);
+        transition: transform .3s ease;
+        width: 80vw;
+        max-width: 300px;
+        border-right: 1px solid rgba(255,255,255,0.1);
+      }
+      nav.sidebar.mobile-hidden { transform: translateX(-100%); }
+      main.container {
+        margin: 70px 12px 12px 12px;
+        padding: 16px;
+        border-radius: 14px;
+      }
+    }
+    @media (min-width: 769px) {
+      #mobileMenuBtn, #backdrop { display: none !important; }
+      nav.sidebar { position: relative; transform: none !important; }
+    }
   </style>
 </head>
 
@@ -140,11 +188,11 @@
 
   <nav class="sidebar">
     <h2>A.B.R.C</h2>
-    <button onclick="goToHome()"><i data-lucide="home"></i> Speed Test</button>
-    <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
-    <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Classificação</button>
-    <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
-    <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
+    <button onclick="goToHome()">Home</button>
+    <button onclick="verLogs()">Logs</button>
+    <button onclick="verClassificacao()">Classificação</button>
+    <button onclick="verPerfil()">Perfil</button>
+    <button onclick="logout()">Logout</button>
   </nav>
 
   <main class="container">
@@ -299,6 +347,17 @@
         return;
       }
       alert('Horários salvos com sucesso!');
+    }
+
+    // Funções de navegação
+    function goToHome() { window.location.href = 'home.html'; }
+    function verLogs() { window.location.href = 'logs.html'; }
+    function verClassificacao() { window.location.href = 'classificacao.html'; }
+    function verPerfil() { window.location.href = 'perfil.html'; }
+    function logout() {
+      supabaseClient.auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      });
     }
 
     window.onload = () => {
