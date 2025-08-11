@@ -95,7 +95,7 @@
       if (horarios.terceiro) document.getElementById('terceiro').value = horarios.terceiro;
     }
 
-    // Função para salvar horários
+    // Função para salvar horários no Supabase e no localStorage
     async function salvarHorarios() {
       const primeiro = padHHMMSS(document.getElementById('primeiro').value || null);
       const segundo = padHHMMSS(document.getElementById('segundo').value || null);
@@ -123,8 +123,8 @@
       }
     }
 
-    // Função para salvar a foto no localStorage
-    document.getElementById('foto').addEventListener('change', async (e) => {
+    // Função para salvar a foto no localStorage (não faz upload para Supabase)
+    document.getElementById('foto').addEventListener('change', (e) => {
       const file = e.target.files?.[0];
       if (!file) return;
 
@@ -139,8 +139,6 @@
         localStorage.setItem("avatar_url", avatarUrl); // Armazena no localStorage
       };
       reader.readAsDataURL(file); // Converte para base64
-
-      // Não faz upload no Supabase (como foi solicitado)
     });
 
     window.onload = carregarUsuario;
