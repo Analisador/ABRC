@@ -7,20 +7,195 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    /* Estilos do perfil (igual ao original) */
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background-image: linear-gradient(45deg, rgb(32, 94, 217), rgb(201, 4, 70));
+      display: flex;
+      height: 100vh;
+      color: white;
+    }
+    nav.sidebar {
+      background: rgba(0, 0, 0, 0.8);
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      box-sizing: border-box;
+      gap: 25px;
+    }
+    nav.sidebar h2 { margin: 0 0 30px 0; font-size: 22px; text-align: center; }
+    nav.sidebar button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    nav.sidebar button:hover { background-color: #ff4e4e; }
+    nav.sidebar button svg { stroke: white; width: 20px; height: 20px; }
+
+    main.container {
+      flex-grow: 1;
+      background-color: rgba(0, 0, 0, 0.8);
+      margin: 40px;
+      padding: 28px 24px 40px;
+      border-radius: 20px;
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+
+    /* Cabeçalho/título bem centralizado e com espaço */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .page-header h1 {
+      margin: 0;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .profile-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 16px auto 30px;
+      gap: 10px;
+    }
+    .profile-pic {
+      border-radius: 50%;
+      width: 140px;
+      height: 140px;
+      object-fit: cover;
+      border: 4px solid white;
+      background: rgba(255,255,255,0.06);
+      display: block;
+    }
+    input[type="file"] { display: none; }
+    .upload-label {
+      background-color: #ffffff;
+      color: black;
+      padding: 8px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+    .upload-label:hover { background-color: #cccccc; }
+
+    .explanation {
+      max-width: 600px;
+      margin: 12px auto 20px;
+      text-align: center;
+      font-size: 16px;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 12px;
+    }
+
+    .form-group {
+      max-width: 400px;
+      margin: 0 auto 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    label { font-weight: bold; }
+    input[type="time"] {
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    button.save-btn {
+      background-color: #ffffff;
+      color: black;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin-top: 20px;
+    }
+    button.save-btn:hover { background-color: #cccccc; }
+
+    /* ====== Responsividade: barra lateral móvel ====== */
+    #mobileMenuBtn {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      z-index: 1001;
+      background: rgba(0,0,0,0.85);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      padding: 10px 12px;
+      cursor: pointer;
+      display: none; /* desktop some */
+    }
+    #backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      display: none;
+    }
+    nav.sidebar.mobile-hidden { transform: translateX(-100%); }
+
+    @media (max-width: 768px) {
+      #mobileMenuBtn { display: inline-flex; align-items: center; gap: 8px; }
+      nav.sidebar {
+        position: fixed;
+        top: 0; left: 0; bottom: 0;
+        height: 100vh;
+        z-index: 1002;
+        transform: translateX(0);
+        transition: transform .3s ease;
+        width: 80vw;
+        max-width: 300px;
+        border-right: 1px solid rgba(255,255,255,0.1);
+      }
+      nav.sidebar.mobile-hidden { transform: translateX(-100%); }
+      main.container {
+        margin: 70px 12px 12px 12px;
+        padding: 16px;
+        border-radius: 14px;
+      }
+    }
+    @media (min-width: 769px) {
+      #mobileMenuBtn, #backdrop { display: none !important; }
+      nav.sidebar { position: relative; transform: none !important; }
+    }
   </style>
 </head>
+
 <body>
-  <button id="mobileMenuBtn" aria-label="Abrir menu"><i data-lucide="menu"></i></button>
+  <!-- Botão hamburguer (mobile) -->
+  <button id="mobileMenuBtn" aria-label="Abrir menu">
+    <i data-lucide="menu"></i>
+  </button>
+
+  <!-- Backdrop (clica e fecha) -->
   <div id="backdrop"></div>
 
   <nav class="sidebar">
-    <h2>Painel</h2>
-    <button onclick="goToHome()">Início</button>
-    <button onclick="verLogs()">Logs</button>
-    <button onclick="verClassificacao()">Classificação</button>
-    <button onclick="verPerfil()">Perfil</button>
-    <button onclick="logout()">Logout</button>
+    <h2>A.B.R.C</h2>
+    <button onclick="goToHome()"><i data-lucide="home"></i> Speed Test</button>
+    <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
+    <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Classificação</button>
+    <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
+    <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
   </nav>
 
   <main class="container">
@@ -59,14 +234,29 @@
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs';
     const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
+    // Placeholder seguro (SVG) pra evitar ícone "?" no iOS
+    const DEFAULT_AVATAR = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="140" height="140">
+        <rect width="100%" height="100%" fill="#273142"/>
+        <circle cx="70" cy="55" r="28" fill="#ffffff"/>
+        <rect x="25" y="95" width="90" height="30" rx="15" fill="#ffffff"/>
+      </svg>
+    `);
+
     let userEmail = null;
-    let linhaId = null;
+    let linhaId = null; // id da linha de cadastro que vamos atualizar
+    let currentUser = null;
 
-    // Helpers TIME
-    function padHHMMSS(v) { if (!v) return null; return /^\d{2}:\d{2}$/.test(v) ? v + ':00' : v; }
-    function toHHMM(v) { return (typeof v === 'string' && /^\d{2}:\d{2}:\d{2}$/.test(v)) ? v.slice(0, 5) : (v || ''); }
+    // Converte "HH:MM" -> "HH:MM:SS" (coluna TIME aceita ambos; padroniza)
+    function padHHMMSS(v) {
+      if (!v) return null;
+      return /^\d{2}:\d{2}$/.test(v) ? v + ':00' : v;
+    }
+    // Converte "HH:MM:SS" -> "HH:MM" para mostrar no input time
+    function toHHMM(v) {
+      return (typeof v === 'string' && /^\d{2}:\d{2}:\d{2}$/.test(v)) ? v.slice(0,5) : (v || '');
+    }
 
-    // Carregar dados do usuário e preencher
     async function carregarUsuario() {
       const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
       if (userError || !user) {
@@ -74,32 +264,42 @@
         window.location.href = "LoginProjet.html";
         return;
       }
+      currentUser = user;
       userEmail = user.email;
 
-      // Carregar foto do localStorage
-      const storedAvatar = localStorage.getItem("avatar_url");
-      if (storedAvatar) {
-        document.getElementById('preview').src = storedAvatar;
+      // Perfil (linha mais recente por e-mail)
+      const { data: rows, error } = await supabaseClient
+        .from('cadastro')
+        .select('id, primeiro, segundo, terceiro, avatar_url')
+        .eq('email', userEmail)
+        .order('id', { ascending: false })
+        .limit(1);
+
+      const preview = document.getElementById('preview');
+      preview.src = DEFAULT_AVATAR; // default sempre
+
+      if (error) {
+        console.error('Erro ao carregar cadastro:', error);
+        return;
       }
 
-      // Carregar horários do localStorage
-      const horarios = JSON.parse(localStorage.getItem('horarios') || '{}');
-      if (horarios.primeiro) document.getElementById('primeiro').value = horarios.primeiro;
-      if (horarios.segundo) document.getElementById('segundo').value = horarios.segundo;
-      if (horarios.terceiro) document.getElementById('terceiro').value = horarios.terceiro;
+      if (rows && rows.length > 0) {
+        const row = rows[0];
+        linhaId = row.id;
+        document.getElementById('primeiro').value = toHHMM(row.primeiro);
+        document.getElementById('segundo').value  = toHHMM(row.segundo);
+        document.getElementById('terceiro').value = toHHMM(row.terceiro);
+
+        // Se tiver avatar salvo, usa
+        if (row.avatar_url) preview.src = row.avatar_url;
+      }
     }
 
-    // Função para salvar horários no Supabase e no localStorage
     async function salvarHorarios() {
       const primeiro = padHHMMSS(document.getElementById('primeiro').value || null);
-      const segundo = padHHMMSS(document.getElementById('segundo').value || null);
+      const segundo  = padHHMMSS(document.getElementById('segundo').value  || null);
       const terceiro = padHHMMSS(document.getElementById('terceiro').value || null);
 
-      // Salva no localStorage para persistir mesmo se trocar de página
-      const horarios = { primeiro, segundo, terceiro };
-      localStorage.setItem('horarios', JSON.stringify(horarios)); // Salva no localStorage
-
-      // Atualiza o Supabase com os novos horários
       if (linhaId) {
         const { error } = await supabaseClient
           .from('cadastro')
@@ -111,31 +311,125 @@
           alert('Erro ao salvar horários: ' + error.message);
           return;
         }
-        alert('Horários salvos no Supabase e localmente!');
-      } else {
-        alert('Erro ao salvar horários no Supabase');
+        alert('Horários salvos com sucesso!');
+        return;
       }
+
+      // Fallback legado: atualiza por e-mail (pode pegar mais de 1 linha antiga)
+      if (!userEmail) {
+        alert('Usuário não autenticado.');
+        return;
+      }
+      const { data, error: updErr } = await supabaseClient
+        .from('cadastro')
+        .update({ primeiro, segundo, terceiro })
+        .eq('email', userEmail)
+        .select('id');
+
+      if (updErr) {
+        console.error('Erro ao salvar horários:', updErr);
+        alert('Erro ao salvar horários: ' + updErr.message);
+        return;
+      }
+      if (!data || data.length === 0) {
+        alert('Seu cadastro ainda não existe. Conclua o cadastro primeiro.');
+        return;
+      }
+      alert('Horários salvos com sucesso!');
     }
 
-    // Função para salvar a foto no localStorage (não faz upload para Supabase)
-    document.getElementById('foto').addEventListener('change', (e) => {
+    // ===== Upload da fotinha para Supabase Storage (bucket: "avatars") =====
+    document.getElementById('foto').addEventListener('change', async (e) => {
       const file = e.target.files?.[0];
-      if (!file) return;
+      if (!file || !currentUser) return;
 
-      // Preview imediato no cliente
       const preview = document.getElementById('preview');
+      // Preview imediato no cliente
       preview.src = URL.createObjectURL(file);
 
-      // Salva foto no localStorage
-      const reader = new FileReader();
-      reader.onloadend = function () {
-        const avatarUrl = reader.result;
-        localStorage.setItem("avatar_url", avatarUrl); // Armazena no localStorage
-      };
-      reader.readAsDataURL(file); // Converte para base64
+      try {
+        // Caminho do arquivo no bucket
+        const path = `${currentUser.id}/${Date.now()}_${file.name}`;
+
+        // Faz upload (bucket deve existir: "avatars", público)
+        const { error: upErr } = await supabaseClient.storage
+          .from('avatars')
+          .upload(path, file, { upsert: true });
+
+        if (upErr) throw upErr;
+
+        // Pega URL pública
+        const { data: pub } = supabaseClient.storage
+          .from('avatars')
+          .getPublicUrl(path);
+
+        const avatarUrl = pub?.publicUrl;
+        if (!avatarUrl) return;
+
+        // Salva o link na tabela (se a coluna avatar_url existir)
+        if (linhaId) {
+          await supabaseClient
+            .from('cadastro')
+            .update({ avatar_url: avatarUrl })
+            .eq('id', linhaId);
+        } else if (userEmail) {
+          await supabaseClient
+            .from('cadastro')
+            .update({ avatar_url: avatarUrl })
+            .eq('email', userEmail);
+        }
+      } catch (err) {
+        console.error('Erro no upload do avatar:', err);
+        // mantém o preview local mesmo que não salve no banco
+      }
     });
 
-    window.onload = carregarUsuario;
+    /* ===== Menu mobile ===== */
+    function toggleSidebar(open) {
+      const sidebar = document.querySelector('nav.sidebar');
+      const backdrop = document.getElementById('backdrop');
+      if (open) {
+        sidebar.classList.remove('mobile-hidden');
+        backdrop.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+      } else {
+        sidebar.classList.add('mobile-hidden');
+        backdrop.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    }
+    function closeMenuOnNavigate() {
+      if (window.matchMedia('(max-width: 768px)').matches) toggleSidebar(false);
+    }
+
+    // Navegação (fecha menu no mobile)
+    function goToHome() { closeMenuOnNavigate(); window.location.href = 'base.html'; }
+    function verLogs() { closeMenuOnNavigate(); window.location.href = 'logs.html'; }
+    function verClassificacao() { closeMenuOnNavigate(); window.location.href = 'classificação.html'; }
+    function verPerfil() { closeMenuOnNavigate(); window.location.href = 'perfil.html'; }
+
+    function logout() {
+      supabaseClient.auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      });
+    }
+
+    window.onload = () => {
+      carregarUsuario();
+      lucide.createIcons();
+
+      // Estado inicial da sidebar no mobile: escondida
+      if (window.matchMedia('(max-width: 768px)').matches) {
+        document.querySelector('nav.sidebar').classList.add('mobile-hidden');
+      }
+      // Botão hamburguer
+      document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+        const isHidden = document.querySelector('nav.sidebar').classList.contains('mobile-hidden');
+        toggleSidebar(isHidden);
+      });
+      // Clicar no backdrop fecha
+      document.getElementById('backdrop').addEventListener('click', () => toggleSidebar(false));
+    };
   </script>
 </body>
 </html>
