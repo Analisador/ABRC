@@ -128,54 +128,6 @@
       margin-top: 20px;
     }
     button.save-btn:hover { background-color: #cccccc; }
-
-    /* ====== Responsividade: barra lateral móvel ====== */
-    #mobileMenuBtn {
-      position: fixed;
-      top: 14px;
-      left: 14px;
-      z-index: 1001;
-      background: rgba(0,0,0,0.85);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 10px;
-      padding: 10px 12px;
-      cursor: pointer;
-      display: none; /* desktop some */
-    }
-    #backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.5);
-      z-index: 1000;
-      display: none;
-    }
-    nav.sidebar.mobile-hidden { transform: translateX(-100%); }
-
-    @media (max-width: 768px) {
-      #mobileMenuBtn { display: inline-flex; align-items: center; gap: 8px; }
-      nav.sidebar {
-        position: fixed;
-        top: 0; left: 0; bottom: 0;
-        height: 100vh;
-        z-index: 1002;
-        transform: translateX(0);
-        transition: transform .3s ease;
-        width: 80vw;
-        max-width: 300px;
-        border-right: 1px solid rgba(255,255,255,0.1);
-      }
-      nav.sidebar.mobile-hidden { transform: translateX(-100%); }
-      main.container {
-        margin: 70px 12px 12px 12px;
-        padding: 16px;
-        border-radius: 14px;
-      }
-    }
-    @media (min-width: 769px) {
-      #mobileMenuBtn, #backdrop { display: none !important; }
-      nav.sidebar { position: relative; transform: none !important; }
-    }
   </style>
 </head>
 
