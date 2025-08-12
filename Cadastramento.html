@@ -14,16 +14,30 @@
 
     body {
       font-family: Arial, Helvetica, sans-serif;
-      background-image: linear-gradient(to right, rgb(32, 94, 217), rgb(201, 4, 70));
       min-height: 100vh;
-      padding: 20px;
       display: flex;
       justify-content: center;
       align-items: center;
+      animation: gradientAnimation 12s ease infinite;
+      background-size: 300% 300%;
+      background-image: linear-gradient(-45deg, #c2142b, #2165ac, #f2c546, #c2142b);
+      padding: 20px;
+    }
+
+    @keyframes gradientAnimation {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
     }
 
     .box {
-      background-color: rgba(0, 0, 0, 0.7);
+      background-color: rgba(0, 0, 0, 0.75);
       color: white;
       padding: 30px;
       border-radius: 15px;
@@ -38,18 +52,18 @@
     }
 
     .logo img {
-      width: 100px;
+      width: 120px;
       height: auto;
     }
 
     fieldset {
-      border: 2px solid dodgerblue;
+      border: 2px solid #2165ac;
       border-radius: 10px;
       padding: 20px;
     }
 
     legend {
-      background-color: dodgerblue;
+      background-color: #2165ac;
       padding: 10px;
       border-radius: 8px;
       font-weight: bold;
@@ -90,7 +104,7 @@
     .inputUser:valid~.labelInput {
       top: -18px;
       font-size: 12px;
-      color: dodgerblue;
+      color: #f2c546;
     }
 
     input[type="date"] {
@@ -104,7 +118,7 @@
     }
 
     #submit {
-      background-image: linear-gradient(to right, rgb(52, 58, 255), rgb(132, 192, 251));
+      background-image: linear-gradient(to right, #2165ac, #f2c546);
       border: none;
       width: 100%;
       padding: 15px;
@@ -113,10 +127,11 @@
       cursor: pointer;
       border-radius: 10px;
       margin-top: 20px;
+      transition: 0.3s;
     }
 
     #submit:hover {
-      background-image: linear-gradient(to right, rgb(37, 42, 174), rgb(86, 129, 172));
+      background-image: linear-gradient(to right, #164c80, #d9aa34);
     }
 
     .back-login {
@@ -125,7 +140,7 @@
     }
 
     .back-login a {
-      color: dodgerblue;
+      color: #f2c546;
       text-decoration: none;
     }
 
@@ -202,7 +217,7 @@
 <body>
   <div class="box">
     <div class="logo">
-      <img src="sua-logo.png" alt="Logo">
+      <img src="images/logo-abrc.png" alt="Logo">
     </div>
     <form id="cadastro-form">
       <fieldset>
@@ -227,7 +242,10 @@
           <input type="password" name="senha" id="senha" class="inputUser" required>
           <label for="senha" class="labelInput">Senha</label>
           <button type="button" class="toggle-olho" onclick="toggleSenha('senha')">
-            <svg viewBox="0 0 24 24"><path d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/><circle cx="12" cy="12" r="2.5"/></svg>
+            <svg viewBox="0 0 24 24">
+              <path d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z" />
+              <circle cx="12" cy="12" r="2.5" />
+            </svg>
           </button>
         </div>
 
@@ -238,7 +256,10 @@
           <input type="password" name="confirmar_senha" id="confirmar_senha" class="inputUser" required>
           <label for="confirmar_senha" class="labelInput">Confirmar Senha</label>
           <button type="button" class="toggle-olho" onclick="toggleSenha('confirmar_senha')">
-            <svg viewBox="0 0 24 24"><path d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/><circle cx="12" cy="12" r="2.5"/></svg>
+            <svg viewBox="0 0 24 24">
+              <path d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z" />
+              <circle cx="12" cy="12" r="2.5" />
+            </svg>
           </button>
         </div>
 
