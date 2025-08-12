@@ -1,161 +1,377 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f6f8;
-            display: flex;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perfil</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background-image: linear-gradient(45deg, rgb(32, 94, 217), rgb(201, 4, 70));
+      display: flex;
+      height: 100vh;
+      color: white;
+    }
+    nav.sidebar {
+      background: rgba(0, 0, 0, 0.8);
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      box-sizing: border-box;
+      gap: 25px;
+    }
+    nav.sidebar h2 { margin: 0 0 30px 0; font-size: 22px; text-align: center; }
+    nav.sidebar button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    nav.sidebar button:hover { background-color: #ff4e4e; }
+    nav.sidebar button svg { stroke: white; width: 20px; height: 20px; }
 
-        /* Sidebar fixa */
-        .sidebar {
-            width: 220px;
-            background-color: #000; /* toda preta */
-            color: white;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 20px;
-            position: fixed;
-            left: 0;
-            top: 0;
-        }
+    main.container {
+      flex-grow: 1;
+      background-color: rgba(0, 0, 0, 0.8);
+      margin: 40px;
+      padding: 28px 24px 40px;
+      border-radius: 20px;
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
 
-        .sidebar img {
-            max-height: 60px;
-            margin-bottom: 20px;
-        }
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .page-header h1 {
+      margin: 0;
+      text-align: center;
+      line-height: 1.2;
+    }
 
-        .sidebar nav {
-            width: 100%;
-        }
+    .profile-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 16px auto 30px;
+      gap: 10px;
+    }
+    .profile-pic {
+      border-radius: 50%;
+      width: 140px;
+      height: 140px;
+      object-fit: cover;
+      border: 4px solid white;
+      background: rgba(255,255,255,0.06);
+      display: block;
+    }
+    input[type="file"] { display: none; }
+    .upload-label {
+      background-color: #ffffff;
+      color: black;
+      padding: 8px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+    .upload-label:hover { background-color: #cccccc; }
 
-        .sidebar nav a {
-            display: block;
-            color: white;
-            padding: 12px 20px;
-            text-decoration: none;
-            transition: background 0.3s;
-        }
+    .explanation {
+      max-width: 600px;
+      margin: 12px auto 20px;
+      text-align: center;
+      font-size: 16px;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 12px;
+    }
 
-        .sidebar nav a:hover {
-            background-color: #222;
-        }
+    .form-group {
+      max-width: 400px;
+      margin: 0 auto 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    label { font-weight: bold; }
+    input[type="time"] {
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    button.save-btn {
+      background-color: #ffffff;
+      color: black;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin-top: 20px;
+    }
+    button.save-btn:hover { background-color: #cccccc; }
 
-        /* Área principal */
-        .main-content {
-            margin-left: 220px; /* largura da sidebar */
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+    /* ====== Responsividade: barra lateral móvel ====== */
+    #mobileMenuBtn {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      z-index: 1001;
+      background: rgba(0,0,0,0.85);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      padding: 10px 12px;
+      cursor: pointer;
+      display: none; /* desktop some */
+    }
+    #backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      display: none;
+    }
+    nav.sidebar.mobile-hidden { transform: translateX(-100%); }
 
-        header {
-            background: linear-gradient(to right, #d4145a, #fbb03b); /* animação igual seu print */
-            padding: 15px;
-            text-align: center;
-            width: 100%;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-        h1 {
-            margin: 0;
-            color: #fff;
-            font-size: 1.8em;
-        }
-
-        .container {
-            flex: 1;
-            padding: 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .card {
-            background-color: #fff;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-
-        canvas {
-            max-width: 100%;
-            height: auto;
-        }
-    </style>
+    @media (max-width: 768px) {
+      #mobileMenuBtn { display: inline-flex; align-items: center; gap: 8px; }
+      nav.sidebar {
+        position: fixed;
+        top: 0; left: 0; bottom: 0;
+        height: 100vh;
+        z-index: 1002;
+        transform: translateX(0);
+        transition: transform .3s ease;
+        width: 80vw;
+        max-width: 300px;
+        border-right: 1px solid rgba(255,255,255,0.1);
+      }
+      nav.sidebar.mobile-hidden { transform: translateX(-100%); }
+      main.container {
+        margin: 70px 12px 12px 12px;
+        padding: 16px;
+        border-radius: 14px;
+      }
+    }
+    @media (min-width: 769px) {
+      #mobileMenuBtn, #backdrop { display: none !important; }
+      nav.sidebar { position: relative; transform: none !important; }
+    }
+  </style>
 </head>
+
 <body>
+  <!-- Botão hamburguer (mobile) -->
+  <button id="mobileMenuBtn" aria-label="Abrir menu">
+    <i data-lucide="menu"></i>
+  </button>
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <img src="SUA_LOGO_AQUI.png" alt="Logo da Empresa">
-        <nav>
-            <a href="#">🏠 Dashboard</a>
-            <a href="#">📊 Relatórios</a>
-            <a href="#">📈 Classificação</a>
-            <a href="#">👤 Perfil</a>
-            <a href="#">🚪 Logout</a>
-        </nav>
-    </aside>
+  <!-- Backdrop (clica e fecha) -->
+  <div id="backdrop"></div>
 
-    <!-- Conteúdo -->
-    <div class="main-content">
-        <header>
-            <h1>Dashboard de Vendas</h1>
-        </header>
+  <nav class="sidebar">
+    <h2>A.B.R.C</h2>
+    <button onclick="goToHome()"><i data-lucide="home"></i> Speed Test</button>
+    <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
+    <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Classificação</button>
+    <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
+    <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
+  </nav>
 
-        <main class="container">
-            <div class="card">
-                <h2>Gráfico 1</h2>
-                <canvas id="grafico1"></canvas>
-            </div>
-
-            <div class="card">
-                <h2>Gráfico 2</h2>
-                <canvas id="grafico2"></canvas>
-            </div>
-        </main>
+  <main class="container">
+    <div class="page-header">
+      <h1>Seu Perfil</h1>
     </div>
 
-    <!-- Bibliotecas -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        const ctx1 = document.getElementById('grafico1').getContext('2d');
-        new Chart(ctx1, {
-            type: 'bar',
-            data: {
-                labels: ['Janeiro', 'Fevereiro', 'Março'],
-                datasets: [{
-                    label: 'Vendas',
-                    data: [12, 19, 3],
-                    backgroundColor: '#4e73df'
-                }]
-            }
-        });
+    <div class="profile-section">
+      <img id="preview" class="profile-pic" alt="Foto de Perfil" />
+      <label for="foto" class="upload-label">Escolher Foto</label>
+      <input type="file" id="foto" accept="image/*" />
+    </div>
 
-        const ctx2 = document.getElementById('grafico2').getContext('2d');
-        new Chart(ctx2, {
-            type: 'line',
-            data: {
-                labels: ['Janeiro', 'Fevereiro', 'Março'],
-                datasets: [{
-                    label: 'Lucro',
-                    data: [15, 10, 25],
-                    backgroundColor: '#1cc88a',
-                    borderColor: '#1cc88a'
-                }]
-            }
-        });
-    </script>
+    <div class="explanation">
+      Os horários abaixo determinam quando os testes de velocidade serão executados automaticamente.
+      Escolha até três horários do seu dia para que o sistema colete os dados de forma automática.
+    </div>
 
+    <div class="form-group">
+      <label for="primeiro">Horário 1:</label>
+      <input type="time" id="primeiro" />
+      <label for="segundo">Horário 2:</label>
+      <input type="time" id="segundo" />
+      <label for="terceiro">Horário 3:</label>
+      <input type="time" id="terceiro" />
+    </div>
+
+    <div style="text-align: center;">
+      <button class="save-btn" onclick="salvarHorarios()">Salvar Horários</button>
+    </div>
+  </main>
+
+  <script>
+    const { createClient } = supabase;
+    const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs';
+    const supabaseClient = createClient(supabaseUrl, supabaseKey);
+
+    // Placeholder seguro (SVG) pra evitar ícone "?" no iOS
+    const DEFAULT_AVATAR = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="140" height="140">
+        <rect width="100%" height="100%" fill="#273142"/>
+        <circle cx="70" cy="55" r="28" fill="#ffffff"/>
+        <rect x="25" y="95" width="90" height="30" rx="15" fill="#ffffff"/>
+      </svg>
+    `);
+
+    let userEmail = null;
+    let linhaId = null; // id da linha de cadastro que vamos atualizar
+    let currentUser = null;
+
+    // Converte "HH:MM" -> "HH:MM:SS" (coluna TIME aceita ambos; padroniza)
+    function padHHMMSS(v) {
+      if (!v) return null;
+      return /^\d{2}:\d{2}$/.test(v) ? v + ':00' : v;
+    }
+    // Converte "HH:MM:SS" -> "HH:MM" para mostrar no input time
+    function toHHMM(v) {
+      return (typeof v === 'string' && /^\d{2}:\d{2}:\d{2}$/.test(v)) ? v.slice(0,5) : (v || '');
+    }
+
+    async function carregarUsuario() {
+      const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+      if (userError || !user) {
+        alert("Usuário não autenticado");
+        window.location.href = "LoginProjet.html";
+        return;
+      }
+      currentUser = user;
+      userEmail = user.email;
+
+      // Carregar horários do localStorage
+      const horario1 = localStorage.getItem('horario1');
+      const horario2 = localStorage.getItem('horario2');
+      const horario3 = localStorage.getItem('horario3');
+
+      document.getElementById('primeiro').value = horario1 || '';
+      document.getElementById('segundo').value = horario2 || '';
+      document.getElementById('terceiro').value = horario3 || '';
+
+      // Perfil (linha mais recente por e-mail)
+      const { data: rows, error } = await supabaseClient
+        .from('cadastro')
+        .select('id, primeiro, segundo, terceiro, avatar_url')
+        .eq('email', userEmail)
+        .order('id', { ascending: false })
+        .limit(1);
+
+      const preview = document.getElementById('preview');
+      preview.src = DEFAULT_AVATAR; // default sempre
+
+      if (error) {
+        console.error('Erro ao carregar cadastro:', error);
+        return;
+      }
+
+      if (rows && rows.length > 0) {
+        const row = rows[0];
+        linhaId = row.id;
+        document.getElementById('primeiro').value = toHHMM(row.primeiro);
+        document.getElementById('segundo').value  = toHHMM(row.segundo);
+        document.getElementById('terceiro').value = toHHMM(row.terceiro);
+
+        // Se tiver avatar salvo, usa
+        if (row.avatar_url) preview.src = row.avatar_url;
+      }
+    }
+
+    async function salvarHorarios() {
+      const primeiro = padHHMMSS(document.getElementById('primeiro').value || null);
+      const segundo  = padHHMMSS(document.getElementById('segundo').value  || null);
+      const terceiro = padHHMMSS(document.getElementById('terceiro').value || null);
+
+      // Salvar os horários no localStorage
+      localStorage.setItem('horario1', primeiro);
+      localStorage.setItem('horario2', segundo);
+      localStorage.setItem('horario3', terceiro);
+
+      // Verifica se o usuário já tem um cadastro no Supabase
+      if (linhaId) {
+        // Atualiza os horários no Supabase, caso a linha já exista
+        const { error } = await supabaseClient
+          .from('cadastro')
+          .update({ primeiro, segundo, terceiro })
+          .eq('id', linhaId); // Atualiza pela linha de ID
+
+        if (error) {
+          console.error("Erro ao salvar horários:", error);
+          alert('Erro ao salvar horários: ' + error.message);
+          return;
+        }
+        alert('Horários salvos com sucesso!');
+        return;
+      }
+
+      // Caso contrário, cria um novo registro no Supabase
+      if (!userEmail) {
+        alert('Usuário não autenticado.');
+        return;
+      }
+
+      const { data, error: updErr } = await supabaseClient
+        .from('cadastro')
+        .update({ primeiro, segundo, terceiro })
+        .eq('email', userEmail)
+        .select('id');
+
+      if (updErr) {
+        console.error('Erro ao salvar horários:', updErr);
+        alert('Erro ao salvar horários: ' + updErr.message);
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        alert('Seu cadastro ainda não existe. Conclua o cadastro primeiro.');
+        return;
+      }
+
+      alert('Horários salvos com sucesso!');
+    }
+
+    // Navegação entre as páginas
+    function goToHome() { window.location.href = 'base.html'; }
+    function verLogs() { window.location.href = 'logs.html'; }
+    function verClassificacao() { window.location.href = 'classificação.html'; }
+    function verPerfil() { window.location.href = 'perfil.html'; }
+
+    function logout() {
+      supabaseClient.auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      });
+    }
+
+    window.onload = () => {
+      carregarUsuario();
+      lucide.createIcons();
+    };
+  </script>
 </body>
 </html>
