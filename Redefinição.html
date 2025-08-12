@@ -1,17 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Nova Senha</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: Arial, Helvetica, sans-serif;
       height: 100vh;
@@ -22,13 +16,11 @@
       background-size: 300% 300%;
       background-image: linear-gradient(-45deg, #c2142b, #2165ac, #f2c546, #c2142b);
     }
-
     @keyframes gradientAnimation {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-
     .reset-container {
       background-color: rgba(0, 0, 0, 0.75);
       padding: 35px;
@@ -38,22 +30,9 @@
       max-width: 400px;
       text-align: center;
     }
-
-    .logo {
-      width: 140px;
-      margin: 0 auto 18px auto;
-      display: block;
-    }
-
-    h1 {
-      margin-bottom: 22px;
-    }
-
-    .inputBox {
-      margin-bottom: 18px;
-      text-align: left;
-    }
-
+    .logo { width: 140px; margin: 0 auto 18px; display: block; }
+    h1 { margin-bottom: 22px; }
+    .inputBox { margin-bottom: 18px; text-align: left; }
     input[type="password"] {
       padding: 15px;
       border: none;
@@ -67,11 +46,7 @@
       font-family: monospace;
       min-height: 48px;
     }
-
-    input::placeholder {
-      color: rgba(255, 255, 255, 0.8);
-    }
-
+    input::placeholder { color: rgba(255, 255, 255, 0.8); }
     button {
       background-image: linear-gradient(to right, #2165ac, #f2c546);
       border: none;
@@ -83,40 +58,20 @@
       cursor: pointer;
       transition: 0.3s;
     }
-
-    button:hover {
-      background-image: linear-gradient(to right, #164c80, #d9aa34);
-    }
-
-    .back-link {
-      margin-top: 18px;
-      font-size: 14px;
-    }
-
-    .back-link a {
-      color: #f2c546;
-      text-decoration: none;
-    }
-
-    .back-link a:hover {
-      text-decoration: underline;
-    }
+    button:hover { background-image: linear-gradient(to right, #164c80, #d9aa34); }
+    .back-link { margin-top: 18px; font-size: 14px; }
+    .back-link a { color: #f2c546; text-decoration: none; }
+    .back-link a:hover { text-decoration: underline; }
   </style>
 </head>
-
 <body>
   <div class="reset-container">
-    <!-- Logo igual à das outras páginas -->
     <img src="images/logo-abrc.png" alt="Logo" class="logo">
-
     <h1>Nova Senha</h1>
-
     <div class="inputBox">
       <input type="password" id="new-password" placeholder="Digite a nova senha" required />
     </div>
-
     <button id="set-password">Atualizar senha</button>
-
     <div class="back-link">
       <p><a href="index.html">Voltar para o login</a></p>
     </div>
@@ -126,43 +81,40 @@
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
+    const supabaseKey = 'YOUR_PUBLIC_ANON_KEY_AQUI';
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Captura token e inicia sessão ao abrir o link do e-mail
+    // Captura params da URL
     const params = new URLSearchParams(window.location.hash.replace('#', '?'));
     const access_token = params.get('access_token');
     const refresh_token = params.get('refresh_token');
+    const type = params.get('type');
 
-    if (access_token && refresh_token) {
-      const { error } = await supabase.auth.setSession({
-        access_token,
-        refresh_token
-      });
+    // Garante que seja o fluxo de recuperação
+    if (type === 'recovery' && access_token && refresh_token) {
+      const { error } = await supabase.auth.setSession({ access_token, refresh_token });
       if (error) {
         alert('Erro ao validar sessão: ' + error.message);
+      } else {
+        // Remove tokens da URL (por segurança)
+        window.history.replaceState({}, document.title, window.location.pathname);
       }
     }
 
     document.getElementById('set-password').addEventListener('click', async () => {
       const newPassword = document.getElementById('new-password').value;
-
       if (!newPassword || newPassword.length < 6) {
         alert('A nova senha deve ter pelo menos 6 caracteres.');
         return;
       }
-
       const { error } = await supabase.auth.updateUser({ password: newPassword });
-
       if (error) {
         alert('Erro ao atualizar senha: ' + error.message);
         return;
       }
-
       alert('Senha atualizada com sucesso! Faça login novamente.');
       window.location.href = 'index.html';
     });
   </script>
 </body>
-
 </html>
