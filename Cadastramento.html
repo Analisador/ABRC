@@ -52,7 +52,7 @@
     }
 
     .logo img {
-      width: 120px;
+      width: 140px;
       height: auto;
     }
 
@@ -157,7 +157,7 @@
 
     .forca-senha {
       font-size: 14px;
-      margin-top: 0;
+      margin-top: -10px;
       margin-bottom: 10px;
       display: block;
     }
@@ -234,7 +234,7 @@
         </div>
 
         <div class="inputBox">
-          <input type="text" name="telefone" id="telefone" class="inputUser" required placeholder="(__) _____-____">
+          <input type="text" name="telefone" id="telefone" class="inputUser" required placeholder="">
           <label for="telefone" class="labelInput">Telefone</label>
         </div>
 
@@ -315,6 +315,16 @@
     const senhaFeedback = document.getElementById('senha-feedback');
     const forcaSenha = document.getElementById('forca-senha');
     const telefoneInput = document.getElementById('telefone');
+
+    telefoneInput.addEventListener('focus', function () {
+      telefoneInput.placeholder = '(__) _____-____';
+    });
+
+    telefoneInput.addEventListener('blur', function () {
+      if (!telefoneInput.value) {
+        telefoneInput.placeholder = '';
+      }
+    });
 
     telefoneInput.addEventListener('input', function () {
       let v = telefoneInput.value.replace(/\D/g, '');
