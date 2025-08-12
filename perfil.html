@@ -3,118 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Controle</title>
+    <title>Painel</title>
     <style>
-        /* Reset básico */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
             font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            padding: 20px;
-        }
-
-        /* Cabeçalho */
-        header {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f8;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #ffffff;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            flex-wrap: wrap;
         }
 
-        header img {
-            height: 50px;
-            margin-right: 15px;
-        }
-
-        header h1 {
-            font-size: 1.8rem;
-            color: #333;
-            text-align: center;
-        }
-
-        /* Container principal */
-        main {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        /* Cartões */
-        .card {
-            background-color: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        /* Sidebar fixa */
+        .sidebar {
+            width: 220px;
+            background-color: #000; /* toda preta */
+            color: white;
+            height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            transition: transform 0.2s ease;
+            padding-top: 20px;
+            position: fixed;
+            left: 0;
+            top: 0;
         }
 
-        .card:hover {
-            transform: translateY(-5px);
+        .sidebar img {
+            max-height: 60px;
+            margin-bottom: 20px;
         }
 
-        .card h2 {
-            font-size: 1.3rem;
-            color: #444;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        /* Gráfico */
-        .grafico {
+        .sidebar nav {
             width: 100%;
-            height: 200px;
-            background: linear-gradient(to bottom, #4e73df, #224abe);
-            border-radius: 8px;
         }
 
-        /* Responsividade */
-        @media (max-width: 500px) {
-            header {
-                flex-direction: column;
-                text-align: center;
-            }
-            header img {
-                margin-bottom: 10px;
-            }
+        .sidebar nav a {
+            display: block;
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .sidebar nav a:hover {
+            background-color: #222;
+        }
+
+        /* Área principal */
+        .main-content {
+            margin-left: 220px; /* largura da sidebar */
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(to right, #d4145a, #fbb03b); /* animação igual seu print */
+            padding: 15px;
+            text-align: center;
+            width: 100%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            margin: 0;
+            color: #fff;
+            font-size: 1.8em;
+        }
+
+        .container {
+            flex: 1;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
         }
     </style>
 </head>
 <body>
 
-    <!-- Cabeçalho -->
-    <header>
-        <img src="logo.png" alt="Logo da Empresa">
-        <h1>Painel de Controle</h1>
-    </header>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <img src="SUA_LOGO_AQUI.png" alt="Logo da Empresa">
+        <nav>
+            <a href="#">🏠 Dashboard</a>
+            <a href="#">📊 Relatórios</a>
+            <a href="#">📈 Classificação</a>
+            <a href="#">👤 Perfil</a>
+            <a href="#">🚪 Logout</a>
+        </nav>
+    </aside>
 
     <!-- Conteúdo -->
-    <main>
-        <div class="card">
-            <h2>Vendas</h2>
-            <div class="grafico"></div>
-        </div>
-        <div class="card">
-            <h2>Usuários</h2>
-            <div class="grafico"></div>
-        </div>
-        <div class="card">
-            <h2>Desempenho</h2>
-            <div class="grafico"></div>
-        </div>
-    </main>
+    <div class="main-content">
+        <header>
+            <h1>Dashboard de Vendas</h1>
+        </header>
+
+        <main class="container">
+            <div class="card">
+                <h2>Gráfico 1</h2>
+                <canvas id="grafico1"></canvas>
+            </div>
+
+            <div class="card">
+                <h2>Gráfico 2</h2>
+                <canvas id="grafico2"></canvas>
+            </div>
+        </main>
+    </div>
+
+    <!-- Bibliotecas -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx1 = document.getElementById('grafico1').getContext('2d');
+        new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: ['Janeiro', 'Fevereiro', 'Março'],
+                datasets: [{
+                    label: 'Vendas',
+                    data: [12, 19, 3],
+                    backgroundColor: '#4e73df'
+                }]
+            }
+        });
+
+        const ctx2 = document.getElementById('grafico2').getContext('2d');
+        new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: ['Janeiro', 'Fevereiro', 'Março'],
+                datasets: [{
+                    label: 'Lucro',
+                    data: [15, 10, 25],
+                    backgroundColor: '#1cc88a',
+                    borderColor: '#1cc88a'
+                }]
+            }
+        });
+    </script>
 
 </body>
 </html>
