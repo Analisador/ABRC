@@ -299,11 +299,18 @@
       const segundo  = padHHMMSS(document.getElementById('segundo').value  || null);
       const terceiro = padHHMMSS(document.getElementById('terceiro').value || null);
 
+      // Salvar os horários no localStorage
+      localStorage.setItem('horario1', primeiro);
+      localStorage.setItem('horario2', segundo);
+      localStorage.setItem('horario3', terceiro);
+
+      // Verifica se o usuário já tem um cadastro no Supabase
       if (linhaId) {
+        // Atualiza os horários no Supabase, caso a linha já exista
         const { error } = await supabaseClient
           .from('cadastro')
           .update({ primeiro, segundo, terceiro })
-          .eq('id', linhaId);
+          .eq('id', linhaId); // Atualiza pela linha de ID
 
         if (error) {
           console.error("Erro ao salvar horários:", error);
@@ -314,11 +321,12 @@
         return;
       }
 
-      // Fallback legado: atualiza por e-mail (pode pegar mais de 1 linha antiga)
+      // Caso contrário, cria um novo registro no Supabase
       if (!userEmail) {
         alert('Usuário não autenticado.');
         return;
       }
+
       const { data, error: updErr } = await supabaseClient
         .from('cadastro')
         .update({ primeiro, segundo, terceiro })
@@ -330,10 +338,12 @@
         alert('Erro ao salvar horários: ' + updErr.message);
         return;
       }
+
       if (!data || data.length === 0) {
         alert('Seu cadastro ainda não existe. Conclua o cadastro primeiro.');
         return;
       }
+
       alert('Horários salvos com sucesso!');
     }
 
