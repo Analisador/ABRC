@@ -28,9 +28,11 @@
       0% {
         background-position: 0% 50%;
       }
+
       50% {
         background-position: 100% 50%;
       }
+
       100% {
         background-position: 0% 50%;
       }
@@ -307,7 +309,7 @@
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // substitua pela sua chave completa
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const form = document.getElementById('cadastro-form');
@@ -317,37 +319,74 @@
     const forcaSenha = document.getElementById('forca-senha');
     const telefoneInput = document.getElementById('telefone');
 
-    telefoneInput.addEventListener('focus', function () {
-      telefoneInput.placeholder = '(__) _____-____';
-    });
-
-    telefoneInput.addEventListener('blur', function () {
-      if (!telefoneInput.value) {
-        telefoneInput.placeholder = '';
-      }
-    });
-
-    telefoneInput.addEventListener('input', function () {
+    // Máscara telefone
+    telefoneInput.addEventListener('focus', () => telefoneInput.placeholder = '(__) _____-____');
+    telefoneInput.addEventListener('blur', () => { if (!telefoneInput.value) telefoneInput.placeholder = ''; });
+    telefoneInput.addEventListener('input', () => {
       let v = telefoneInput.value.replace(/\D/g, '');
       v = v.replace(/^(\d{2})(\d)/g, '($1) $2');
       v = v.replace(/(\d{5})(\d)/, '$1-$2');
       telefoneInput.value = v;
     });
 
-    form.addEventListener('submit', async function (event) {
+    // Envio formulário
+    form.addEventListener('submit', async (event) => {
       event.preventDefault();
+
+      const email = document.getElementById('email').value;
       const senha = senhaInput.value;
       const confirmarSenha = confirmarInput.value;
+      const nome = document.getElementById('nome').value;
+      const telefone = telefoneInput.value;
+      const sexo = document.querySelector('input[name="genero"]:checked')?.value;
+      const data_nascimento = document.getElementById('data_nascimento').value;
+      const cidade = document.getElementById('cidade').value;
+      const estado = document.getElementById('estado').value;
+      const endereco = document.getElementById('endereco').value;
 
       if (senha !== confirmarSenha) {
         senhaFeedback.textContent = "As senhas não coincidem.";
         return;
       }
-
+      if (senha.length < 8 || !/[A-Z]/.test(senha) || !/[0-9]/.test(senha)) {
+        senhaFeedback.textContent = "A senha deve ter no mínimo 8 caracteres, com letra maiúscula e número.";
+        return;
+      }
       senhaFeedback.textContent = "";
-      alert("Formulário enviado!");
+
+      // Cria conta no Supabase
+      const { error: signUpError } = await supabase.auth.signUp({
+        email,
+        password: senha,
+        options: { emailRedirectTo: 'https://seusite.com/confirmado' }
+      });
+
+      if (signUpError) {
+        alert('Erro ao criar conta: ' + signUpError.message);
+        return;
+      }
+
+      // Salva dados adicionais
+      const { error: insertError } = await supabase.from('cadastro').insert([{
+        email,
+        nome,
+        telefone,
+        sexo,
+        data_de_nascimento: data_nascimento,
+        cidade,
+        estado,
+        endereco
+      }]);
+
+      if (insertError) {
+        alert('Erro ao salvar dados: ' + insertError.message);
+      } else {
+        alert('Cadastro realizado! Verifique seu e-mail para confirmar a conta.');
+        form.reset();
+      }
     });
 
+    // Força senha
     senhaInput.addEventListener('input', () => {
       const senha = senhaInput.value;
       let forca = 0;
@@ -368,7 +407,8 @@
       }
     });
 
-    window.toggleSenha = function (id) {
+    // Mostrar/ocultar senha
+    window.toggleSenha = (id) => {
       const input = document.getElementById(id);
       input.type = input.type === 'password' ? 'text' : 'password';
     };
