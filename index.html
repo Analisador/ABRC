@@ -14,12 +14,11 @@
 
     body {
       font-family: Arial, Helvetica, sans-serif;
-      background-image: linear-gradient(to right, rgb(32, 94, 217), rgb(201, 4, 70));
+      background-image: linear-gradient(to right, #205ed9, #c90446); /* cores baseadas na logo */
       height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      position: relative;
     }
 
     .login-container {
@@ -30,6 +29,12 @@
       width: 100%;
       max-width: 400px;
       text-align: center;
+    }
+
+    .logo {
+      width: 150px;
+      margin: 0 auto 20px auto;
+      display: block;
     }
 
     .login-container h1 {
@@ -79,7 +84,7 @@
     }
 
     .options a {
-      color: dodgerblue;
+      color: #87cefa;
       text-decoration: none;
     }
 
@@ -88,7 +93,7 @@
     }
 
     button {
-      background-image: linear-gradient(to right, rgb(52, 58, 255), rgb(132, 192, 251));
+      background-image: linear-gradient(to right, #205ed9, #87cefa); /* degradê harmonizado */
       border: none;
       padding: 15px;
       width: 100%;
@@ -100,7 +105,7 @@
     }
 
     button:hover {
-      background-image: linear-gradient(to right, rgb(37, 42, 174), rgb(86, 129, 172));
+      background-image: linear-gradient(to right, #1740a8, #5daee8);
     }
 
     .register-link {
@@ -109,35 +114,21 @@
     }
 
     .register-link a {
-      color: dodgerblue;
+      color: #87cefa;
       text-decoration: none;
     }
 
     .register-link a:hover {
       text-decoration: underline;
     }
-
-    /* Logo no canto inferior direito */
-    .logo {
-      position: fixed;
-      bottom: 15px;
-      right: 15px;
-      width: 120px; /* tamanho médio */
-      height: auto;
-      opacity: 0.9;
-    }
-
-    /* Ajusta tamanho em telas menores */
-    @media (max-width: 600px) {
-      .logo {
-        width: 80px;
-      }
-    }
   </style>
 </head>
 
 <body>
   <div class="login-container">
+    <!-- Logo centralizada -->
+    <img src="images/logo-abrc.png" alt="Logo" class="logo">
+
     <h1>Login</h1>
 
     <div class="inputBox">
@@ -161,9 +152,6 @@
       <p>Não tem conta? <a href="Cadastramento.html">Cadastre-se</a></p>
     </div>
   </div>
-
-  <!-- Logo no canto -->
-  <img src="images/logo-abrc.png" alt="Logo" class="logo">
 
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
@@ -195,17 +183,14 @@
       window.location.href = 'base.html';
     }
 
-    // Clique no botão
     document.getElementById('login-btn').addEventListener('click', login);
 
-    // Enter para enviar
     document.addEventListener('keydown', function (event) {
       if (event.key === 'Enter') {
         login();
       }
     });
 
-    // Mostrar ou esconder senha
     document.getElementById('toggleSenha').addEventListener('change', function () {
       const senhaInput = document.getElementById('login-senha');
       senhaInput.type = this.checked ? 'text' : 'password';
