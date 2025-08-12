@@ -32,9 +32,9 @@
     }
     .logo { width: 140px; margin: 0 auto 18px; display: block; }
     h1 { margin-bottom: 22px; font-size: 1.8rem; }
-    .inputBox { margin-bottom: 18px; text-align: left; }
-    input[type="password"] {
-      padding: 15px;
+    .inputBox { margin-bottom: 18px; text-align: left; position: relative; }
+    input[type="password"], input[type="text"] {
+      padding: 15px 40px 15px 15px;
       border: none;
       outline: none;
       font-size: 15px;
@@ -47,10 +47,21 @@
       min-height: 48px;
       transition: border-color 0.3s;
     }
-    input[type="password"]:focus {
+    input:focus {
       border-color: #f2c546;
     }
     input::placeholder { color: rgba(255, 255, 255, 0.8); }
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 16px;
+      color: #f2c546;
+      background: none;
+      border: none;
+    }
     button {
       background-image: linear-gradient(to right, #2165ac, #f2c546);
       border: none;
@@ -70,12 +81,21 @@
 </head>
 <body>
   <div class="reset-container">
-    <img src="images/logo.png" alt="Logo" class="logo">
+    <img src="./images/logo.png" alt="Logo" class="logo">
     <h1>Nova Senha</h1>
+
     <div class="inputBox">
       <input type="password" id="new-password" placeholder="Digite a nova senha" required />
+      <button class="toggle-password" type="button" onclick="toggleVisibility('new-password')">👁</button>
     </div>
+
+    <div class="inputBox">
+      <input type="password" id="confirm-password" placeholder="Confirme a nova senha" required />
+      <button class="toggle-password" type="button" onclick="toggleVisibility('confirm-password')">👁</button>
+    </div>
+
     <button id="set-password">Atualizar senha</button>
+
     <div class="back-link">
       <p><a href="index.html">Voltar para o login</a></p>
     </div>
@@ -84,12 +104,11 @@
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-    const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
+     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     async function init() {
-      // Captura tokens (funciona com # ou ?)
       const hashParams = new URLSearchParams(window.location.hash.replace('#', '?'));
       const queryParams = new URLSearchParams(window.location.search);
 
@@ -106,15 +125,20 @@
         window.history.replaceState({}, document.title, window.location.pathname);
       }
     }
-
     init();
 
     document.getElementById('set-password').addEventListener('click', async () => {
       const btn = document.getElementById('set-password');
       const newPassword = document.getElementById('new-password').value.trim();
+      const confirmPassword = document.getElementById('confirm-password').value.trim();
 
       if (!newPassword || newPassword.length < 6) {
         alert('A nova senha deve ter pelo menos 6 caracteres.');
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        alert('As senhas não coincidem.');
         return;
       }
 
@@ -134,6 +158,12 @@
       alert('Senha atualizada com sucesso! Faça login novamente.');
       window.location.href = 'index.html';
     });
+
+    // Função para mostrar/ocultar senha
+    window.toggleVisibility = function (id) {
+      const input = document.getElementById(id);
+      input.type = input.type === 'password' ? 'text' : 'password';
+    };
   </script>
 </body>
 </html>
