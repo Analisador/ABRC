@@ -51,6 +51,7 @@
       box-sizing: border-box;
     }
 
+    /* Cabeçalho/título bem centralizado e com espaço */
     .page-header {
       display: flex;
       align-items: center;
@@ -233,11 +234,29 @@
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs';
     const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
+    // Placeholder seguro (SVG) pra evitar ícone "?" no iOS
+    const DEFAULT_AVATAR = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="140" height="140">
+        <rect width="100%" height="100%" fill="#273142"/>
+        <circle cx="70" cy="55" r="28" fill="#ffffff"/>
+        <rect x="25" y="95" width="90" height="30" rx="15" fill="#ffffff"/>
+      </svg>
+    `);
+
     let userEmail = null;
     let linhaId = null; // id da linha de cadastro que vamos atualizar
     let currentUser = null;
 
-    // Carregar o usuário e os horários
+    // Converte "HH:MM" -> "HH:MM:SS" (coluna TIME aceita ambos; padroniza)
+    function padHHMMSS(v) {
+      if (!v) return null;
+      return /^\d{2}:\d{2}$/.test(v) ? v + ':00' : v;
+    }
+    // Converte "HH:MM:SS" -> "HH:MM" para mostrar no input time
+    function toHHMM(v) {
+      return (typeof v === 'string' && /^\d{2}:\d{2}:\d{2}$/.test(v)) ? v.slice(0,5) : (v || '');
+    }
+
     async function carregarUsuario() {
       const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
       if (userError || !user) {
@@ -248,6 +267,7 @@
       currentUser = user;
       userEmail = user.email;
 
+      // Perfil (linha mais recente por e-mail)
       const { data: rows, error } = await supabaseClient
         .from('cadastro')
         .select('id, primeiro, segundo, terceiro, avatar_url')
@@ -256,7 +276,7 @@
         .limit(1);
 
       const preview = document.getElementById('preview');
-      preview.src = 'default_avatar_url'; // Default avatar
+      preview.src = DEFAULT_AVATAR; // default sempre
 
       if (error) {
         console.error('Erro ao carregar cadastro:', error);
@@ -266,18 +286,19 @@
       if (rows && rows.length > 0) {
         const row = rows[0];
         linhaId = row.id;
-        document.getElementById('primeiro').value = row.primeiro || '';
-        document.getElementById('segundo').value = row.segundo || '';
-        document.getElementById('terceiro').value = row.terceiro || '';
+        document.getElementById('primeiro').value = toHHMM(row.primeiro);
+        document.getElementById('segundo').value  = toHHMM(row.segundo);
+        document.getElementById('terceiro').value = toHHMM(row.terceiro);
+
+        // Se tiver avatar salvo, usa
         if (row.avatar_url) preview.src = row.avatar_url;
       }
     }
 
-    // Salvar horários no Supabase
     async function salvarHorarios() {
-      const primeiro = document.getElementById('primeiro').value || null;
-      const segundo = document.getElementById('segundo').value || null;
-      const terceiro = document.getElementById('terceiro').value || null;
+      const primeiro = padHHMMSS(document.getElementById('primeiro').value || null);
+      const segundo  = padHHMMSS(document.getElementById('segundo').value  || null);
+      const terceiro = padHHMMSS(document.getElementById('terceiro').value || null);
 
       if (linhaId) {
         const { error } = await supabaseClient
@@ -291,12 +312,123 @@
           return;
         }
         alert('Horários salvos com sucesso!');
+        return;
       }
+
+      // Fallback legado: atualiza por e-mail (pode pegar mais de 1 linha antiga)
+      if (!userEmail) {
+        alert('Usuário não autenticado.');
+        return;
+      }
+      const { data, error: updErr } = await supabaseClient
+        .from('cadastro')
+        .update({ primeiro, segundo, terceiro })
+        .eq('email', userEmail)
+        .select('id');
+
+      if (updErr) {
+        console.error('Erro ao salvar horários:', updErr);
+        alert('Erro ao salvar horários: ' + updErr.message);
+        return;
+      }
+      if (!data || data.length === 0) {
+        alert('Seu cadastro ainda não existe. Conclua o cadastro primeiro.');
+        return;
+      }
+      alert('Horários salvos com sucesso!');
+    }
+
+    // ===== Upload da fotinha para Supabase Storage (bucket: "avatars") =====
+    document.getElementById('foto').addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if (!file || !currentUser) return;
+
+      const preview = document.getElementById('preview');
+      // Preview imediato no cliente
+      preview.src = URL.createObjectURL(file);
+
+      try {
+        // Caminho do arquivo no bucket
+        const path = `${currentUser.id}/${Date.now()}_${file.name}`;
+
+        // Faz upload (bucket deve existir: "avatars", público)
+        const { error: upErr } = await supabaseClient.storage
+          .from('avatars')
+          .upload(path, file, { upsert: true });
+
+        if (upErr) throw upErr;
+
+        // Pega URL pública
+        const { data: pub } = supabaseClient.storage
+          .from('avatars')
+          .getPublicUrl(path);
+
+        const avatarUrl = pub?.publicUrl;
+        if (!avatarUrl) return;
+
+        // Salva o link na tabela (se a coluna avatar_url existir)
+        if (linhaId) {
+          await supabaseClient
+            .from('cadastro')
+            .update({ avatar_url: avatarUrl })
+            .eq('id', linhaId);
+        } else if (userEmail) {
+          await supabaseClient
+            .from('cadastro')
+            .update({ avatar_url: avatarUrl })
+            .eq('email', userEmail);
+        }
+      } catch (err) {
+        console.error('Erro no upload do avatar:', err);
+        // mantém o preview local mesmo que não salve no banco
+      }
+    });
+
+    /* ===== Menu mobile ===== */
+    function toggleSidebar(open) {
+      const sidebar = document.querySelector('nav.sidebar');
+      const backdrop = document.getElementById('backdrop');
+      if (open) {
+        sidebar.classList.remove('mobile-hidden');
+        backdrop.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+      } else {
+        sidebar.classList.add('mobile-hidden');
+        backdrop.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    }
+    function closeMenuOnNavigate() {
+      if (window.matchMedia('(max-width: 768px)').matches) toggleSidebar(false);
+    }
+
+    // Navegação (fecha menu no mobile)
+    function goToHome() { closeMenuOnNavigate(); window.location.href = 'base.html'; }
+    function verLogs() { closeMenuOnNavigate(); window.location.href = 'logs.html'; }
+    function verClassificacao() { closeMenuOnNavigate(); window.location.href = 'classificação.html'; }
+    function verPerfil() { closeMenuOnNavigate(); window.location.href = 'perfil.html'; }
+
+    function logout() {
+      supabaseClient.auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      });
     }
 
     window.onload = () => {
       carregarUsuario();
       lucide.createIcons();
+
+      // Estado inicial da sidebar no mobile: escondida
+      if (window.matchMedia('(max-width: 768px)').matches) {
+        document.querySelector('nav.sidebar').classList.add('mobile-hidden');
+      }
+      // Botão hamburguer
+      document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+        const isHidden = document.querySelector('nav.sidebar').classList.contains('mobile-hidden');
+        toggleSidebar(isHidden);
+      });
+      // Clicar no backdrop fecha
+      document.getElementById('backdrop').addEventListener('click', () => toggleSidebar(false));
     };
   </script>
 </body>
