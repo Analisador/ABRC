@@ -31,6 +31,17 @@
       max-width: 500px;
     }
 
+    .logo {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .logo img {
+      width: 100px;
+      height: auto;
+    }
+
     fieldset {
       border: 2px solid dodgerblue;
       border-radius: 10px;
@@ -126,12 +137,12 @@
       font-size: 14px;
       color: red;
       margin-top: 5px;
-      margin-bottom: 5px;
+      margin-bottom: 2px;
     }
 
     .forca-senha {
       font-size: 14px;
-      margin-top: 5px;
+      margin-top: 0;
       margin-bottom: 10px;
       display: block;
     }
@@ -157,6 +168,13 @@
       border: none;
       cursor: pointer;
       color: white;
+      padding: 0;
+    }
+
+    .toggle-olho svg {
+      width: 20px;
+      height: 20px;
+      fill: white;
     }
 
     @media (max-width: 600px) {
@@ -183,6 +201,9 @@
 
 <body>
   <div class="box">
+    <div class="logo">
+      <img src="sua-logo.png" alt="Logo">
+    </div>
     <form id="cadastro-form">
       <fieldset>
         <legend>Cadastro</legend>
@@ -198,14 +219,16 @@
         </div>
 
         <div class="inputBox">
-          <input type="text" name="telefone" id="telefone" class="inputUser" required>
+          <input type="text" name="telefone" id="telefone" class="inputUser" required placeholder="(__) _____-____">
           <label for="telefone" class="labelInput">Telefone</label>
         </div>
 
         <div class="inputBox">
           <input type="password" name="senha" id="senha" class="inputUser" required>
           <label for="senha" class="labelInput">Senha</label>
-          <button type="button" class="toggle-olho" onclick="toggleSenha('senha')">👁️</button>
+          <button type="button" class="toggle-olho" onclick="toggleSenha('senha')">
+            <svg viewBox="0 0 24 24"><path d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/><circle cx="12" cy="12" r="2.5"/></svg>
+          </button>
         </div>
 
         <div id="senha-feedback" class="senha-feedback"></div>
@@ -214,7 +237,9 @@
         <div class="inputBox">
           <input type="password" name="confirmar_senha" id="confirmar_senha" class="inputUser" required>
           <label for="confirmar_senha" class="labelInput">Confirmar Senha</label>
-          <button type="button" class="toggle-olho" onclick="toggleSenha('confirmar_senha')">👁️</button>
+          <button type="button" class="toggle-olho" onclick="toggleSenha('confirmar_senha')">
+            <svg viewBox="0 0 24 24"><path d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/><circle cx="12" cy="12" r="2.5"/></svg>
+          </button>
         </div>
 
         <div class="radio-group">
@@ -257,10 +282,10 @@
   </div>
 
   <script type="module">
-    import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs'; // Chave encurtada
+    const supabaseKey = 'SUA_CHAVE';
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const form = document.getElementById('cadastro-form');
@@ -268,71 +293,32 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
     const confirmarInput = document.getElementById('confirmar_senha');
     const senhaFeedback = document.getElementById('senha-feedback');
     const forcaSenha = document.getElementById('forca-senha');
+    const telefoneInput = document.getElementById('telefone');
 
-    // Permitir enviar com Enter
-    form.addEventListener('keypress', function (event) {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        document.getElementById('submit').click();
-      }
+    telefoneInput.addEventListener('input', function () {
+      let v = telefoneInput.value.replace(/\D/g, '');
+      v = v.replace(/^(\d{2})(\d)/g, '($1) $2');
+      v = v.replace(/(\d{5})(\d)/, '$1-$2');
+      telefoneInput.value = v;
     });
 
     form.addEventListener('submit', async function (event) {
       event.preventDefault();
-
-      const email = document.getElementById('email').value;
       const senha = senhaInput.value;
       const confirmarSenha = confirmarInput.value;
-      const nome = document.getElementById('nome').value;
-      const telefone = document.getElementById('telefone').value;
-      const sexo = document.querySelector('input[name="genero"]:checked')?.value;
-      const data_nascimento = document.getElementById('data_nascimento').value;
-      const cidade = document.getElementById('cidade').value;
-      const estado = document.getElementById('estado').value;
-      const endereco = document.getElementById('endereco').value;
 
       if (senha !== confirmarSenha) {
         senhaFeedback.textContent = "As senhas não coincidem.";
         return;
       }
 
-      if (senha.length < 8 || !/[A-Z]/.test(senha) || !/[0-9]/.test(senha)) {
-        senhaFeedback.textContent = "A senha deve ter no mínimo 8 caracteres, com letra maiúscula e número.";
-        return;
-      }
-
       senhaFeedback.textContent = "";
-
-      const {error: signUpError} = await supabase.auth.signUp({email, password: senha});
-
-      if (signUpError) {
-        alert('Erro ao criar conta: ' + signUpError.message);
-        return;
-      }
-
-      const {error: insertError} = await supabase.from('cadastro').insert([{
-        email,
-        nome,
-        telefone,
-        sexo,
-        data_de_nascimento: data_nascimento,
-        cidade,
-        estado,
-        endereco
-      }]);
-
-      if (insertError) {
-        alert('Erro ao salvar dados: ' + insertError.message);
-      } else {
-        alert('Cadastro realizado com sucesso!');
-        window.location.href = 'index.html';
-      }
+      alert("Formulário enviado!");
     });
 
     senhaInput.addEventListener('input', () => {
       const senha = senhaInput.value;
       let forca = 0;
-
       if (senha.length >= 8) forca++;
       if (/[A-Z]/.test(senha)) forca++;
       if (/[0-9]/.test(senha)) forca++;
@@ -356,5 +342,4 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
     };
   </script>
 </body>
-
 </html>
