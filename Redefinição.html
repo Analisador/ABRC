@@ -85,15 +85,17 @@
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
-    const supabaseKey = 'SUA_CHAVE_PUBLICA_AQUI'; // Coloque sua chave pública anon
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     async function init() {
-      // Captura tokens do hash na URL (#)
-      const params = new URLSearchParams(window.location.hash.replace('#', '?'));
-      const access_token = params.get('access_token');
-      const refresh_token = params.get('refresh_token');
-      const type = params.get('type');
+      // Captura tokens (funciona com # ou ?)
+      const hashParams = new URLSearchParams(window.location.hash.replace('#', '?'));
+      const queryParams = new URLSearchParams(window.location.search);
+
+      const access_token = hashParams.get('access_token') || queryParams.get('access_token');
+      const refresh_token = hashParams.get('refresh_token') || queryParams.get('refresh_token');
+      const type = hashParams.get('type') || queryParams.get('type');
 
       if (type === 'recovery' && access_token && refresh_token) {
         const { error } = await supabase.auth.setSession({ access_token, refresh_token });
@@ -101,7 +103,6 @@
           alert('Erro ao validar sessão: ' + error.message);
           return;
         }
-        // Remove hash da URL
         window.history.replaceState({}, document.title, window.location.pathname);
       }
     }
@@ -109,16 +110,27 @@
     init();
 
     document.getElementById('set-password').addEventListener('click', async () => {
+      const btn = document.getElementById('set-password');
       const newPassword = document.getElementById('new-password').value.trim();
+
       if (!newPassword || newPassword.length < 6) {
         alert('A nova senha deve ter pelo menos 6 caracteres.');
         return;
       }
+
+      btn.disabled = true;
+      btn.textContent = 'Atualizando...';
+
       const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+      btn.disabled = false;
+      btn.textContent = 'Atualizar senha';
+
       if (error) {
         alert('Erro ao atualizar senha: ' + error.message);
         return;
       }
+
       alert('Senha atualizada com sucesso! Faça login novamente.');
       window.location.href = 'index.html';
     });
