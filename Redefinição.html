@@ -14,16 +14,24 @@
 
     body {
       font-family: Arial, Helvetica, sans-serif;
-      background-image: linear-gradient(to right, rgb(32, 94, 217), rgb(201, 4, 70));
       height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
+      animation: gradientAnimation 12s ease infinite;
+      background-size: 300% 300%;
+      background-image: linear-gradient(-45deg, #c2142b, #2165ac, #f2c546, #c2142b);
+    }
+
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     .reset-container {
-      background-color: rgba(0, 0, 0, 0.7);
-      padding: 40px;
+      background-color: rgba(0, 0, 0, 0.75);
+      padding: 35px;
       border-radius: 15px;
       color: white;
       width: 100%;
@@ -31,12 +39,18 @@
       text-align: center;
     }
 
-    .reset-container h1 {
-      margin-bottom: 25px;
+    .logo {
+      width: 140px;
+      margin: 0 auto 18px auto;
+      display: block;
+    }
+
+    h1 {
+      margin-bottom: 22px;
     }
 
     .inputBox {
-      margin-bottom: 20px;
+      margin-bottom: 18px;
       text-align: left;
     }
 
@@ -50,6 +64,8 @@
       background: none;
       color: white;
       border-bottom: 1px solid white;
+      font-family: monospace;
+      min-height: 48px;
     }
 
     input::placeholder {
@@ -57,7 +73,7 @@
     }
 
     button {
-      background-image: linear-gradient(to right, rgb(52, 58, 255), rgb(132, 192, 251));
+      background-image: linear-gradient(to right, #2165ac, #f2c546);
       border: none;
       padding: 15px;
       width: 100%;
@@ -69,16 +85,16 @@
     }
 
     button:hover {
-      background-image: linear-gradient(to right, rgb(37, 42, 174), rgb(86, 129, 172));
+      background-image: linear-gradient(to right, #164c80, #d9aa34);
     }
 
     .back-link {
-      margin-top: 20px;
+      margin-top: 18px;
       font-size: 14px;
     }
 
     .back-link a {
-      color: dodgerblue;
+      color: #f2c546;
       text-decoration: none;
     }
 
@@ -90,6 +106,9 @@
 
 <body>
   <div class="reset-container">
+    <!-- Logo igual à das outras páginas -->
+    <img src="images/logo-abrc.png" alt="Logo" class="logo">
+
     <h1>Nova Senha</h1>
 
     <div class="inputBox">
@@ -104,11 +123,26 @@
   </div>
 
   <script type="module">
-    import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Captura token e inicia sessão ao abrir o link do e-mail
+    const params = new URLSearchParams(window.location.hash.replace('#', '?'));
+    const access_token = params.get('access_token');
+    const refresh_token = params.get('refresh_token');
+
+    if (access_token && refresh_token) {
+      const { error } = await supabase.auth.setSession({
+        access_token,
+        refresh_token
+      });
+      if (error) {
+        alert('Erro ao validar sessão: ' + error.message);
+      }
+    }
 
     document.getElementById('set-password').addEventListener('click', async () => {
       const newPassword = document.getElementById('new-password').value;
@@ -118,17 +152,15 @@
         return;
       }
 
-      const {data, error} = await supabase.auth.updateUser({
-        password: newPassword
-      });
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
 
       if (error) {
         alert('Erro ao atualizar senha: ' + error.message);
         return;
       }
 
-      alert('Senha atualizada com sucesso. Faça login novamente.');
-      window.location.href = 'LoginProjet.html';
+      alert('Senha atualizada com sucesso! Faça login novamente.');
+      window.location.href = 'index.html';
     });
   </script>
 </body>
