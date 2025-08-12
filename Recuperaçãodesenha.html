@@ -24,9 +24,17 @@
     }
 
     @keyframes gradientAnimation {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
     }
 
     .recovery-container {
@@ -130,23 +138,26 @@
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     document.getElementById('send-recovery').addEventListener('click', async () => {
-      const email = document.getElementById('recovery-email').value;
+      const email = document.getElementById('recovery-email').value.trim();
 
       if (!email) {
         alert('Digite o email para recuperação.');
         return;
       }
 
-      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://seu-dominio.com/nova-senha.html'
-      });
+      try {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: 'https://seu-dominio.com/nova-senha.html'
+        });
 
-      if (error) {
-        alert('Erro ao enviar link de redefinição: ' + error.message);
-        return;
+        if (error) {
+          alert('Erro ao enviar link de redefinição: ' + error.message);
+        } else {
+          alert('Link de redefinição enviado! Verifique seu e-mail.');
+        }
+      } catch (err) {
+        alert('Erro inesperado: ' + err.message);
       }
-
-      alert('Link de redefinição enviado para seu email.');
     });
   </script>
 </body>
