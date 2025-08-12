@@ -356,6 +356,18 @@
       alert('Horários salvos com sucesso!');
     }
 
+    // Navegação entre as páginas
+    function goToHome() { window.location.href = 'base.html'; }
+    function verLogs() { window.location.href = 'logs.html'; }
+    function verClassificacao() { window.location.href = 'classificação.html'; }
+    function verPerfil() { window.location.href = 'perfil.html'; }
+
+    function logout() {
+      supabaseClient.auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      });
+    }
+
     window.onload = () => {
       carregarUsuario();
       lucide.createIcons();
