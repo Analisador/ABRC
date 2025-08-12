@@ -8,161 +8,240 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: Arial, Helvetica, sans-serif;
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
       animation: gradientAnimation 12s ease infinite;
       background-size: 300% 300%;
       background-image: linear-gradient(-45deg, #c2142b, #2165ac, #f2c546, #c2142b);
+      padding: 20px;
     }
     @keyframes gradientAnimation {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-    .reset-container {
+    .box {
       background-color: rgba(0, 0, 0, 0.75);
-      padding: 35px;
-      border-radius: 15px;
       color: white;
+      padding: 30px;
+      border-radius: 15px;
       width: 100%;
-      max-width: 400px;
-      text-align: center;
+      max-width: 450px;
     }
-    .logo { width: 140px; margin: 0 auto 18px; display: block; }
-    h1 { margin-bottom: 22px; font-size: 1.8rem; }
-    .inputBox { margin-bottom: 18px; position: relative; }
-    input[type="password"], input[type="text"] {
-      padding: 15px;
+    .logo {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .logo img {
+      width: 140px;
+      height: auto;
+    }
+    fieldset {
+      border: 2px solid #2165ac;
+      border-radius: 10px;
+      padding: 20px;
+    }
+    legend {
+      background-color: #2165ac;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      text-align: center;
+      color: white;
+      font-size: 20px;
+    }
+    .inputBox {
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .inputUser {
+      background: none;
       border: none;
+      border-bottom: 1px solid white;
       outline: none;
+      color: white;
       font-size: 15px;
       width: 100%;
-      border-radius: 8px;
-      background: none;
-      color: white;
-      border-bottom: 1px solid white;
-      font-family: monospace;
-      min-height: 48px;
-      transition: border-color 0.3s;
+      padding: 5px 0;
     }
-    input[type="password"]:focus, input[type="text"]:focus {
-      border-color: #f2c546;
+    .labelInput {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      transition: 0.5s;
     }
-    input::placeholder { color: rgba(255, 255, 255, 0.8); }
-    .toggle-password {
+    .inputUser:focus~.labelInput,
+    .inputUser:valid~.labelInput {
+      top: -18px;
+      font-size: 12px;
+      color: #f2c546;
+    }
+    .toggle-olho {
       position: absolute;
       right: 10px;
       top: 50%;
       transform: translateY(-50%);
+      background: none;
+      border: none;
       cursor: pointer;
-      font-size: 18px;
-      color: #f2c546;
+      padding: 0;
     }
-    button {
+    .toggle-olho svg {
+      width: 20px;
+      height: 20px;
+      fill: white;
+    }
+    .senha-feedback {
+      font-size: 14px;
+      color: red;
+      margin-top: 5px;
+      margin-bottom: 5px;
+    }
+    .forca-senha {
+      font-size: 12px;
+      margin-top: -10px;
+      margin-bottom: 15px;
+      display: block;
+      clear: both;
+    }
+    .forca-senha.fraca { color: red; }
+    .forca-senha.media { color: orange; }
+    .forca-senha.forte { color: limegreen; }
+    #submit {
       background-image: linear-gradient(to right, #2165ac, #f2c546);
       border: none;
-      padding: 15px;
       width: 100%;
-      border-radius: 10px;
+      padding: 15px;
       color: white;
       font-size: 15px;
       cursor: pointer;
+      border-radius: 10px;
+      margin-top: 20px;
       transition: 0.3s;
     }
-    button:hover { background-image: linear-gradient(to right, #164c80, #d9aa34); }
-    .back-link { margin-top: 18px; font-size: 14px; }
-    .back-link a { color: #f2c546; text-decoration: none; }
-    .back-link a:hover { text-decoration: underline; }
+    #submit:hover {
+      background-image: linear-gradient(to right, #164c80, #d9aa34);
+    }
+    .back-login {
+      text-align: center;
+      margin-top: 15px;
+    }
+    .back-login a {
+      color: #f2c546;
+      text-decoration: none;
+    }
   </style>
 </head>
 <body>
-  <div class="reset-container">
-    <img src="images/logo.png" alt="Logo" class="logo">
-    <h1>Nova Senha</h1>
-    
-    <div class="inputBox">
-      <input type="password" id="new-password" placeholder="Digite a nova senha" required />
-      <span class="toggle-password" data-target="new-password">👁</span>
+  <div class="box">
+    <div class="logo">
+      <img src="images/logo-abrc.png" alt="Logo">
     </div>
+    <form id="nova-senha-form">
+      <fieldset>
+        <legend>Nova Senha</legend>
 
-    <div class="inputBox">
-      <input type="password" id="confirm-password" placeholder="Confirme a nova senha" required />
-      <span class="toggle-password" data-target="confirm-password">👁</span>
-    </div>
+        <div class="inputBox">
+          <input type="password" id="senha" class="inputUser" required>
+          <label for="senha" class="labelInput">Digite a nova senha</label>
+          <button type="button" class="toggle-olho" onclick="toggleSenha('senha')">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z" />
+              <circle cx="12" cy="12" r="2.5" />
+            </svg>
+          </button>
+        </div>
 
-    <button id="set-password">Atualizar senha</button>
-    <div class="back-link">
-      <p><a href="index.html">Voltar para o login</a></p>
-    </div>
+        <div id="senha-feedback" class="senha-feedback"></div>
+        <span id="forca-senha" class="forca-senha"></span>
+
+        <div class="inputBox">
+          <input type="password" id="confirmar_senha" class="inputUser" required>
+          <label for="confirmar_senha" class="labelInput">Confirmar nova senha</label>
+          <button type="button" class="toggle-olho" onclick="toggleSenha('confirmar_senha')">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z" />
+              <circle cx="12" cy="12" r="2.5" />
+            </svg>
+          </button>
+        </div>
+
+        <input type="submit" value="Atualizar Senha" id="submit">
+
+        <div class="back-login">
+          <p><a href="index.html">Voltar para o login</a></p>
+        </div>
+      </fieldset>
+    </form>
   </div>
 
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // Sua chave
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Mostrar/ocultar senha
-    document.querySelectorAll('.toggle-password').forEach(icon => {
-      icon.addEventListener('click', () => {
-        const target = document.getElementById(icon.dataset.target);
-        target.type = target.type === 'password' ? 'text' : 'password';
-      });
+    const form = document.getElementById('nova-senha-form');
+    const senhaInput = document.getElementById('senha');
+    const confirmarInput = document.getElementById('confirmar_senha');
+    const senhaFeedback = document.getElementById('senha-feedback');
+    const forcaSenha = document.getElementById('forca-senha');
+
+    // Força da senha
+    senhaInput.addEventListener('input', () => {
+      const senha = senhaInput.value;
+      let forca = 0;
+      if (senha.length >= 8) forca++;
+      if (/[A-Z]/.test(senha)) forca++;
+      if (/[0-9]/.test(senha)) forca++;
+      if (/[@$!%*?&]/.test(senha)) forca++;
+
+      if (forca <= 1) {
+        forcaSenha.textContent = 'Senha fraca';
+        forcaSenha.className = 'forca-senha fraca';
+      } else if (forca === 2 || forca === 3) {
+        forcaSenha.textContent = 'Senha média';
+        forcaSenha.className = 'forca-senha media';
+      } else {
+        forcaSenha.textContent = 'Senha forte';
+        forcaSenha.className = 'forca-senha forte';
+      }
     });
 
-    async function init() {
-      const hashParams = new URLSearchParams(window.location.hash.replace('#', '?'));
-      const queryParams = new URLSearchParams(window.location.search);
+    // Mostrar/ocultar senha
+    window.toggleSenha = (id) => {
+      const input = document.getElementById(id);
+      input.type = input.type === 'password' ? 'text' : 'password';
+    };
 
-      const access_token = hashParams.get('access_token') || queryParams.get('access_token');
-      const refresh_token = hashParams.get('refresh_token') || queryParams.get('refresh_token');
-      const type = hashParams.get('type') || queryParams.get('type');
+    // Envio do formulário
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const senha = senhaInput.value;
+      const confirmarSenha = confirmarInput.value;
 
-      if (type === 'recovery' && access_token && refresh_token) {
-        const { error } = await supabase.auth.setSession({ access_token, refresh_token });
-        if (error) {
-          alert('Erro ao validar sessão: ' + error.message);
-          return;
-        }
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-    }
-
-    init();
-
-    document.getElementById('set-password').addEventListener('click', async () => {
-      const btn = document.getElementById('set-password');
-      const newPassword = document.getElementById('new-password').value.trim();
-      const confirmPassword = document.getElementById('confirm-password').value.trim();
-
-      if (!newPassword || newPassword.length < 6) {
-        alert('A nova senha deve ter pelo menos 6 caracteres.');
+      if (senha !== confirmarSenha) {
+        senhaFeedback.textContent = "As senhas não coincidem.";
         return;
       }
-
-      if (newPassword !== confirmPassword) {
-        alert('As senhas não coincidem.');
+      if (senha.length < 8 || !/[A-Z]/.test(senha) || !/[0-9]/.test(senha)) {
+        senhaFeedback.textContent = "A senha deve ter no mínimo 8 caracteres, com letra maiúscula e número.";
         return;
       }
+      senhaFeedback.textContent = "";
 
-      btn.disabled = true;
-      btn.textContent = 'Atualizando...';
-
-      const { error } = await supabase.auth.updateUser({ password: newPassword });
-
-      btn.disabled = false;
-      btn.textContent = 'Atualizar senha';
-
+      const { error } = await supabase.auth.updateUser({ password: senha });
       if (error) {
         alert('Erro ao atualizar senha: ' + error.message);
-        return;
+      } else {
+        alert('Senha atualizada com sucesso! Faça login novamente.');
+        window.location.href = 'index.html';
       }
-
-      alert('Senha atualizada com sucesso! Faça login novamente.');
-      window.location.href = 'index.html';
     });
   </script>
 </body>
