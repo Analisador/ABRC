@@ -14,48 +14,43 @@
 
     body {
       font-family: Arial, Helvetica, sans-serif;
-      background-image: linear-gradient(to right, rgb(32, 94, 217), rgb(201, 4, 70));
       height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
+      animation: gradientAnimation 12s ease infinite;
+      background-size: 300% 300%;
+      background-image: linear-gradient(-45deg, #c2142b, #2165ac, #f2c546, #c2142b);
+    }
+
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     .recovery-container {
-      background-color: rgba(0, 0, 0, 0.7);
-      padding: 40px;
+      background-color: rgba(0, 0, 0, 0.75);
+      padding: 35px;
       border-radius: 15px;
       color: white;
       width: 100%;
       max-width: 400px;
       text-align: center;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
-      animation: fadeIn 0.5s ease-in-out;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: scale(0.95);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
     }
 
     .logo {
-      width: 120px;
-      margin-bottom: 15px;
+      width: 140px;
+      margin: 0 auto 18px auto;
+      display: block;
     }
 
     h1 {
-      margin-bottom: 25px;
-      font-size: 24px;
+      margin-bottom: 22px;
     }
 
     .inputBox {
-      margin-bottom: 20px;
+      margin-bottom: 18px;
       text-align: left;
     }
 
@@ -68,12 +63,9 @@
       border-radius: 8px;
       background: none;
       color: white;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.6);
-      transition: border-bottom 0.3s;
-    }
-
-    input[type="email"]:focus {
       border-bottom: 1px solid white;
+      font-family: monospace;
+      min-height: 48px;
     }
 
     input::placeholder {
@@ -81,7 +73,7 @@
     }
 
     button {
-      background-image: linear-gradient(to right, rgb(52, 58, 255), rgb(132, 192, 251));
+      background-image: linear-gradient(to right, #2165ac, #f2c546);
       border: none;
       padding: 15px;
       width: 100%;
@@ -93,16 +85,16 @@
     }
 
     button:hover {
-      background-image: linear-gradient(to right, rgb(37, 42, 174), rgb(86, 129, 172));
+      background-image: linear-gradient(to right, #164c80, #d9aa34);
     }
 
     .back-link {
-      margin-top: 20px;
+      margin-top: 18px;
       font-size: 14px;
     }
 
     .back-link a {
-      color: dodgerblue;
+      color: #f2c546;
       text-decoration: none;
     }
 
@@ -114,7 +106,9 @@
 
 <body>
   <div class="recovery-container">
-    <img src="sua-logo.png" alt="Logo" class="logo" /> <!-- mesma logo do outro HTML -->
+    <!-- Logo igual à da página de login -->
+    <img src="images/logo-abrc.png" alt="Logo" class="logo">
+
     <h1>Recuperar Senha</h1>
 
     <div class="inputBox">
