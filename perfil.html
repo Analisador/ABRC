@@ -266,6 +266,15 @@
       currentUser = user;
       userEmail = user.email;
 
+      // Carregar horários do localStorage
+      const horario1 = localStorage.getItem('horario1');
+      const horario2 = localStorage.getItem('horario2');
+      const horario3 = localStorage.getItem('horario3');
+
+      document.getElementById('primeiro').value = horario1 || '';
+      document.getElementById('segundo').value = horario2 || '';
+      document.getElementById('terceiro').value = horario3 || '';
+
       // Perfil (linha mais recente por e-mail)
       const { data: rows, error } = await supabaseClient
         .from('cadastro')
@@ -347,97 +356,9 @@
       alert('Horários salvos com sucesso!');
     }
 
-    // ===== Upload da fotinha para Supabase Storage (bucket: "avatars") =====
-    document.getElementById('foto').addEventListener('change', async (e) => {
-      const file = e.target.files?.[0];
-      if (!file || !currentUser) return;
-
-      const preview = document.getElementById('preview');
-      // Preview imediato no cliente
-      preview.src = URL.createObjectURL(file);
-
-      try {
-        // Caminho do arquivo no bucket
-        const path = `${currentUser.id}/${Date.now()}_${file.name}`;
-
-        // Faz upload (bucket deve existir: "avatars", público)
-        const { error: upErr } = await supabaseClient.storage
-          .from('avatars')
-          .upload(path, file, { upsert: true });
-
-        if (upErr) throw upErr;
-
-        // Pega URL pública
-        const { data: pub } = supabaseClient.storage
-          .from('avatars')
-          .getPublicUrl(path);
-
-        const avatarUrl = pub?.publicUrl;
-        if (!avatarUrl) return;
-
-        // Salva o link na tabela (se a coluna avatar_url existir)
-        if (linhaId) {
-          await supabaseClient
-            .from('cadastro')
-            .update({ avatar_url: avatarUrl })
-            .eq('id', linhaId);
-        } else if (userEmail) {
-          await supabaseClient
-            .from('cadastro')
-            .update({ avatar_url: avatarUrl })
-            .eq('email', userEmail);
-        }
-      } catch (err) {
-        console.error('Erro no upload do avatar:', err);
-        // mantém o preview local mesmo que não salve no banco
-      }
-    });
-
-    /* ===== Menu mobile ===== */
-    function toggleSidebar(open) {
-      const sidebar = document.querySelector('nav.sidebar');
-      const backdrop = document.getElementById('backdrop');
-      if (open) {
-        sidebar.classList.remove('mobile-hidden');
-        backdrop.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-      } else {
-        sidebar.classList.add('mobile-hidden');
-        backdrop.style.display = 'none';
-        document.body.style.overflow = '';
-      }
-    }
-    function closeMenuOnNavigate() {
-      if (window.matchMedia('(max-width: 768px)').matches) toggleSidebar(false);
-    }
-
-    // Navegação (fecha menu no mobile)
-    function goToHome() { closeMenuOnNavigate(); window.location.href = 'base.html'; }
-    function verLogs() { closeMenuOnNavigate(); window.location.href = 'logs.html'; }
-    function verClassificacao() { closeMenuOnNavigate(); window.location.href = 'classificação.html'; }
-    function verPerfil() { closeMenuOnNavigate(); window.location.href = 'perfil.html'; }
-
-    function logout() {
-      supabaseClient.auth.signOut().then(() => {
-        window.location.href = 'index.html';
-      });
-    }
-
     window.onload = () => {
       carregarUsuario();
       lucide.createIcons();
-
-      // Estado inicial da sidebar no mobile: escondida
-      if (window.matchMedia('(max-width: 768px)').matches) {
-        document.querySelector('nav.sidebar').classList.add('mobile-hidden');
-      }
-      // Botão hamburguer
-      document.getElementById('mobileMenuBtn').addEventListener('click', () => {
-        const isHidden = document.querySelector('nav.sidebar').classList.contains('mobile-hidden');
-        toggleSidebar(isHidden);
-      });
-      // Clicar no backdrop fecha
-      document.getElementById('backdrop').addEventListener('click', () => toggleSidebar(false));
     };
   </script>
 </body>
