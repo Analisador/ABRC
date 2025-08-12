@@ -7,7 +7,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    /* Seu estilo CSS aqui... (sem alterações) */
+    /* O restante do seu código de estilo permanece igual */
   </style>
 </head>
 
@@ -54,34 +54,34 @@
   </main>
 
   <script>
+    // Funções de navegação
+    function goToHome() {
+      window.location.href = 'base.html'; // Redireciona para a página de Speed Test
+    }
+    
+    function verLogs() {
+      window.location.href = 'logs.html'; // Redireciona para a página de Logs
+    }
+    
+    function verClassificacao() {
+      window.location.href = 'classificação.html'; // Redireciona para a página de Classificação
+    }
+    
+    function verPerfil() {
+      window.location.href = 'perfil.html'; // Redireciona para a página de Perfil
+    }
+
+    function logout() {
+      supabaseClient.auth.signOut().then(() => {
+        window.location.href = 'index.html'; // Redireciona para a página inicial
+      });
+    }
+
     // Supabase client configuration
     const { createClient } = supabase;
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs';
     const supabaseClient = createClient(supabaseUrl, supabaseKey);
-
-    // Navegação entre as páginas
-    function goToHome() {
-      window.location.href = 'base.html';
-    }
-    
-    function verLogs() {
-      window.location.href = 'logs.html';
-    }
-    
-    function verClassificacao() {
-      window.location.href = 'classificação.html';
-    }
-    
-    function verPerfil() {
-      window.location.href = 'perfil.html';
-    }
-
-    function logout() {
-      supabaseClient.auth.signOut().then(() => {
-        window.location.href = 'index.html';
-      });
-    }
 
     // Função para carregar o usuário
     async function carregarUsuario() {
