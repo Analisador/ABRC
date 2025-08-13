@@ -87,50 +87,102 @@
       justify-content: center;
     }
 
-    .grafico-pequeno {
-      width: 280px;
-      height: 280px;
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
     }
 
-    .info-box {
-      flex: 1 1 320px;
-      background-color: rgba(255, 255, 255, 0.05);
-      padding: 20px;
-      border-radius: 12px;
-      max-width: 420px;
+    .profile-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 30px;
     }
 
-    .info-box h3 {
+    .profile-pic {
+      border-radius: 50%;
+      width: 140px;
+      height: 140px;
+      object-fit: cover;
+      border: 4px solid white;
       margin-bottom: 10px;
-      color: #f2c546;
     }
 
-    .info-box p, .info-box li {
-      margin-bottom: 6px;
-      font-size: 14px;
-      line-height: 1.4em;
+    input[type="file"] {
+      display: none;
     }
 
-    @media (max-width: 768px) {
-      body { flex-direction: column; }
-      nav.sidebar { display: none; }
-      main.container { margin: 20px; padding: 20px; flex-direction: column; align-items: center; }
-      .grafico-pequeno { width: 250px; height: 250px; }
+    .upload-label {
+      background-color: #ffffff;
+      color: black;
+      padding: 8px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background .3s;
     }
+
+    .upload-label:hover {
+      background-color: #cccccc;
+    }
+
+    .form-group {
+      max-width: 400px;
+      margin: 0 auto 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      font-weight: bold;
+    }
+
+    input[type="time"] {
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    .save-btn {
+      background-color: #ffffff;
+      color: black;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background .3s;
+      margin-top: 20px;
+    }
+
+    .save-btn:hover {
+      background-color: #cccccc;
+    }
+
+    .explanation {
+      max-width: 600px;
+      margin: 20px auto;
+      text-align: center;
+      font-size: 16px;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 12px;
+    }
+
   </style>
 </head>
 
 <body>
   <nav class="sidebar">
-    <div>
-      <h2>A.B.R.C</h2>
-      <button onclick="goToHome()"><i data-lucide="gauge"></i> Speed Test</button>
-      <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
-      <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Classificação</button>
-      <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
-      <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
-    </div>
-    <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
+    <h2>Painel</h2>
+    <button onclick="goToHome()"><i data-lucide="home"></i> Início</button>
+    <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
+    <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Classificação</button>
+    <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
+    <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
   </nav>
 
   <main class="container">
