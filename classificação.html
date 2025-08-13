@@ -73,7 +73,7 @@
     }
 
     .sidebar-logo {
-      width: 120px;
+      width: 140px; /* aumentada */
       margin: 20px auto 0 auto;
       display: block;
     }
@@ -191,19 +191,21 @@
     const { createClient } = window.supabase;
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
-    const supabase = createClient(supabaseUrl, supabaseKey);
+   const supabase = createClient(supabaseUrl, supabaseKey);
 
     function toggleMenu() {
       document.getElementById("sidebar").classList.toggle("active");
     }
 
+    // Mapeamento por porta → [Nome, Exemplos]
     const mapeamentoPortas = {
-      "HTTP": { portas: [80, 8080], exemplos: ["Navegação web", "APIs HTTP"] },
-      "HTTPS": { portas: [443], exemplos: ["Sites seguros", "APIs HTTPS"] },
-      "FTP": { portas: [21], exemplos: ["Transferência de arquivos"] },
-      "DNS": { portas: [53], exemplos: ["Resolução de nomes"] },
-      "SMTP": { portas: [25, 587], exemplos: ["Envio de emails"] },
-      "Desconhecido": { portas: [], exemplos: ["Tráfego não identificado"] }
+      80: ["HTTP", "Navegação web, APIs HTTP"],
+      8080: ["HTTP Alternativa", "Servidores de teste, proxies"],
+      443: ["HTTPS", "Sites seguros, APIs HTTPS, VPNs TLS"],
+      21: ["FTP", "Transferência de arquivos"],
+      53: ["DNS", "Resolução de nomes"],
+      25: ["SMTP", "Envio de e-mails"],
+      587: ["SMTP Seguro", "Envio de e-mails autenticado"]
     };
 
     let dadosAtuais = [];
@@ -261,18 +263,20 @@
 
     function mostrarInfo(categoria, porcentagem) {
       const infoCaixa = document.getElementById("infoCaixa");
-      const map = mapeamentoPortas[categoria] || { portas: [], exemplos: [] };
+      const registrosCategoria = dadosAtuais.filter(d => d.tipo === categoria);
+      const portasUsadas = [...new Set(registrosCategoria.map(r => r.porta).filter(Boolean))];
+      const exemplos = portasUsadas.map(p => mapeamentoPortas[p]?.[1] || "Desconhecido");
+
       document.getElementById("infoCategoria").innerText = categoria;
       document.getElementById("infoPorcentagem").innerText = `Porcentagem: ${porcentagem}`;
-      document.getElementById("infoPortas").innerText = map.portas.join(', ') || "N/A";
-      document.getElementById("infoExemplos").innerText = map.exemplos.join(', ') || "N/A";
+      document.getElementById("infoPortas").innerText = portasUsadas.length ? portasUsadas.join(', ') : "N/A";
+      document.getElementById("infoExemplos").innerText = exemplos.length ? [...new Set(exemplos)].join('; ') : "N/A";
 
-      const ultimos = dadosAtuais.filter(d => d.tipo === categoria).slice(0, 5);
       const lista = document.getElementById("infoRegistros");
       lista.innerHTML = "";
-      ultimos.forEach(r => {
+      registrosCategoria.slice(0, 5).forEach(r => {
         const li = document.createElement("li");
-        li.innerText = `${r.timestamp} - Porta ${r.porta}`;
+        li.innerText = `${r.timestamp} - Porta ${r.porta || "N/A"}`;
         lista.appendChild(li);
       });
 
