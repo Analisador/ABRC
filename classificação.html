@@ -1,199 +1,302 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Análise de Tráfego</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Classificação de Tráfego</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f6fa;
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
-    .container {
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      height: 100vh;
       display: flex;
-      gap: 20px;
+      color: white;
+      animation: gradientAnimation 12s ease infinite;
+      background-size: 300% 300%;
+      background-image: linear-gradient(-45deg, #c2142b, #2165ac, #f2c546, #c2142b);
+    }
+
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    nav.sidebar {
+      background: rgba(0, 0, 0, 0.8);
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
       padding: 20px;
+      gap: 25px;
     }
-    .grafico-pequeno {
-      width: 50%;
-      background: white;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    .info-lateral {
-      width: 50%;
-      background: white;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    .info-lateral h3 {
-      margin-top: 0;
-    }
-    .legenda {
-      margin-top: 15px;
+
+    nav.sidebar h2 {
+      font-size: 22px;
       text-align: center;
     }
-    .legenda span {
-      display: inline-block;
-      margin: 5px 10px;
+
+    nav.sidebar button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
     }
-    .legenda span i {
+
+    nav.sidebar button:hover {
+      background-color: rgba(242, 197, 70, 0.4);
+    }
+
+    nav.sidebar button svg {
+      stroke: white;
+      width: 20px;
+      height: 20px;
+    }
+
+    .sidebar-logo {
+      width: 120px;
+      margin: 20px auto 0 auto;
+      display: block;
+    }
+
+    main.container {
+      flex-grow: 1;
+      background-color: rgba(0, 0, 0, 0.75);
+      margin: 40px;
+      padding: 40px;
+      border-radius: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      justify-content: center;
+    }
+
+    .grafico-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .grafico-pequeno {
+      width: 350px;
+      height: 350px;
+    }
+
+    .grafico-legenda {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .grafico-legenda span {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    .grafico-legenda i {
+      width: 14px;
+      height: 14px;
       display: inline-block;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      margin-right: 5px;
+      margin-right: 6px;
+      border-radius: 3px;
+    }
+
+    .info-box {
+      flex: 1 1 300px;
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 400px;
+    }
+
+    .info-box h3 {
+      margin-bottom: 10px;
+      color: #f2c546;
+    }
+
+    .info-box p, .info-box li {
+      margin-bottom: 6px;
+      font-size: 14px;
+      line-height: 1.4em;
+    }
+
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      nav.sidebar { display: none; }
+      main.container { margin: 20px; padding: 20px; }
+      .grafico-pequeno { width: 250px; height: 250px; }
     }
   </style>
 </head>
+
 <body>
+  <nav class="sidebar">
+    <div>
+      <h2>A.B.R.C</h2>
+      <button onclick="goToHome()"><i data-lucide="gauge"></i> Speed Test</button>
+      <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
+      <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Classificação</button>
+      <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
+      <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
+    </div>
+    <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
+  </nav>
 
-<div class="container">
-  <div class="grafico-pequeno">
-    <canvas id="graficoTrafego"></canvas>
-    <div class="legenda" id="legendaCustom"></div>
-  </div>
-  <div class="info-lateral" id="infoTrafego">
-    <h3>Selecione um tipo de tráfego</h3>
-    <p>Clique em uma fatia do gráfico para ver detalhes e exemplos.</p>
-  </div>
-</div>
+  <main class="container">
+    <div class="grafico-box">
+      <canvas id="graficoTrafego" class="grafico-pequeno"></canvas>
+      <div id="graficoLegenda" class="grafico-legenda"></div>
+    </div>
+    <div id="infoTrafego" class="info-box">
+      <h3>Detalhes do Tráfego</h3>
+      <p>Clique em uma fatia para ver descrição e últimos registros reais.</p>
+    </div>
+  </main>
 
-<script type="module">
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
-    const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
+  <script>
+    const { createClient } = window.supabase;
+     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
-  const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
-  const portaParaTipo = {
-    80: "HTTP",
-    443: "HTTPS",
-    21: "FTP",
-    25: "SMTP",
-    53: "DNS"
-  };
+    const descricoes = {
+      HTTP: "Tráfego HTTP refere-se à navegação em sites, APIs e comunicação baseada em protocolo web.",
+      FTP: "Tráfego FTP é usado para transferir arquivos entre cliente e servidor.",
+      DNS: "Tráfego DNS resolve nomes de domínio para endereços IP.",
+      SMTP: "Tráfego SMTP é usado para envio de e-mails.",
+      HTTPS: "Tráfego HTTPS é HTTP seguro, criptografado para proteger dados.",
+      Outros: "Tráfego que não se encaixa nas categorias principais."
+    };
 
-  const descricoes = {
-    "HTTP": "Tráfego web não criptografado, geralmente navegação em sites antigos ou servidores locais.",
-    "HTTPS": "Tráfego web seguro, utilizado pela maioria dos sites modernos.",
-    "FTP": "Transferência de arquivos entre servidores e clientes.",
-    "SMTP": "Envio de e-mails.",
-    "DNS": "Tradução de nomes de sites em endereços IP.",
-    "Outros": "Tráfego que não se encaixa nas categorias principais."
-  };
+    let chart;
 
-  function classificarTipo(porta) {
-    return portaParaTipo[porta] || "Outros";
-  }
+    async function carregarDados() {
+      const { data, error } = await supabase
+        .from('trafego')
+        .select('timestamp, tipo, porta');
 
-  async function carregarDados() {
-    const { data, error } = await supabase
-      .from('trafego')
-      .select('timestamp, porta');
+      if (error) {
+        console.error("Erro:", error);
+        return;
+      }
 
-    if (error) {
-      console.error("Erro:", error);
-      return;
+      const contagem = {};
+      data.forEach(reg => {
+        const tipo = reg.tipo || 'Outros';
+        contagem[tipo] = (contagem[tipo] || 0) + 1;
+      });
+
+      desenharGrafico(contagem, data.length, data);
     }
 
-    const contagem = {};
-    const registrosComTipo = data.map(reg => {
-      const tipo = classificarTipo(reg.porta);
-      contagem[tipo] = (contagem[tipo] || 0) + 1;
-      return { ...reg, tipo };
-    });
-
-    desenharGrafico(contagem, data.length, registrosComTipo);
-  }
-
-  let chart;
-
-  function desenharGrafico(contagem, total, todosDados) {
-    const ctx = document.getElementById('graficoTrafego').getContext('2d');
-
-    chart = new Chart(ctx, {
-      type: 'pie',
-      data: {
-        labels: Object.keys(contagem),
-        datasets: [{
-          data: Object.values(contagem),
-          backgroundColor: ['#4e9cff', '#f54291', '#33cc33', '#ffa500', '#cc33ff', '#ff3333', '#00cccc'],
-          borderColor: 'white',
-          borderWidth: 2
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: (ctx) => {
-                const label = ctx.label || '';
-                const value = ctx.raw;
-                const pct = ((value / total) * 100).toFixed(1);
-                return `${label}: ${value} (${pct}%)`;
+    function desenharGrafico(contagem, total, todosDados) {
+      const ctx = document.getElementById('graficoTrafego').getContext('2d');
+      chart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(contagem),
+          datasets: [{
+            data: Object.values(contagem),
+            backgroundColor: ['#4e9cff', '#f54291', '#33cc33', '#ffa500', '#cc33ff', '#ff3333', '#00cccc'],
+            borderColor: 'white',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  const label = context.label || '';
+                  const value = context.parsed;
+                  const pct = ((value / total) * 100).toFixed(1);
+                  return `${label}: ${value} • ${pct}%`;
+                }
               }
             }
           },
-          datalabels: { display: false }
-        },
-        onClick: async (event, elements) => {
-          if (elements.length) {
-            const label = chart.data.labels[elements[0].index];
-            await mostrarInfoHibrido(label, todosDados, contagem, total);
+          onClick: async (event, elements) => {
+            if (elements.length) {
+              const label = chart.data.labels[elements[0].index];
+              await mostrarInfoHibrido(label, todosDados);
+            }
           }
         }
-      }
-    });
-
-    gerarLegendaPersonalizada(contagem, total);
-  }
-
-  function gerarLegendaPersonalizada(contagem, total) {
-    const legendaContainer = document.getElementById('legendaCustom');
-    legendaContainer.innerHTML = '';
-    Object.entries(contagem).forEach(([tipo, valor], idx) => {
-      const pct = ((valor / total) * 100).toFixed(1);
-      const span = document.createElement('span');
-      span.innerHTML = `<i style="background-color:${chart.data.datasets[0].backgroundColor[idx]}"></i>${tipo} (${pct}%)`;
-      legendaContainer.appendChild(span);
-    });
-  }
-
-  async function mostrarInfoHibrido(tipo, todosDados, contagem, total) {
-    const registros = todosDados
-      .filter(r => r.tipo === tipo)
-      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-      .slice(0, 5);
-
-    const pct = ((contagem[tipo] / total) * 100).toFixed(1);
-    let html = `<h3>${tipo}</h3>`;
-    html += `<p>${descricoes[tipo] || "Tipo de tráfego não identificado."}</p>`;
-    html += `<p><strong>Participação no total:</strong> ${pct}%</p>`;
-
-    if (registros.length === 0) {
-      html += `<p>Não há registros recentes deste tipo.</p>`;
-    } else {
-      html += `<p>Últimos registros:</p><ul>`;
-      registros.forEach(reg => {
-        const hora = new Date(reg.timestamp).toLocaleString();
-        html += `<li>Porta: ${reg.porta} — ${hora}</li>`;
       });
-      html += `</ul>`;
+
+      gerarLegenda(contagem, total);
     }
-    document.getElementById('infoTrafego').innerHTML = html;
-  }
 
-  carregarDados();
-</script>
+    function gerarLegenda(contagem, total) {
+      const legendaDiv = document.getElementById('graficoLegenda');
+      legendaDiv.innerHTML = '';
+      const cores = ['#4e9cff', '#f54291', '#33cc33', '#ffa500', '#cc33ff', '#ff3333', '#00cccc'];
+      Object.keys(contagem).forEach((tipo, i) => {
+        const pct = ((contagem[tipo] / total) * 100).toFixed(1);
+        const item = document.createElement('span');
+        item.innerHTML = `<i style="background-color:${cores[i]}"></i>${tipo} (${pct}%)`;
+        legendaDiv.appendChild(item);
+      });
+    }
 
+    async function mostrarInfoHibrido(tipo, todosDados) {
+      const registros = todosDados
+        .filter(r => (r.tipo || 'Outros') === tipo)
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .slice(0, 5);
+
+      let html = `<h3>${tipo}</h3>`;
+      html += `<p>${descricoes[tipo] || "Tipo de tráfego não identificado."}</p>`;
+
+      if (registros.length === 0) {
+        html += `<p>Não há registros recentes deste tipo.</p>`;
+      } else {
+        html += `<p>Últimos registros:</p><ul>`;
+        registros.forEach(reg => {
+          const hora = new Date(reg.timestamp).toLocaleString();
+          html += `<li>Porta: ${reg.porta} — ${hora}</li>`;
+        });
+        html += `</ul>`;
+      }
+      document.getElementById('infoTrafego').innerHTML = html;
+    }
+
+    function goToHome() { window.location.href = 'base.html'; }
+    function verLogs() { window.location.href = 'logs.html'; }
+    function verClassificacao() { window.location.href = 'classificação.html'; }
+    function verPerfil() { window.location.href = 'perfil.html'; }
+    function logout() {
+      supabase.auth.signOut().then(() => window.location.href = 'index.html');
+    }
+
+    window.onload = () => {
+      carregarDados();
+      lucide.createIcons();
+    };
+  </script>
 </body>
 </html>
