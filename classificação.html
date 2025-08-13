@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Classificação de Tráfego</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
 
@@ -83,52 +84,24 @@
       margin: 40px;
       padding: 40px;
       border-radius: 20px;
-      overflow-y: auto;
       display: flex;
       flex-wrap: wrap;
       gap: 30px;
+      align-items: flex-start;
       justify-content: center;
-    }
-
-    .grafico-box {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
     }
 
     .grafico-pequeno {
-      width: 350px;
-      height: 350px;
-    }
-
-    .grafico-legenda {
-      margin-top: 20px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .grafico-legenda span {
-      display: flex;
-      align-items: center;
-      font-size: 14px;
-    }
-
-    .grafico-legenda i {
-      width: 14px;
-      height: 14px;
-      display: inline-block;
-      margin-right: 6px;
-      border-radius: 3px;
+      width: 280px;
+      height: 280px;
     }
 
     .info-box {
-      flex: 1 1 300px;
+      flex: 1 1 320px;
       background-color: rgba(255, 255, 255, 0.05);
       padding: 20px;
       border-radius: 12px;
-      max-width: 400px;
+      max-width: 420px;
     }
 
     .info-box h3 {
@@ -145,7 +118,7 @@
     @media (max-width: 768px) {
       body { flex-direction: column; }
       nav.sidebar { display: none; }
-      main.container { margin: 20px; padding: 20px; }
+      main.container { margin: 20px; padding: 20px; flex-direction: column; align-items: center; }
       .grafico-pequeno { width: 250px; height: 250px; }
     }
   </style>
@@ -165,13 +138,10 @@
   </nav>
 
   <main class="container">
-    <div class="grafico-box">
-      <canvas id="graficoTrafego" class="grafico-pequeno"></canvas>
-      <div id="graficoLegenda" class="grafico-legenda"></div>
-    </div>
+    <canvas id="graficoTrafego" class="grafico-pequeno"></canvas>
     <div id="infoTrafego" class="info-box">
       <h3>Detalhes do Tráfego</h3>
-      <p>Clique em uma fatia para ver descrição e últimos registros reais.</p>
+      <p>Clique em uma fatia para ver descrição, exemplos e últimos registros.</p>
     </div>
   </main>
 
@@ -179,7 +149,7 @@
     const { createClient } = window.supabase;
      const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
-    const supabase = createClient(supabaseUrl, supabaseKey);
+   const supabase = createClient(supabaseUrl, supabaseKey);
 
     const descricoes = {
       HTTP: "Tráfego HTTP refere-se à navegação em sites, APIs e comunicação baseada em protocolo web.",
@@ -188,6 +158,15 @@
       SMTP: "Tráfego SMTP é usado para envio de e-mails.",
       HTTPS: "Tráfego HTTPS é HTTP seguro, criptografado para proteger dados.",
       Outros: "Tráfego que não se encaixa nas categorias principais."
+    };
+
+    const exemplos = {
+      HTTP: "Exemplo: abrir sites simples, carregar imagens, usar APIs abertas (porta 80).",
+      HTTPS: "Exemplo: redes sociais, internet banking, e-mails, compras online (porta 443).",
+      DNS: "Exemplo: converter 'google.com' em um endereço IP (porta 53).",
+      FTP: "Exemplo: enviar e baixar arquivos de servidores (porta 21).",
+      SMTP: "Exemplo: enviar e-mails por servidores de correio eletrônico (porta 25).",
+      Outros: "Exemplo: jogos online, protocolos específicos de aplicativos."
     };
 
     let chart;
@@ -228,15 +207,15 @@
           responsive: true,
           plugins: {
             legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: function (context) {
-                  const label = context.label || '';
-                  const value = context.parsed;
-                  const pct = ((value / total) * 100).toFixed(1);
-                  return `${label}: ${value} • ${pct}%`;
-                }
-              }
+            tooltip: { enabled: false },
+            datalabels: {
+              color: '#fff',
+              formatter: (value, ctx) => {
+                const label = ctx.chart.data.labels[ctx.dataIndex];
+                const pct = ((value / total) * 100).toFixed(1);
+                return `${label}\n${value} • ${pct}%`;
+              },
+              font: { weight: 'bold', size: 12 }
             }
           },
           onClick: async (event, elements) => {
@@ -245,21 +224,8 @@
               await mostrarInfoHibrido(label, todosDados);
             }
           }
-        }
-      });
-
-      gerarLegenda(contagem, total);
-    }
-
-    function gerarLegenda(contagem, total) {
-      const legendaDiv = document.getElementById('graficoLegenda');
-      legendaDiv.innerHTML = '';
-      const cores = ['#4e9cff', '#f54291', '#33cc33', '#ffa500', '#cc33ff', '#ff3333', '#00cccc'];
-      Object.keys(contagem).forEach((tipo, i) => {
-        const pct = ((contagem[tipo] / total) * 100).toFixed(1);
-        const item = document.createElement('span');
-        item.innerHTML = `<i style="background-color:${cores[i]}"></i>${tipo} (${pct}%)`;
-        legendaDiv.appendChild(item);
+        },
+        plugins: [ChartDataLabels]
       });
     }
 
@@ -271,6 +237,7 @@
 
       let html = `<h3>${tipo}</h3>`;
       html += `<p>${descricoes[tipo] || "Tipo de tráfego não identificado."}</p>`;
+      html += `<p><strong>${exemplos[tipo] || ""}</strong></p>`;
 
       if (registros.length === 0) {
         html += `<p>Não há registros recentes deste tipo.</p>`;
