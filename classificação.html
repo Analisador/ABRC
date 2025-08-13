@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,6 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+
   <style>
     body {
       margin: 0;
@@ -16,6 +18,8 @@
       height: 100vh;
       color: white;
     }
+
+    /* Sidebar */
     nav.sidebar {
       background: rgba(0, 0, 0, 0.8);
       width: 220px;
@@ -24,12 +28,15 @@
       padding: 20px;
       box-sizing: border-box;
       gap: 25px;
+      transition: transform 0.3s ease;
     }
+
     nav.sidebar h2 {
       margin: 0 0 30px 0;
       font-size: 22px;
       text-align: center;
     }
+
     nav.sidebar button {
       background: none;
       border: none;
@@ -41,39 +48,99 @@
       padding: 10px 12px;
       border-radius: 8px;
       cursor: pointer;
+      transition: background-color 0.3s ease;
     }
+
     nav.sidebar button:hover {
       background-color: #ff4e4e;
     }
+
     nav.sidebar button svg {
       stroke: white;
       width: 20px;
       height: 20px;
     }
+
+    /* Conteúdo */
     main.container {
       flex-grow: 1;
-      display: flex;
-      flex-direction: row;
-      gap: 20px;
       background-color: rgba(0, 0, 0, 0.8);
       margin: 40px;
       padding: 40px;
       border-radius: 20px;
       overflow-y: auto;
       box-sizing: border-box;
+      position: relative;
     }
-    h1 { text-align: center; margin-bottom: 30px; width: 100%; }
-    .grafico-container { flex: 1; display: flex; justify-content: center; align-items: center; }
-    .detalhes-container { flex: 1; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; }
-    .grafico-pequeno { max-width: 350px; max-height: 350px; }
-    .menu-toggle { display: none; }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .grafico-pequeno {
+      width: 350px;
+      height: 350px;
+    }
+
+    /* Botão hamburguer */
+    .menu-toggle {
+      display: none;
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: rgba(0, 0, 0, 0.8);
+      border: none;
+      color: white;
+      padding: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    /* Mobile */
     @media (max-width: 768px) {
-      main.container { flex-direction: column; }
-      .grafico-container, .detalhes-container { width: 100%; }
+      body {
+        flex-direction: column;
+      }
+
+      nav.sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        transform: translateX(-100%);
+        z-index: 999;
+      }
+
+      nav.sidebar.active {
+        transform: translateX(0);
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+
+      main.container {
+        margin: 20px;
+        padding: 20px;
+      }
+
+      .grafico-pequeno {
+        width: 250px;
+        height: 250px;
+      }
     }
   </style>
 </head>
+
 <body>
+  <!-- Botão hamburguer -->
+  <button class="menu-toggle" onclick="toggleMenu()">
+    <i data-lucide="menu"></i>
+  </button>
+
+  <!-- Sidebar -->
   <nav class="sidebar" id="sidebar">
     <h2>A.B.R.C</h2>
     <button onclick="goToHome()"><i data-lucide="home"></i> Speed Test</button>
@@ -83,26 +150,26 @@
     <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
   </nav>
 
+  <!-- Conteúdo Principal -->
   <main class="container">
-    <div class="grafico-container">
-      <canvas id="graficoTrafego" class="grafico-pequeno"></canvas>
-    </div>
-    <div class="detalhes-container" id="detalhes">
-      <h2>Detalhes</h2>
-      <p>Selecione uma fatia do gráfico para ver mais informações.</p>
-    </div>
+    <h1>Classificação de Tráfego</h1>
+    <canvas id="graficoTrafego" class="grafico-pequeno"></canvas>
   </main>
 
   <script>
     const { createClient } = window.supabase;
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs';
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    function toggleMenu() {
+      document.getElementById("sidebar").classList.toggle("active");
+    }
 
     async function carregarDados() {
       const { data, error } = await supabase
         .from('trafego')
-        .select('"carimbo de data/hora" as timestamp, tipo, porta')
+        .select('timestamp, tipo, porta')
         .order('timestamp', { ascending: false });
 
       if (error) {
@@ -114,23 +181,20 @@
 
     function desenharGrafico(data) {
       const contagem = {};
-      const portasPorTipo = {};
       data.forEach(registro => {
         const tipo = registro.tipo || 'Desconhecido';
         contagem[tipo] = (contagem[tipo] || 0) + 1;
-        portasPorTipo[tipo] = portasPorTipo[tipo] || new Set();
-        if (registro.porta) portasPorTipo[tipo].add(registro.porta);
       });
 
-      const total = data.length;
       const ctx = document.getElementById('graficoTrafego').getContext('2d');
       new Chart(ctx, {
         type: 'pie',
         data: {
           labels: Object.keys(contagem),
           datasets: [{
+            label: 'Tipos de Tráfego',
             data: Object.values(contagem),
-            backgroundColor: ['#A5C9CA','#E7E6E1','#C9CCD5','#D3CEDF','#FFE6E6','#F7DAD9','#F9E4C8'],
+            backgroundColor: ['#4e9cff', '#f54291', '#33cc33', '#ffa500', '#cc33ff', '#ff3333', '#00cccc'],
             borderColor: 'white',
             borderWidth: 2
           }]
@@ -141,29 +205,8 @@
             legend: { display: false },
             tooltip: {
               callbacks: {
-                label: (context) => {
-                  const valor = context.parsed;
-                  const perc = ((valor / total) * 100).toFixed(1);
-                  return `${context.label}: ${valor} (${perc}%)`;
-                }
+                label: (context) => `${context.label}: ${context.parsed}`
               }
-            }
-          },
-          onClick: (evt, elements) => {
-            if (elements.length > 0) {
-              const index = elements[0].index;
-              const tipo = ctx.chart.data.labels[index];
-              const valor = contagem[tipo];
-              const perc = ((valor / total) * 100).toFixed(1);
-              const portas = Array.from(portasPorTipo[tipo]).join(', ');
-              const ultimos = data.filter(r => r.tipo === tipo).slice(0, 5);
-              document.getElementById('detalhes').innerHTML = `
-                <h2>${tipo}</h2>
-                <p><b>Porcentagem:</b> ${perc}%</p>
-                <p><b>Portas associadas:</b> ${portas || 'Nenhuma'}</p>
-                <h3>Últimos registros</h3>
-                <ul>${ultimos.map(r => `<li>${r.timestamp} - Porta ${r.porta}</li>`).join('')}</ul>
-              `;
             }
           }
         }
@@ -174,7 +217,11 @@
     function verLogs() { window.location.href = 'logs.html'; }
     function verClassificacao() { window.location.href = 'classificação.html'; }
     function verPerfil() { window.location.href = 'perfil.html'; }
-    function logout() { supabase.auth.signOut().then(() => window.location.href = 'index.html'); }
+    function logout() {
+      supabase.auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      });
+    }
 
     window.onload = () => {
       carregarDados();
@@ -182,4 +229,6 @@
     };
   </script>
 </body>
+
 </html>
+
