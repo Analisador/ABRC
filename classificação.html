@@ -1,192 +1,293 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gráfico de Tráfego</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Classificação de Tráfego</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
     body {
-        font-family: Arial, sans-serif;
-        background-color: #f7f9fc;
-        margin: 0;
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background-image: linear-gradient(45deg, rgb(32, 94, 217), rgb(201, 4, 70));
+      display: flex;
+      height: 100vh;
+      color: white;
+    }
+
+    nav.sidebar {
+      background: rgba(0, 0, 0, 0.8);
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      gap: 25px;
+      box-sizing: border-box;
+      transition: transform 0.3s ease;
+    }
+
+    nav.sidebar h2 {
+      margin: 0 0 30px 0;
+      font-size: 22px;
+      text-align: center;
+    }
+
+    nav.sidebar button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    nav.sidebar button:hover {
+      background-color: #ff4e4e;
+    }
+
+    nav.sidebar button svg {
+      stroke: white;
+      width: 20px;
+      height: 20px;
+    }
+
+    main.container {
+      flex-grow: 1;
+      background-color: rgba(0, 0, 0, 0.8);
+      margin: 40px;
+      padding: 40px;
+      border-radius: 20px;
+      overflow-y: auto;
+      box-sizing: border-box;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    h1 {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .grafico-area {
+      flex: 1 1 350px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .grafico-pequeno {
+      max-width: 350px;
+      max-height: 350px;
+    }
+
+    .detalhes-area {
+      flex: 1 1 300px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .detalhes-area h2 {
+      margin-top: 0;
+    }
+
+    .detalhes-area ul {
+      padding-left: 20px;
+    }
+
+    .menu-toggle {
+      display: none;
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: rgba(0, 0, 0, 0.8);
+      border: none;
+      color: white;
+      padding: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      nav.sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        transform: translateX(-100%);
+        z-index: 999;
+      }
+
+      nav.sidebar.active {
+        transform: translateX(0);
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+
+      main.container {
+        margin: 20px;
         padding: 20px;
-        color: #333;
+        flex-direction: column;
+      }
     }
-    .container {
-        display: flex;
-        gap: 20px;
-        flex-wrap: wrap;
-    }
-    .chart-container {
-        flex: 1;
-        min-width: 300px;
-        max-width: 400px;
-    }
-    .info-box {
-        flex: 1;
-        min-width: 300px;
-        background: #fff;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
-    .info-box h3 {
-        margin-top: 0;
-        font-size: 1.3em;
-        color: #444;
-    }
-    .info-box p {
-        margin: 6px 0;
-    }
-    .info-ports {
-        font-weight: bold;
-        color: #555;
-    }
-    .info-examples {
-        color: #666;
-        font-size: 0.95em;
-    }
-    .records {
-        margin-top: 10px;
-        font-size: 0.9em;
-        color: #555;
-    }
-</style>
+  </style>
 </head>
+
 <body>
+  <button class="menu-toggle" onclick="toggleMenu()">
+    <i data-lucide="menu"></i>
+  </button>
 
-<h2>Uso de Tráfego por Categoria</h2>
+  <nav class="sidebar" id="sidebar">
+    <h2>A.B.R.C</h2>
+    <button onclick="goToHome()"><i data-lucide="home"></i> Speed Test</button>
+    <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
+    <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Classificação</button>
+    <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
+    <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
+  </nav>
 
-<div class="container">
-    <div class="chart-container">
-        <canvas id="trafficChart"></canvas>
+  <main class="container">
+    <h1>Classificação de Tráfego</h1>
+    <div class="grafico-area">
+      <canvas id="graficoTrafego" class="grafico-pequeno"></canvas>
     </div>
-    <div class="info-box" id="infoBox">
-        <h3>Selecione uma fatia</h3>
-        <p>Porcentagem: -</p>
-        <p class="info-ports">Portas: -</p>
-        <p class="info-examples">Exemplos: -</p>
-        <div class="records">Últimos registros: -</div>
+    <div class="detalhes-area" id="detalhes">
+      <h2>Detalhes</h2>
+      <p>Clique em uma fatia do gráfico para ver informações.</p>
     </div>
-</div>
+  </main>
 
-<script>
-const portaExemplos = {
-    443: "Acesso seguro a sites e apps: Google, YouTube, WhatsApp, Instagram, bancos online",
-    80: "Acesso a sites não criptografados e alguns serviços antigos",
-    53: "Resolução de nomes de sites (DNS)",
-    25: "Envio de e-mails (SMTP)",
-    465: "Envio seguro de e-mails (SMTP sobre SSL/TLS)",
-    587: "Envio de e-mails autenticados (SMTP)",
-    21: "Transferência de arquivos via FTP",
-    outro: "Tráfego não identificado ou misto (pode incluir VPNs, jogos online, streaming, etc.)"
-};
-
-// Configuração Supabase
+  <script>
+    const { createClient } = window.supabase;
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
-async function buscarDados() {
-    // Exemplo: buscar tráfego agrupado
-    const { data, error } = await supabaseClient
-        .from("trafego")
-        .select("*");
-
-    if (error) {
-        console.error("Erro ao buscar dados:", error);
-        return [];
+    function toggleMenu() {
+      document.getElementById("sidebar").classList.toggle("active");
     }
 
-    return data;
-}
+    async function carregarDados() {
+      const { data, error } = await supabase
+        .from('trafego')
+        .select('timestamp:carimbo de data/hora, tipo, porta')
+        .order('timestamp', { ascending: false });
 
-function agruparPorCategoria(dados) {
-    const categorias = {};
+      if (error) {
+        console.error("Erro ao buscar dados:", error);
+        return;
+      }
 
-    dados.forEach(item => {
-        const porta = item.porta || "outro";
-        if (!categorias[item.categoria]) {
-            categorias[item.categoria] = { total: 0, portas: new Set(), registros: [] };
+      processarDados(data);
+    }
+
+    function processarDados(data) {
+      const tipos = {};
+      data.forEach(reg => {
+        if (!tipos[reg.tipo]) {
+          tipos[reg.tipo] = { count: 0, portas: [], registros: [] };
         }
-        categorias[item.categoria].total += item.bytes;
-        categorias[item.categoria].portas.add(porta);
-        categorias[item.categoria].registros.push(item);
-    });
+        tipos[reg.tipo].count++;
+        tipos[reg.tipo].portas.push(reg.porta);
+        tipos[reg.tipo].registros.push(reg);
+      });
 
-    return categorias;
-}
+      const labels = Object.keys(tipos);
+      const valores = labels.map(l => tipos[l].count);
+      const total = data.length;
+      const porcentagens = valores.map(v => ((v / total) * 100).toFixed(1));
 
-function criarGrafico(categorias) {
-    const labels = Object.keys(categorias);
-    const valores = labels.map(cat => categorias[cat].total);
-    const cores = ["#a3d8f4", "#f9c0c0", "#fce2ae", "#b5ead7", "#c7ceea", "#ffd6a5"];
+      const cores = [
+        '#a3d8f4', '#fbc4ab', '#b5ead7',
+        '#ffdac1', '#e2f0cb', '#ffb7b2',
+        '#c7ceea'
+      ];
 
-    const ctx = document.getElementById('trafficChart').getContext('2d');
-    const chart = new Chart(ctx, {
+      const ctx = document.getElementById('graficoTrafego').getContext('2d');
+      new Chart(ctx, {
         type: 'pie',
         data: {
-            labels: labels,
-            datasets: [{
-                data: valores,
-                backgroundColor: cores
-            }]
+          labels,
+          datasets: [{
+            data: valores,
+            backgroundColor: cores,
+            borderColor: 'white',
+            borderWidth: 2
+          }]
         },
         options: {
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            let total = context.dataset.data.reduce((a,b) => a+b, 0);
-                            let valor = context.parsed;
-                            let porcentagem = ((valor / total) * 100).toFixed(1);
-                            return `${context.label}: ${valor} bytes (${porcentagem}%)`;
-                        }
-                    }
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (context) => {
+                  const i = context.dataIndex;
+                  return `${labels[i]}: ${valores[i]} (${porcentagens[i]}%)`;
                 }
-            },
-            onClick: (evt, elements) => {
-                if (elements.length > 0) {
-                    const index = elements[0].index;
-                    mostrarInfo(labels[index], categorias[labels[index]]);
-                }
+              }
             }
+          },
+          onClick: (evt, elements) => {
+            if (elements.length > 0) {
+              const index = elements[0].index;
+              mostrarDetalhes(labels[index], porcentagens[index], tipos[labels[index]]);
+            }
+          }
         }
-    });
-}
+      });
+    }
 
-function mostrarInfo(nome, dados) {
-    const totalBytes = Object.values(dados.total).reduce ? dados.total : dados.total;
-    const totalGeral = totalBytes; // Já é total
-    const porcentagem = ((dados.total / calcularTotalGeral()) * 100).toFixed(1);
+    function mostrarDetalhes(tipo, porcentagem, dados) {
+      const portasUnicas = [...new Set(dados.portas)];
+      const exemplos = portasUnicas.slice(0, 3);
+      const ultimos = dados.registros.slice(0, 5);
 
-    const portas = Array.from(dados.portas).join(", ");
-    const exemplos = Array.from(dados.portas).map(p => portaExemplos[p] || portaExemplos.outro).join(" | ");
-    const ultimos = dados.registros.slice(-5).map(r => `Porta ${r.porta} - ${r.bytes} bytes`).join("<br>");
+      const detalhes = document.getElementById('detalhes');
+      detalhes.innerHTML = `
+        <h2>${tipo}</h2>
+        <p><strong>Porcentagem:</strong> ${porcentagem}%</p>
+        <p><strong>Portas associadas:</strong> ${portasUnicas.join(', ')}</p>
+        <p><strong>Exemplos:</strong> ${exemplos.join(', ')}</p>
+        <h3>Últimos registros:</h3>
+        <ul>
+          ${ultimos.map(r => `<li>${new Date(r.timestamp).toLocaleString()} — Porta ${r.porta}</li>`).join('')}
+        </ul>
+      `;
+    }
 
-    document.getElementById("infoBox").innerHTML = `
-        <h3>${nome}</h3>
-        <p>Porcentagem: ${porcentagem}%</p>
-        <p class="info-ports">Portas: ${portas}</p>
-        <p class="info-examples">Exemplos: ${exemplos}</p>
-        <div class="records">Últimos registros:<br>${ultimos}</div>
-    `;
-}
+    function goToHome() { window.location.href = 'base.html'; }
+    function verLogs() { window.location.href = 'logs.html'; }
+    function verClassificacao() { window.location.href = 'classificação.html'; }
+    function verPerfil() { window.location.href = 'perfil.html'; }
+    function logout() {
+      supabase.auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      });
+    }
 
-let totalGlobal = 0;
-function calcularTotalGeral() {
-    return totalGlobal;
-}
-
-(async () => {
-    const dados = await buscarDados();
-    const categorias = agruparPorCategoria(dados);
-    totalGlobal = Object.values(categorias).reduce((soma, cat) => soma + cat.total, 0);
-    criarGrafico(categorias);
-})();
-</script>
+    window.onload = () => {
+      carregarDados();
+      lucide.createIcons();
+    };
+  </script>
 </body>
 </html>
