@@ -10,21 +10,51 @@
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
-      background-image: linear-gradient(45deg, rgb(32, 94, 217), rgb(201, 4, 70));
-      display: flex;
       height: 100vh;
-      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-image: linear-gradient(-45deg, #c2142b, #2165ac, #f2c546, #c2142b);
+      background-size: 300% 300%;
+      animation: gradientAnimation 12s ease infinite;
     }
+
+    @keyframes gradientAnimation {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    /* Barra lateral ajustada */
     nav.sidebar {
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(0, 0, 0, 0.7); /* Transparência mais leve */
       width: 220px;
       display: flex;
       flex-direction: column;
       padding: 20px;
       box-sizing: border-box;
       gap: 25px;
+      position: relative;
+      height: 100vh; /* Isso vai fazer a barra lateral ocupar toda a altura da tela */
     }
-    nav.sidebar h2 { margin: 0 0 30px 0; font-size: 22px; text-align: center; }
+
+    nav.sidebar h2 {
+      margin: 0;
+      font-size: 22px;
+      text-align: center;
+      color: white;
+      flex-grow: 1; /* Isso vai fazer com que o título "A.B.R.C." ocupe o restante da altura disponível */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
     nav.sidebar button {
       background: none;
       border: none;
@@ -38,9 +68,27 @@
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
-    nav.sidebar button:hover { background-color: #ff4e4e; }
-    nav.sidebar button svg { stroke: white; width: 20px; height: 20px; }
 
+    nav.sidebar button:hover { 
+      background-color: #ff4e4e; 
+    }
+
+    nav.sidebar button svg { 
+      stroke: white; 
+      width: 20px; 
+      height: 20px; 
+    }
+
+    /* Logo na parte inferior */
+    .sidebar-logo {
+      margin-top: auto;
+      width: 140px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Seção principal */
     main.container {
       flex-grow: 1;
       background-color: rgba(0, 0, 0, 0.8);
@@ -57,10 +105,12 @@
       justify-content: center;
       margin-bottom: 16px;
     }
+
     .page-header h1 {
       margin: 0;
       text-align: center;
       line-height: 1.2;
+      color: white;
     }
 
     .profile-section {
@@ -70,6 +120,7 @@
       margin: 16px auto 30px;
       gap: 10px;
     }
+
     .profile-pic {
       border-radius: 50%;
       width: 140px;
@@ -79,7 +130,11 @@
       background: rgba(255,255,255,0.06);
       display: block;
     }
-    input[type="file"] { display: none; }
+
+    input[type="file"] { 
+      display: none; 
+    }
+
     .upload-label {
       background-color: #ffffff;
       color: black;
@@ -89,7 +144,10 @@
       font-weight: bold;
       transition: background 0.3s ease;
     }
-    .upload-label:hover { background-color: #cccccc; }
+
+    .upload-label:hover { 
+      background-color: #cccccc; 
+    }
 
     .explanation {
       max-width: 600px;
@@ -99,6 +157,7 @@
       background-color: rgba(255, 255, 255, 0.1);
       padding: 15px;
       border-radius: 12px;
+      color: white;
     }
 
     .form-group {
@@ -108,13 +167,19 @@
       flex-direction: column;
       gap: 8px;
     }
-    label { font-weight: bold; }
+
+    label { 
+      font-weight: bold; 
+      color: white;
+    }
+
     input[type="time"] {
       padding: 10px;
       border: none;
       border-radius: 8px;
       font-size: 16px;
     }
+
     button.save-btn {
       background-color: #ffffff;
       color: black;
@@ -127,7 +192,10 @@
       transition: background 0.3s ease;
       margin-top: 20px;
     }
-    button.save-btn:hover { background-color: #cccccc; }
+
+    button.save-btn:hover { 
+      background-color: #cccccc; 
+    }
 
     /* ====== Responsividade: barra lateral móvel ====== */
     #mobileMenuBtn {
@@ -143,6 +211,7 @@
       cursor: pointer;
       display: none; /* desktop some */
     }
+
     #backdrop {
       position: fixed;
       inset: 0;
@@ -150,7 +219,10 @@
       z-index: 1000;
       display: none;
     }
-    nav.sidebar.mobile-hidden { transform: translateX(-100%); }
+
+    nav.sidebar.mobile-hidden { 
+      transform: translateX(-100%); 
+    }
 
     @media (max-width: 768px) {
       #mobileMenuBtn { display: inline-flex; align-items: center; gap: 8px; }
@@ -165,13 +237,17 @@
         max-width: 300px;
         border-right: 1px solid rgba(255,255,255,0.1);
       }
-      nav.sidebar.mobile-hidden { transform: translateX(-100%); }
+      nav.sidebar.mobile-hidden { 
+        transform: translateX(-100%); 
+      }
+
       main.container {
         margin: 70px 12px 12px 12px;
         padding: 16px;
         border-radius: 14px;
       }
     }
+
     @media (min-width: 769px) {
       #mobileMenuBtn, #backdrop { display: none !important; }
       nav.sidebar { position: relative; transform: none !important; }
@@ -195,6 +271,9 @@
     <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Classificação</button>
     <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
     <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
+
+    <!-- Logo na parte inferior -->
+    <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
   </nav>
 
   <main class="container">
@@ -233,134 +312,11 @@
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs';
     const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
-    // Placeholder seguro (SVG) pra evitar ícone "?" no iOS
-    const DEFAULT_AVATAR = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" width="140" height="140">
-        <rect width="100%" height="100%" fill="#273142"/>
-        <circle cx="70" cy="55" r="28" fill="#ffffff"/>
-        <rect x="25" y="95" width="90" height="30" rx="15" fill="#ffffff"/>
-      </svg>
-    `);
-
-    let userEmail = null;
-    let linhaId = null; // id da linha de cadastro que vamos atualizar
-    let currentUser = null;
-
-    // Converte "HH:MM" -> "HH:MM:SS" (coluna TIME aceita ambos; padroniza)
-    function padHHMMSS(v) {
-      if (!v) return null;
-      return /^\d{2}:\d{2}$/.test(v) ? v + ':00' : v;
-    }
-    // Converte "HH:MM:SS" -> "HH:MM" para mostrar no input time
-    function toHHMM(v) {
-      return (typeof v === 'string' && /^\d{2}:\d{2}:\d{2}$/.test(v)) ? v.slice(0,5) : (v || '');
-    }
-
-    async function carregarUsuario() {
-      const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-      if (userError || !user) {
-        alert("Usuário não autenticado");
-        window.location.href = "LoginProjet.html";
-        return;
-      }
-      currentUser = user;
-      userEmail = user.email;
-
-      // Carregar horários do localStorage
-      const horario1 = localStorage.getItem('horario1');
-      const horario2 = localStorage.getItem('horario2');
-      const horario3 = localStorage.getItem('horario3');
-
-      document.getElementById('primeiro').value = horario1 || '';
-      document.getElementById('segundo').value = horario2 || '';
-      document.getElementById('terceiro').value = horario3 || '';
-
-      // Perfil (linha mais recente por e-mail)
-      const { data: rows, error } = await supabaseClient
-        .from('cadastro')
-        .select('id, primeiro, segundo, terceiro, avatar_url')
-        .eq('email', userEmail)
-        .order('id', { ascending: false })
-        .limit(1);
-
-      const preview = document.getElementById('preview');
-      preview.src = DEFAULT_AVATAR; // default sempre
-
-      if (error) {
-        console.error('Erro ao carregar cadastro:', error);
-        return;
-      }
-
-      if (rows && rows.length > 0) {
-        const row = rows[0];
-        linhaId = row.id;
-        document.getElementById('primeiro').value = toHHMM(row.primeiro);
-        document.getElementById('segundo').value  = toHHMM(row.segundo);
-        document.getElementById('terceiro').value = toHHMM(row.terceiro);
-
-        // Se tiver avatar salvo, usa
-        if (row.avatar_url) preview.src = row.avatar_url;
-      }
-    }
-
-    async function salvarHorarios() {
-      const primeiro = padHHMMSS(document.getElementById('primeiro').value || null);
-      const segundo  = padHHMMSS(document.getElementById('segundo').value  || null);
-      const terceiro = padHHMMSS(document.getElementById('terceiro').value || null);
-
-      // Salvar os horários no localStorage
-      localStorage.setItem('horario1', primeiro);
-      localStorage.setItem('horario2', segundo);
-      localStorage.setItem('horario3', terceiro);
-
-      // Verifica se o usuário já tem um cadastro no Supabase
-      if (linhaId) {
-        // Atualiza os horários no Supabase, caso a linha já exista
-        const { error } = await supabaseClient
-          .from('cadastro')
-          .update({ primeiro, segundo, terceiro })
-          .eq('id', linhaId); // Atualiza pela linha de ID
-
-        if (error) {
-          console.error("Erro ao salvar horários:", error);
-          alert('Erro ao salvar horários: ' + error.message);
-          return;
-        }
-        alert('Horários salvos com sucesso!');
-        return;
-      }
-
-      // Caso contrário, cria um novo registro no Supabase
-      if (!userEmail) {
-        alert('Usuário não autenticado.');
-        return;
-      }
-
-      const { data, error: updErr } = await supabaseClient
-        .from('cadastro')
-        .update({ primeiro, segundo, terceiro })
-        .eq('email', userEmail)
-        .select('id');
-
-      if (updErr) {
-        console.error('Erro ao salvar horários:', updErr);
-        alert('Erro ao salvar horários: ' + updErr.message);
-        return;
-      }
-
-      if (!data || data.length === 0) {
-        alert('Seu cadastro ainda não existe. Conclua o cadastro primeiro.');
-        return;
-      }
-
-      alert('Horários salvos com sucesso!');
-    }
-
     // Navegação entre as páginas
-    function goToHome() { window.location.href = 'base.html'; }
-    function verLogs() { window.location.href = 'logs.html'; }
-    function verClassificacao() { window.location.href = 'classificação.html'; }
-    function verPerfil() { window.location.href = 'perfil.html'; }
+    function goToHome() { window.location.assign('base.html'); }
+    function verLogs() { window.location.assign('logs.html'); }
+    function verClassificacao() { window.location.assign('classificação.html'); }
+    function verPerfil() { window.location.assign('perfil.html'); }
 
     function logout() {
       supabaseClient.auth.signOut().then(() => {
