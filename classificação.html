@@ -178,7 +178,7 @@
   <script>
     const { createClient } = window.supabase;
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs';
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     function toggleMenu() {
@@ -188,7 +188,7 @@
     async function carregarDados() {
       const { data, error } = await supabase
         .from('trafego')
-        .select('timestamp:carimbo de data/hora, tipo, porta')
+        .select('"carimbo de data/hora" as timestamp, tipo, porta')
         .order('timestamp', { ascending: false });
 
       if (error) {
