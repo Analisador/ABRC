@@ -48,13 +48,11 @@
       flex-direction: column;
       justify-content: space-between;
       padding: 20px;
-      box-sizing: border-box;
       gap: 25px;
       transition: transform 0.3s ease;
     }
 
     nav.sidebar h2 {
-      margin: 0 0 30px 0;
       font-size: 22px;
       text-align: center;
     }
@@ -83,7 +81,6 @@
       height: 20px;
     }
 
-    /* Logo inferior */
     .sidebar-logo {
       width: 120px;
       margin: 20px auto 0 auto;
@@ -98,34 +95,35 @@
       padding: 40px;
       border-radius: 20px;
       overflow-y: auto;
-      box-sizing: border-box;
-      position: relative;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      justify-content: center;
     }
 
     .grafico-pequeno {
       width: 350px;
       height: 350px;
-      margin: 0 auto;
     }
 
-    /* Botão hamburguer */
-    .menu-toggle {
-      display: none;
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      background: rgba(0, 0, 0, 0.8);
-      border: none;
-      color: white;
-      padding: 8px;
-      border-radius: 8px;
-      cursor: pointer;
-      z-index: 1000;
+    /* Caixa de informações */
+    .info-box {
+      flex: 1 1 300px;
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 400px;
+    }
+
+    .info-box h3 {
+      margin-bottom: 10px;
+      color: #f2c546;
+    }
+
+    .info-box p {
+      margin-bottom: 6px;
+      font-size: 14px;
+      line-height: 1.4em;
     }
 
     /* Mobile */
@@ -147,10 +145,6 @@
         transform: translateX(0);
       }
 
-      .menu-toggle {
-        display: block;
-      }
-
       main.container {
         margin: 20px;
         padding: 20px;
@@ -161,11 +155,31 @@
         height: 250px;
       }
     }
+
+    /* Botão hamburguer */
+    .menu-toggle {
+      display: none;
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: rgba(0, 0, 0, 0.8);
+      border: none;
+      color: white;
+      padding: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    @media (max-width: 768px) {
+      .menu-toggle {
+        display: block;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <!-- Botão hamburguer -->
   <button class="menu-toggle" onclick="toggleMenu()">
     <i data-lucide="menu"></i>
   </button>
@@ -185,8 +199,13 @@
 
   <!-- Conteúdo Principal -->
   <main class="container">
-    <h1>Classificação de Tráfego</h1>
-    <canvas id="graficoTrafego" class="grafico-pequeno"></canvas>
+    <div>
+      <canvas id="graficoTrafego" class="grafico-pequeno"></canvas>
+    </div>
+    <div id="infoTrafego" class="info-box">
+      <h3>Detalhes do Tráfego</h3>
+      <p>Passe o mouse ou toque em uma fatia do gráfico para ver detalhes sobre cada tipo de tráfego detectado.</p>
+    </div>
   </main>
 
   <script>
@@ -194,6 +213,35 @@
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs';
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const explicacoes = {
+      'HTTP': {
+        titulo: 'HTTP – Tráfego Web',
+        descricao: 'Acessos a sites sem criptografia.',
+        exemplos: 'Ex.: blogs, APIs abertas.',
+        nota: 'Menos seguro, dados podem ser interceptados.'
+      },
+      'HTTPS': {
+        titulo: 'HTTPS – Tráfego Web Seguro',
+        descricao: 'Acessos protegidos com criptografia.',
+        exemplos: 'Ex.: bancos, redes sociais, e-commerce.',
+        nota: 'Mais seguro contra ataques.'
+      },
+      'FTP': {
+        titulo: 'FTP – Transferência de Arquivos',
+        descricao: 'Usado para enviar e receber arquivos.',
+        exemplos: 'Ex.: servidores de hospedagem.',
+        nota: 'Normalmente sem criptografia, use SFTP para mais segurança.'
+      },
+      'DNS': {
+        titulo: 'DNS – Resolução de Nomes',
+        descricao: 'Tradução de endereços de sites para IPs.',
+        exemplos: 'Ex.: quando você acessa google.com.',
+        nota: 'Pode ser alvo de ataques de spoofing.'
+      }
+    };
+
+    let chart;
 
     function toggleMenu() {
       document.getElementById("sidebar").classList.toggle("active");
@@ -220,12 +268,11 @@
       });
 
       const ctx = document.getElementById('graficoTrafego').getContext('2d');
-      new Chart(ctx, {
+      chart = new Chart(ctx, {
         type: 'pie',
         data: {
           labels: Object.keys(contagem),
           datasets: [{
-            label: 'Tipos de Tráfego',
             data: Object.values(contagem),
             backgroundColor: ['#4e9cff', '#f54291', '#33cc33', '#ffa500', '#cc33ff', '#ff3333', '#00cccc'],
             borderColor: 'white',
@@ -236,14 +283,32 @@
           responsive: true,
           plugins: {
             legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: (context) => `${context.label}: ${context.parsed}`
-              }
+            tooltip: { enabled: false }
+          },
+          onHover: (event, elements) => {
+            if (elements.length) {
+              const label = chart.data.labels[elements[0].index];
+              mostrarInfo(label);
             }
           }
         }
       });
+    }
+
+    function mostrarInfo(label) {
+      const info = explicacoes[label] || {
+        titulo: label,
+        descricao: 'Sem descrição disponível.',
+        exemplos: 'Sem exemplos.',
+        nota: 'Sem informações adicionais.'
+      };
+
+      document.getElementById('infoTrafego').innerHTML = `
+        <h3>${info.titulo}</h3>
+        <p>${info.descricao}</p>
+        <p><strong>Exemplos:</strong> ${info.exemplos}</p>
+        <p><strong>Nota:</strong> ${info.nota}</p>
+      `;
     }
 
     function goToHome() { window.location.href = 'base.html'; }
