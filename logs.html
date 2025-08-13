@@ -6,18 +6,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Logs</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script src="https://unpkg.com/lucide@latest"></script> <!-- Versão igual do seu painel -->
+  <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       font-family: Arial, Helvetica, sans-serif;
-      background-image: linear-gradient(45deg, rgb(32, 94, 217), rgb(201, 4, 70));
       margin: 0;
       padding: 0;
       color: white;
       display: flex;
       height: 100vh;
       overflow: hidden;
+      animation: gradientAnimation 12s ease infinite;
+      background-size: 300% 300%;
+      background-image: linear-gradient(-45deg, #c2142b, #2165ac, #f2c546, #c2142b);
+    }
+
+    @keyframes gradientAnimation {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
     }
 
     /* Sidebar */
@@ -399,6 +415,3 @@
 </body>
 
 </html>
-
-
-
