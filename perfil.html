@@ -10,51 +10,21 @@
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
-      height: 100vh;
+      background-image: linear-gradient(45deg, rgb(32, 94, 217), rgb(201, 4, 70));
       display: flex;
-      justify-content: center;
-      align-items: center;
-      background-image: linear-gradient(-45deg, #c2142b, #2165ac, #f2c546, #c2142b);
-      background-size: 300% 300%;
-      animation: gradientAnimation 12s ease infinite;
+      height: 100vh;
+      color: white;
     }
-
-    @keyframes gradientAnimation {
-      0% {
-        background-position: 0% 50%;
-      }
-      50% {
-        background-position: 100% 50%;
-      }
-      100% {
-        background-position: 0% 50%;
-      }
-    }
-
-    /* Barra lateral ajustada */
     nav.sidebar {
-      background: rgba(0, 0, 0, 0.7); /* Transparência mais leve */
+      background: rgba(0, 0, 0, 0.8);
       width: 220px;
       display: flex;
       flex-direction: column;
       padding: 20px;
       box-sizing: border-box;
       gap: 25px;
-      position: relative;
-      height: 100vh; /* Isso vai fazer a barra lateral ocupar toda a altura da tela */
     }
-
-    nav.sidebar h2 {
-      margin: 0;
-      font-size: 22px;
-      text-align: center;
-      color: white;
-      flex-grow: 1; /* Isso vai fazer com que o título "A.B.R.C." ocupe o restante da altura disponível */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
+    nav.sidebar h2 { margin: 0 0 30px 0; font-size: 22px; text-align: center; }
     nav.sidebar button {
       background: none;
       border: none;
@@ -68,27 +38,9 @@
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
+    nav.sidebar button:hover { background-color: #ff4e4e; }
+    nav.sidebar button svg { stroke: white; width: 20px; height: 20px; }
 
-    nav.sidebar button:hover { 
-      background-color: #ff4e4e; 
-    }
-
-    nav.sidebar button svg { 
-      stroke: white; 
-      width: 20px; 
-      height: 20px; 
-    }
-
-    /* Logo na parte inferior */
-    .sidebar-logo {
-      margin-top: auto;
-      width: 140px;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    /* Seção principal */
     main.container {
       flex-grow: 1;
       background-color: rgba(0, 0, 0, 0.8);
@@ -105,12 +57,10 @@
       justify-content: center;
       margin-bottom: 16px;
     }
-
     .page-header h1 {
       margin: 0;
       text-align: center;
       line-height: 1.2;
-      color: white;
     }
 
     .profile-section {
@@ -120,7 +70,6 @@
       margin: 16px auto 30px;
       gap: 10px;
     }
-
     .profile-pic {
       border-radius: 50%;
       width: 140px;
@@ -130,11 +79,7 @@
       background: rgba(255,255,255,0.06);
       display: block;
     }
-
-    input[type="file"] { 
-      display: none; 
-    }
-
+    input[type="file"] { display: none; }
     .upload-label {
       background-color: #ffffff;
       color: black;
@@ -144,10 +89,7 @@
       font-weight: bold;
       transition: background 0.3s ease;
     }
-
-    .upload-label:hover { 
-      background-color: #cccccc; 
-    }
+    .upload-label:hover { background-color: #cccccc; }
 
     .explanation {
       max-width: 600px;
@@ -157,7 +99,6 @@
       background-color: rgba(255, 255, 255, 0.1);
       padding: 15px;
       border-radius: 12px;
-      color: white;
     }
 
     .form-group {
@@ -167,19 +108,13 @@
       flex-direction: column;
       gap: 8px;
     }
-
-    label { 
-      font-weight: bold; 
-      color: white;
-    }
-
+    label { font-weight: bold; }
     input[type="time"] {
       padding: 10px;
       border: none;
       border-radius: 8px;
       font-size: 16px;
     }
-
     button.save-btn {
       background-color: #ffffff;
       color: black;
@@ -192,10 +127,7 @@
       transition: background 0.3s ease;
       margin-top: 20px;
     }
-
-    button.save-btn:hover { 
-      background-color: #cccccc; 
-    }
+    button.save-btn:hover { background-color: #cccccc; }
 
     /* ====== Responsividade: barra lateral móvel ====== */
     #mobileMenuBtn {
@@ -211,7 +143,6 @@
       cursor: pointer;
       display: none; /* desktop some */
     }
-
     #backdrop {
       position: fixed;
       inset: 0;
@@ -219,10 +150,7 @@
       z-index: 1000;
       display: none;
     }
-
-    nav.sidebar.mobile-hidden { 
-      transform: translateX(-100%); 
-    }
+    nav.sidebar.mobile-hidden { transform: translateX(-100%); }
 
     @media (max-width: 768px) {
       #mobileMenuBtn { display: inline-flex; align-items: center; gap: 8px; }
@@ -237,17 +165,13 @@
         max-width: 300px;
         border-right: 1px solid rgba(255,255,255,0.1);
       }
-      nav.sidebar.mobile-hidden { 
-        transform: translateX(-100%); 
-      }
-
+      nav.sidebar.mobile-hidden { transform: translateX(-100%); }
       main.container {
         margin: 70px 12px 12px 12px;
         padding: 16px;
         border-radius: 14px;
       }
     }
-
     @media (min-width: 769px) {
       #mobileMenuBtn, #backdrop { display: none !important; }
       nav.sidebar { position: relative; transform: none !important; }
@@ -271,9 +195,6 @@
     <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Classificação</button>
     <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
     <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
-
-    <!-- Logo na parte inferior -->
-    <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
   </nav>
 
   <main class="container">
@@ -313,13 +234,13 @@
     const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
     // Placeholder seguro (SVG) pra evitar ícone "?" no iOS
-    const DEFAULT_AVATAR = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+    const DEFAULT_AVATAR = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" width="140" height="140">
         <rect width="100%" height="100%" fill="#273142"/>
         <circle cx="70" cy="55" r="28" fill="#ffffff"/>
         <rect x="25" y="95" width="90" height="30" rx="15" fill="#ffffff"/>
       </svg>
-    );
+    `);
 
     let userEmail = null;
     let linhaId = null; // id da linha de cadastro que vamos atualizar
