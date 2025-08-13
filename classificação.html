@@ -1,269 +1,192 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Classificação de Tráfego</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gráfico de Tráfego</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
     body {
-      font-family: Arial, Helvetica, sans-serif;
-      height: 100vh;
-      display: flex;
-      color: white;
-      animation: gradientAnimation 12s ease infinite;
-      background-size: 300% 300%;
-      background-image: linear-gradient(-45deg, #c2142b, #2165ac, #f2c546, #c2142b);
+        font-family: Arial, sans-serif;
+        background-color: #f7f9fc;
+        margin: 0;
+        padding: 20px;
+        color: #333;
     }
-
-    @keyframes gradientAnimation {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    .container {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
     }
-
-    nav.sidebar {
-      background: rgba(0, 0, 0, 0.8);
-      width: 220px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 20px;
-      gap: 25px;
+    .chart-container {
+        flex: 1;
+        min-width: 300px;
+        max-width: 400px;
     }
-
-    nav.sidebar h2 {
-      font-size: 22px;
-      text-align: center;
-    }
-
-    nav.sidebar button {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 18px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    nav.sidebar button:hover {
-      background-color: rgba(242, 197, 70, 0.4);
-    }
-
-    nav.sidebar button svg {
-      stroke: white;
-      width: 20px;
-      height: 20px;
-    }
-
-    .sidebar-logo {
-      width: 120px;
-      margin: 20px auto 0 auto;
-      display: block;
-    }
-
-    main.container {
-      flex-grow: 1;
-      background-color: rgba(0, 0, 0, 0.75);
-      margin: 40px;
-      padding: 40px;
-      border-radius: 20px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 30px;
-      align-items: flex-start;
-      justify-content: center;
-    }
-
-    .grafico-pequeno {
-      width: 280px;
-      height: 280px;
-    }
-
     .info-box {
-      flex: 1 1 320px;
-      background-color: rgba(255, 255, 255, 0.05);
-      padding: 20px;
-      border-radius: 12px;
-      max-width: 420px;
+        flex: 1;
+        min-width: 300px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
-
     .info-box h3 {
-      margin-bottom: 10px;
-      color: #f2c546;
+        margin-top: 0;
+        font-size: 1.3em;
+        color: #444;
     }
-
-    .info-box p, .info-box li {
-      margin-bottom: 6px;
-      font-size: 14px;
-      line-height: 1.4em;
+    .info-box p {
+        margin: 6px 0;
     }
-
-    @media (max-width: 768px) {
-      body { flex-direction: column; }
-      nav.sidebar { display: none; }
-      main.container { margin: 20px; padding: 20px; flex-direction: column; align-items: center; }
-      .grafico-pequeno { width: 250px; height: 250px; }
+    .info-ports {
+        font-weight: bold;
+        color: #555;
     }
-  </style>
+    .info-examples {
+        color: #666;
+        font-size: 0.95em;
+    }
+    .records {
+        margin-top: 10px;
+        font-size: 0.9em;
+        color: #555;
+    }
+</style>
 </head>
-
 <body>
-  <nav class="sidebar">
-    <div>
-      <h2>A.B.R.C</h2>
-      <button onclick="goToHome()"><i data-lucide="gauge"></i> Speed Test</button>
-      <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
-      <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Classificação</button>
-      <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
-      <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
-    </div>
-    <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
-  </nav>
 
-  <main class="container">
-    <canvas id="graficoTrafego" class="grafico-pequeno"></canvas>
-    <div id="infoTrafego" class="info-box">
-      <h3>Detalhes do Tráfego</h3>
-      <p>Clique em uma fatia para ver descrição, exemplos e últimos registros.</p>
-    </div>
-  </main>
+<h2>Uso de Tráfego por Categoria</h2>
 
-  <script>
-    const { createClient } = window.supabase;
-     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
+<div class="container">
+    <div class="chart-container">
+        <canvas id="trafficChart"></canvas>
+    </div>
+    <div class="info-box" id="infoBox">
+        <h3>Selecione uma fatia</h3>
+        <p>Porcentagem: -</p>
+        <p class="info-ports">Portas: -</p>
+        <p class="info-examples">Exemplos: -</p>
+        <div class="records">Últimos registros: -</div>
+    </div>
+</div>
+
+<script>
+const portaExemplos = {
+    443: "Acesso seguro a sites e apps: Google, YouTube, WhatsApp, Instagram, bancos online",
+    80: "Acesso a sites não criptografados e alguns serviços antigos",
+    53: "Resolução de nomes de sites (DNS)",
+    25: "Envio de e-mails (SMTP)",
+    465: "Envio seguro de e-mails (SMTP sobre SSL/TLS)",
+    587: "Envio de e-mails autenticados (SMTP)",
+    21: "Transferência de arquivos via FTP",
+    outro: "Tráfego não identificado ou misto (pode incluir VPNs, jogos online, streaming, etc.)"
+};
+
+// Configuração Supabase
+    const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
-   const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const descricoes = {
-      HTTP: "Tráfego HTTP refere-se à navegação em sites, APIs e comunicação baseada em protocolo web.",
-      FTP: "Tráfego FTP é usado para transferir arquivos entre cliente e servidor.",
-      DNS: "Tráfego DNS resolve nomes de domínio para endereços IP.",
-      SMTP: "Tráfego SMTP é usado para envio de e-mails.",
-      HTTPS: "Tráfego HTTPS é HTTP seguro, criptografado para proteger dados.",
-      Outros: "Tráfego que não se encaixa nas categorias principais."
-    };
+async function buscarDados() {
+    // Exemplo: buscar tráfego agrupado
+    const { data, error } = await supabaseClient
+        .from("trafego")
+        .select("*");
 
-    const exemplos = {
-      HTTP: "Exemplo: abrir sites simples, carregar imagens, usar APIs abertas (porta 80).",
-      HTTPS: "Exemplo: redes sociais, internet banking, e-mails, compras online (porta 443).",
-      DNS: "Exemplo: converter 'google.com' em um endereço IP (porta 53).",
-      FTP: "Exemplo: enviar e baixar arquivos de servidores (porta 21).",
-      SMTP: "Exemplo: enviar e-mails por servidores de correio eletrônico (porta 25).",
-      Outros: "Exemplo: jogos online, protocolos específicos de aplicativos."
-    };
-
-    let chart;
-
-    async function carregarDados() {
-      const { data, error } = await supabase
-        .from('trafego')
-        .select('timestamp, tipo, porta');
-
-      if (error) {
-        console.error("Erro:", error);
-        return;
-      }
-
-      const contagem = {};
-      data.forEach(reg => {
-        const tipo = reg.tipo || 'Outros';
-        contagem[tipo] = (contagem[tipo] || 0) + 1;
-      });
-
-      desenharGrafico(contagem, data.length, data);
+    if (error) {
+        console.error("Erro ao buscar dados:", error);
+        return [];
     }
 
-    function desenharGrafico(contagem, total, todosDados) {
-      const ctx = document.getElementById('graficoTrafego').getContext('2d');
-      chart = new Chart(ctx, {
+    return data;
+}
+
+function agruparPorCategoria(dados) {
+    const categorias = {};
+
+    dados.forEach(item => {
+        const porta = item.porta || "outro";
+        if (!categorias[item.categoria]) {
+            categorias[item.categoria] = { total: 0, portas: new Set(), registros: [] };
+        }
+        categorias[item.categoria].total += item.bytes;
+        categorias[item.categoria].portas.add(porta);
+        categorias[item.categoria].registros.push(item);
+    });
+
+    return categorias;
+}
+
+function criarGrafico(categorias) {
+    const labels = Object.keys(categorias);
+    const valores = labels.map(cat => categorias[cat].total);
+    const cores = ["#a3d8f4", "#f9c0c0", "#fce2ae", "#b5ead7", "#c7ceea", "#ffd6a5"];
+
+    const ctx = document.getElementById('trafficChart').getContext('2d');
+    const chart = new Chart(ctx, {
         type: 'pie',
         data: {
-          labels: Object.keys(contagem),
-          datasets: [{
-            data: Object.values(contagem),
-            backgroundColor: ['#4e9cff', '#f54291', '#33cc33', '#ffa500', '#cc33ff', '#ff3333', '#00cccc'],
-            borderColor: 'white',
-            borderWidth: 2
-          }]
+            labels: labels,
+            datasets: [{
+                data: valores,
+                backgroundColor: cores
+            }]
         },
         options: {
-          responsive: true,
-          plugins: {
-            legend: { display: false },
-            tooltip: { enabled: false },
-            datalabels: {
-              color: '#fff',
-              formatter: (value, ctx) => {
-                const label = ctx.chart.data.labels[ctx.dataIndex];
-                const pct = ((value / total) * 100).toFixed(1);
-                return `${label}\n${value} • ${pct}%`;
-              },
-              font: { weight: 'bold', size: 12 }
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let total = context.dataset.data.reduce((a,b) => a+b, 0);
+                            let valor = context.parsed;
+                            let porcentagem = ((valor / total) * 100).toFixed(1);
+                            return `${context.label}: ${valor} bytes (${porcentagem}%)`;
+                        }
+                    }
+                }
+            },
+            onClick: (evt, elements) => {
+                if (elements.length > 0) {
+                    const index = elements[0].index;
+                    mostrarInfo(labels[index], categorias[labels[index]]);
+                }
             }
-          },
-          onClick: async (event, elements) => {
-            if (elements.length) {
-              const label = chart.data.labels[elements[0].index];
-              await mostrarInfoHibrido(label, todosDados);
-            }
-          }
-        },
-        plugins: [ChartDataLabels]
-      });
-    }
+        }
+    });
+}
 
-    async function mostrarInfoHibrido(tipo, todosDados) {
-      const registros = todosDados
-        .filter(r => (r.tipo || 'Outros') === tipo)
-        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-        .slice(0, 5);
+function mostrarInfo(nome, dados) {
+    const totalBytes = Object.values(dados.total).reduce ? dados.total : dados.total;
+    const totalGeral = totalBytes; // Já é total
+    const porcentagem = ((dados.total / calcularTotalGeral()) * 100).toFixed(1);
 
-      let html = `<h3>${tipo}</h3>`;
-      html += `<p>${descricoes[tipo] || "Tipo de tráfego não identificado."}</p>`;
-      html += `<p><strong>${exemplos[tipo] || ""}</strong></p>`;
+    const portas = Array.from(dados.portas).join(", ");
+    const exemplos = Array.from(dados.portas).map(p => portaExemplos[p] || portaExemplos.outro).join(" | ");
+    const ultimos = dados.registros.slice(-5).map(r => `Porta ${r.porta} - ${r.bytes} bytes`).join("<br>");
 
-      if (registros.length === 0) {
-        html += `<p>Não há registros recentes deste tipo.</p>`;
-      } else {
-        html += `<p>Últimos registros:</p><ul>`;
-        registros.forEach(reg => {
-          const hora = new Date(reg.timestamp).toLocaleString();
-          html += `<li>Porta: ${reg.porta} — ${hora}</li>`;
-        });
-        html += `</ul>`;
-      }
-      document.getElementById('infoTrafego').innerHTML = html;
-    }
+    document.getElementById("infoBox").innerHTML = `
+        <h3>${nome}</h3>
+        <p>Porcentagem: ${porcentagem}%</p>
+        <p class="info-ports">Portas: ${portas}</p>
+        <p class="info-examples">Exemplos: ${exemplos}</p>
+        <div class="records">Últimos registros:<br>${ultimos}</div>
+    `;
+}
 
-    function goToHome() { window.location.href = 'base.html'; }
-    function verLogs() { window.location.href = 'logs.html'; }
-    function verClassificacao() { window.location.href = 'classificação.html'; }
-    function verPerfil() { window.location.href = 'perfil.html'; }
-    function logout() {
-      supabase.auth.signOut().then(() => window.location.href = 'index.html');
-    }
+let totalGlobal = 0;
+function calcularTotalGeral() {
+    return totalGlobal;
+}
 
-    window.onload = () => {
-      carregarDados();
-      lucide.createIcons();
-    };
-  </script>
+(async () => {
+    const dados = await buscarDados();
+    const categorias = agruparPorCategoria(dados);
+    totalGlobal = Object.values(categorias).reduce((soma, cat) => soma + cat.total, 0);
+    criarGrafico(categorias);
+})();
+</script>
 </body>
 </html>
