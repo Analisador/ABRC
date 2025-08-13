@@ -66,10 +66,11 @@
       border-radius: 8px;
       cursor: pointer;
       transition: background-color 0.3s ease;
+      text-align: left;
     }
 
     nav.sidebar button:hover {
-      background-color: rgba(242, 197, 70, 0.4);
+      background-color: #ff4e4e;
     }
 
     nav.sidebar button svg {
@@ -80,8 +81,10 @@
 
     .sidebar-logo {
       width: 120px;
-      margin: 20px auto 0 auto;
+      margin-top: auto;
       display: block;
+      margin-bottom: 20px;
+      align-self: center;
     }
 
     main.container {
@@ -149,6 +152,56 @@
       background-color: #37373d;
     }
 
+    .nivel-1 {
+      color: red;
+      font-weight: bold;
+    }
+
+    .nivel-2 {
+      color: orangered;
+    }
+
+    .nivel-3 {
+      color: orange;
+    }
+
+    .nivel-4 {
+      color: gold;
+    }
+
+    .nivel-5 {
+      color: yellowgreen;
+    }
+
+    .nivel-6 {
+      color: green;
+    }
+
+    .nivel-7 {
+      color: teal;
+    }
+
+    .nivel-8 {
+      color: skyblue;
+    }
+
+    .nivel-9 {
+      color: white;
+    }
+
+    .legenda {
+      margin-top: 20px;
+      background-color: #333;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    .legenda span {
+      display: inline-block;
+      margin: 5px 15px 5px 0;
+    }
+
     .grafico-container {
       max-width: 400px;
       margin: 0 auto 30px auto;
@@ -207,14 +260,12 @@
   </button>
 
   <nav class="sidebar" id="sidebar">
-    <div>
-      <h2>A.B.R.C</h2>
-      <button onclick="goToHome()"><i data-lucide="gauge"></i> Speed Test</button>
-      <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
-      <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Classificação</button>
-      <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
-      <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
-    </div>
+    <h2>A.B.R.C</h2>
+    <button onclick="goToHome()"><i data-lucide="home"></i> Speed Test</button>
+    <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
+    <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Classificação</button>
+    <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
+    <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
     <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
   </nav>
 
@@ -239,6 +290,19 @@
 
     <div class="grafico-container">
       <canvas id="graficoNiveis"></canvas>
+    </div>
+
+    <div class="legenda">
+      <strong>Legenda de Gravidade dos Logs:</strong><br />
+      <span class="nivel-1">Nível 1 - Crítico</span>
+      <span class="nivel-2">2 - Alta gravidade</span>
+      <span class="nivel-3">3 - Grave</span>
+      <span class="nivel-4">4 - Atenção</span>
+      <span class="nivel-5">5 - Aviso</span>
+      <span class="nivel-6">6 - Normal</span>
+      <span class="nivel-7">7 - Info</span>
+      <span class="nivel-8">8 - Debug</span>
+      <span class="nivel-9">9 - Outros</span>
     </div>
   </main>
 
