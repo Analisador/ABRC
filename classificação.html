@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Classificação de Tráfego</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
 
@@ -142,7 +143,7 @@
     </div>
     <div id="infoTrafego" class="info-box">
       <h3>Detalhes do Tráfego</h3>
-      <p>Passe o mouse ou toque em uma fatia para ver registros reais.</p>
+      <p>Clique em uma fatia para ver descrição e últimos registros reais.</p>
     </div>
   </main>
 
@@ -152,28 +153,38 @@
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    const descricoes = {
+      HTTP: "Tráfego HTTP refere-se à navegação em sites, APIs e comunicação baseada em protocolo web.",
+      FTP: "Tráfego FTP é usado para transferir arquivos entre cliente e servidor.",
+      DNS: "Tráfego DNS resolve nomes de domínio para endereços IP.",
+      SMTP: "Tráfego SMTP é usado para envio de e-mails.",
+      HTTPS: "Tráfego HTTPS é HTTP seguro, criptografado para proteger dados.",
+      Outros: "Tráfego que não se encaixa nas categorias principais."
+    };
+
     let chart;
 
     async function carregarDados() {
       const { data, error } = await supabase
         .from('trafego')
-        .select('timestamp, tipo')
-        .order('timestamp', { ascending: false });
+        .select('timestamp, tipo, porta');
 
       if (error) {
         console.error("Erro:", error);
         return;
       }
-      desenharGrafico(data);
-    }
 
-    function desenharGrafico(data) {
+      // Contagem total
       const contagem = {};
-      data.forEach(registro => {
-        const tipo = registro.tipo || 'Desconhecido';
+      data.forEach(reg => {
+        const tipo = reg.tipo || 'Outros';
         contagem[tipo] = (contagem[tipo] || 0) + 1;
       });
 
+      desenharGrafico(contagem, data.length, data);
+    }
+
+    function desenharGrafico(contagem, total, todosDados) {
       const ctx = document.getElementById('graficoTrafego').getContext('2d');
       chart = new Chart(ctx, {
         type: 'pie',
@@ -188,36 +199,45 @@
         },
         options: {
           responsive: true,
-          plugins: { legend: { display: false }, tooltip: { enabled: false } },
+          plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false },
+            datalabels: {
+              color: '#fff',
+              formatter: (value, ctx) => {
+                const label = ctx.chart.data.labels[ctx.dataIndex];
+                const pct = ((value / total) * 100).toFixed(1);
+                return `${label}\n${value} • ${pct}%`;
+              },
+              font: { weight: 'bold', size: 12 }
+            }
+          },
           onClick: async (event, elements) => {
             if (elements.length) {
               const label = chart.data.labels[elements[0].index];
-              await mostrarInfoDinamico(label);
+              await mostrarInfoHibrido(label, todosDados);
             }
           }
-        }
+        },
+        plugins: [ChartDataLabels]
       });
     }
 
-    async function mostrarInfoDinamico(tipo) {
-      const { data, error } = await supabase
-        .from('trafego')
-        .select('timestamp, porta')
-        .eq('tipo', tipo)
-        .order('timestamp', { ascending: false })
-        .limit(5);
-
-      if (error) {
-        console.error("Erro ao buscar exemplos:", error);
-        return;
-      }
+    async function mostrarInfoHibrido(tipo, todosDados) {
+      // Últimos 5 registros reais
+      const registros = todosDados
+        .filter(r => (r.tipo || 'Outros') === tipo)
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .slice(0, 5);
 
       let html = `<h3>${tipo}</h3>`;
-      if (data.length === 0) {
+      html += `<p>${descricoes[tipo] || "Tipo de tráfego não identificado."}</p>`;
+
+      if (registros.length === 0) {
         html += `<p>Não há registros recentes deste tipo.</p>`;
       } else {
         html += `<p>Últimos registros:</p><ul>`;
-        data.forEach(reg => {
+        registros.forEach(reg => {
           const hora = new Date(reg.timestamp).toLocaleString();
           html += `<li>Porta: ${reg.porta} — ${hora}</li>`;
         });
@@ -240,5 +260,4 @@
     };
   </script>
 </body>
-
 </html>
