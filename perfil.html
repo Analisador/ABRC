@@ -32,14 +32,15 @@
     }
 
     nav.sidebar {
-      background: rgba(0, 0, 0, 0.8);
-      width: 220px; /* Largura ajustada para ser igual ao primeiro código */
+      background: rgba(0, 0, 0, 0.4); /* Alterado para transparência */
+      width: 220px;
       display: flex;
       flex-direction: column;
       padding: 20px;
       box-sizing: border-box;
       gap: 25px;
       position: relative;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Sombra para dar um leve destaque */
     }
     nav.sidebar h2 { margin: 0 0 30px 0; font-size: 22px; text-align: center; }
     nav.sidebar button {
@@ -58,7 +59,7 @@
     nav.sidebar button:hover { background-color: #ff4e4e; }
     nav.sidebar button svg { stroke: white; width: 20px; height: 20px; }
 
-    /* Logo na parte inferior da barra lateral */
+    /* Logo na parte inferior */
     .sidebar-logo {
       margin-top: auto;
       width: 140px;
