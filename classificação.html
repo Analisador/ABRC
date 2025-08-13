@@ -27,20 +27,11 @@
     }
 
     @keyframes gradientAnimation {
-      0% {
-        background-position: 0% 50%;
-      }
-
-      50% {
-        background-position: 100% 50%;
-      }
-
-      100% {
-        background-position: 0% 50%;
-      }
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
-    /* Sidebar */
     nav.sidebar {
       background: rgba(0, 0, 0, 0.8);
       width: 220px;
@@ -49,7 +40,6 @@
       justify-content: space-between;
       padding: 20px;
       gap: 25px;
-      transition: transform 0.3s ease;
     }
 
     nav.sidebar h2 {
@@ -87,7 +77,6 @@
       display: block;
     }
 
-    /* Conteúdo */
     main.container {
       flex-grow: 1;
       background-color: rgba(0, 0, 0, 0.75);
@@ -106,7 +95,6 @@
       height: 350px;
     }
 
-    /* Caixa de informações */
     .info-box {
       flex: 1 1 300px;
       background-color: rgba(255, 255, 255, 0.05);
@@ -120,72 +108,23 @@
       color: #f2c546;
     }
 
-    .info-box p {
+    .info-box p, .info-box li {
       margin-bottom: 6px;
       font-size: 14px;
       line-height: 1.4em;
     }
 
-    /* Mobile */
     @media (max-width: 768px) {
-      body {
-        flex-direction: column;
-      }
-
-      nav.sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 100%;
-        transform: translateX(-100%);
-        z-index: 999;
-      }
-
-      nav.sidebar.active {
-        transform: translateX(0);
-      }
-
-      main.container {
-        margin: 20px;
-        padding: 20px;
-      }
-
-      .grafico-pequeno {
-        width: 250px;
-        height: 250px;
-      }
-    }
-
-    /* Botão hamburguer */
-    .menu-toggle {
-      display: none;
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      background: rgba(0, 0, 0, 0.8);
-      border: none;
-      color: white;
-      padding: 8px;
-      border-radius: 8px;
-      cursor: pointer;
-      z-index: 1000;
-    }
-
-    @media (max-width: 768px) {
-      .menu-toggle {
-        display: block;
-      }
+      body { flex-direction: column; }
+      nav.sidebar { display: none; }
+      main.container { margin: 20px; padding: 20px; }
+      .grafico-pequeno { width: 250px; height: 250px; }
     }
   </style>
 </head>
 
 <body>
-  <button class="menu-toggle" onclick="toggleMenu()">
-    <i data-lucide="menu"></i>
-  </button>
-
-  <!-- Sidebar -->
-  <nav class="sidebar" id="sidebar">
+  <nav class="sidebar">
     <div>
       <h2>A.B.R.C</h2>
       <button onclick="goToHome()"><i data-lucide="gauge"></i> Speed Test</button>
@@ -197,64 +136,32 @@
     <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
   </nav>
 
-  <!-- Conteúdo Principal -->
   <main class="container">
     <div>
       <canvas id="graficoTrafego" class="grafico-pequeno"></canvas>
     </div>
     <div id="infoTrafego" class="info-box">
       <h3>Detalhes do Tráfego</h3>
-      <p>Passe o mouse ou toque em uma fatia do gráfico para ver detalhes sobre cada tipo de tráfego detectado.</p>
+      <p>Passe o mouse ou toque em uma fatia para ver registros reais.</p>
     </div>
   </main>
 
   <script>
     const { createClient } = window.supabase;
-      const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
+    const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const explicacoes = {
-      'HTTP': {
-        titulo: 'HTTP – Tráfego Web',
-        descricao: 'Acessos a sites sem criptografia.',
-        exemplos: 'Ex.: blogs, APIs abertas.',
-        nota: 'Menos seguro, dados podem ser interceptados.'
-      },
-      'HTTPS': {
-        titulo: 'HTTPS – Tráfego Web Seguro',
-        descricao: 'Acessos protegidos com criptografia.',
-        exemplos: 'Ex.: bancos, redes sociais, e-commerce.',
-        nota: 'Mais seguro contra ataques.'
-      },
-      'FTP': {
-        titulo: 'FTP – Transferência de Arquivos',
-        descricao: 'Usado para enviar e receber arquivos.',
-        exemplos: 'Ex.: servidores de hospedagem.',
-        nota: 'Normalmente sem criptografia, use SFTP para mais segurança.'
-      },
-      'DNS': {
-        titulo: 'DNS – Resolução de Nomes',
-        descricao: 'Tradução de endereços de sites para IPs.',
-        exemplos: 'Ex.: quando você acessa google.com.',
-        nota: 'Pode ser alvo de ataques de spoofing.'
-      }
-    };
-
     let chart;
-
-    function toggleMenu() {
-      document.getElementById("sidebar").classList.toggle("active");
-    }
 
     async function carregarDados() {
       const { data, error } = await supabase
         .from('trafego')
-        .select('timestamp, tipo, porta')
+        .select('timestamp, tipo')
         .order('timestamp', { ascending: false });
 
       if (error) {
-        console.error("Erro ao buscar dados:", error);
+        console.error("Erro:", error);
         return;
       }
       desenharGrafico(data);
@@ -281,34 +188,42 @@
         },
         options: {
           responsive: true,
-          plugins: {
-            legend: { display: false },
-            tooltip: { enabled: false }
-          },
-          onHover: (event, elements) => {
+          plugins: { legend: { display: false }, tooltip: { enabled: false } },
+          onClick: async (event, elements) => {
             if (elements.length) {
               const label = chart.data.labels[elements[0].index];
-              mostrarInfo(label);
+              await mostrarInfoDinamico(label);
             }
           }
         }
       });
     }
 
-    function mostrarInfo(label) {
-      const info = explicacoes[label] || {
-        titulo: label,
-        descricao: 'Sem descrição disponível.',
-        exemplos: 'Sem exemplos.',
-        nota: 'Sem informações adicionais.'
-      };
+    async function mostrarInfoDinamico(tipo) {
+      const { data, error } = await supabase
+        .from('trafego')
+        .select('timestamp, porta')
+        .eq('tipo', tipo)
+        .order('timestamp', { ascending: false })
+        .limit(5);
 
-      document.getElementById('infoTrafego').innerHTML = `
-        <h3>${info.titulo}</h3>
-        <p>${info.descricao}</p>
-        <p><strong>Exemplos:</strong> ${info.exemplos}</p>
-        <p><strong>Nota:</strong> ${info.nota}</p>
-      `;
+      if (error) {
+        console.error("Erro ao buscar exemplos:", error);
+        return;
+      }
+
+      let html = `<h3>${tipo}</h3>`;
+      if (data.length === 0) {
+        html += `<p>Não há registros recentes deste tipo.</p>`;
+      } else {
+        html += `<p>Últimos registros:</p><ul>`;
+        data.forEach(reg => {
+          const hora = new Date(reg.timestamp).toLocaleString();
+          html += `<li>Porta: ${reg.porta} — ${hora}</li>`;
+        });
+        html += `</ul>`;
+      }
+      document.getElementById('infoTrafego').innerHTML = html;
     }
 
     function goToHome() { window.location.href = 'base.html'; }
@@ -316,9 +231,7 @@
     function verClassificacao() { window.location.href = 'classificação.html'; }
     function verPerfil() { window.location.href = 'perfil.html'; }
     function logout() {
-      supabase.auth.signOut().then(() => {
-        window.location.href = 'index.html';
-      });
+      supabase.auth.signOut().then(() => window.location.href = 'index.html');
     }
 
     window.onload = () => {
@@ -329,4 +242,3 @@
 </body>
 
 </html>
-
