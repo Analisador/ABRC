@@ -33,15 +33,15 @@
 
     /* Barra lateral ajustada */
     nav.sidebar {
-      background: rgba(0, 0, 0, 0.7); /* Transparência mais leve */
+      background: rgba(0, 0, 0, 0.7);
       width: 220px;
       display: flex;
       flex-direction: column;
       padding: 20px;
       box-sizing: border-box;
-      gap: 25px;
+      gap: 30px;
       position: relative;
-      height: 100vh; /* Isso vai fazer a barra lateral ocupar toda a altura da tela */
+      height: 100vh; 
     }
 
     nav.sidebar h2 {
@@ -49,7 +49,6 @@
       font-size: 22px;
       text-align: center;
       color: white;
-      flex-grow: 1; /* Isso vai fazer com que o título "A.B.R.C." ocupe o restante da altura disponível */
       display: flex;
       justify-content: center;
       align-items: center;
@@ -63,7 +62,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 10px 12px;
+      padding: 12px 16px;
       border-radius: 8px;
       cursor: pointer;
       transition: background-color 0.3s ease;
@@ -197,7 +196,7 @@
       background-color: #cccccc; 
     }
 
-    /* ====== Responsividade: barra lateral móvel ====== */
+    /* Responsividade: barra lateral móvel */
     #mobileMenuBtn {
       position: fixed;
       top: 14px;
@@ -209,7 +208,7 @@
       border-radius: 10px;
       padding: 10px 12px;
       cursor: pointer;
-      display: none; /* desktop some */
+      display: none;
     }
 
     #backdrop {
@@ -266,7 +265,7 @@
 
   <nav class="sidebar">
     <h2>A.B.R.C</h2>
-    <button onclick="goToHome()"><i data-lucide="wifi"></i> Speed Test</button> <!-- Alterado para ícone de velocidade -->
+    <button onclick="goToHome()"><i data-lucide="zap"></i> Speed Test</button> <!-- Alterado para ícone de velocidade -->
     <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
     <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Classificação</button>
     <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
