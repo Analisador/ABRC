@@ -27,20 +27,11 @@
     }
 
     @keyframes gradientAnimation {
-      0% {
-        background-position: 0% 50%;
-      }
-
-      50% {
-        background-position: 100% 50%;
-      }
-
-      100% {
-        background-position: 0% 50%;
-      }
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
-    /* Sidebar */
     nav.sidebar {
       background: rgba(0, 0, 0, 0.8);
       width: 220px;
@@ -48,13 +39,11 @@
       flex-direction: column;
       justify-content: space-between;
       padding: 20px;
-      box-sizing: border-box;
       gap: 25px;
       transition: transform 0.3s ease;
     }
 
     nav.sidebar h2 {
-      margin: 0 0 30px 0;
       font-size: 22px;
       text-align: center;
     }
@@ -83,14 +72,12 @@
       height: 20px;
     }
 
-    /* Logo inferior */
     .sidebar-logo {
       width: 120px;
       margin: 20px auto 0 auto;
       display: block;
     }
 
-    /* Conteúdo */
     main.container {
       flex-grow: 1;
       background-color: rgba(0, 0, 0, 0.75);
@@ -98,22 +85,40 @@
       padding: 40px;
       border-radius: 20px;
       overflow-y: auto;
-      box-sizing: border-box;
       position: relative;
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
     }
 
     h1 {
       text-align: center;
       margin-bottom: 30px;
+      width: 100%;
     }
 
     .grafico-pequeno {
       width: 350px;
       height: 350px;
-      margin: 0 auto;
     }
 
-    /* Botão hamburguer */
+    .info-caixa {
+      flex: 1;
+      min-width: 250px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 20px;
+      border-radius: 15px;
+      display: none;
+    }
+
+    .info-caixa h2 {
+      margin-bottom: 10px;
+    }
+
+    .info-caixa p {
+      margin-bottom: 6px;
+    }
+
     .menu-toggle {
       display: none;
       position: absolute;
@@ -128,34 +133,21 @@
       z-index: 1000;
     }
 
-    /* Mobile */
     @media (max-width: 768px) {
-      body {
-        flex-direction: column;
-      }
-
+      body { flex-direction: column; }
       nav.sidebar {
         position: fixed;
-        top: 0;
-        left: 0;
+        top: 0; left: 0;
         height: 100%;
         transform: translateX(-100%);
         z-index: 999;
       }
-
-      nav.sidebar.active {
-        transform: translateX(0);
-      }
-
-      .menu-toggle {
-        display: block;
-      }
-
+      nav.sidebar.active { transform: translateX(0); }
+      .menu-toggle { display: block; }
       main.container {
         margin: 20px;
         padding: 20px;
       }
-
       .grafico-pequeno {
         width: 250px;
         height: 250px;
@@ -165,12 +157,8 @@
 </head>
 
 <body>
-  <!-- Botão hamburguer -->
-  <button class="menu-toggle" onclick="toggleMenu()">
-    <i data-lucide="menu"></i>
-  </button>
+  <button class="menu-toggle" onclick="toggleMenu()"><i data-lucide="menu"></i></button>
 
-  <!-- Sidebar -->
   <nav class="sidebar" id="sidebar">
     <div>
       <h2>A.B.R.C</h2>
@@ -183,21 +171,42 @@
     <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
   </nav>
 
-  <!-- Conteúdo Principal -->
   <main class="container">
     <h1>Classificação de Tráfego</h1>
     <canvas id="graficoTrafego" class="grafico-pequeno"></canvas>
+
+    <div class="info-caixa" id="infoCaixa">
+      <h2 id="infoCategoria"></h2>
+      <p id="infoPorcentagem"></p>
+      <p><strong>Portas:</strong> <span id="infoPortas"></span></p>
+      <p><strong>Exemplos:</strong> <span id="infoExemplos"></span></p>
+      <div>
+        <strong>Últimos Registros:</strong>
+        <ul id="infoRegistros"></ul>
+      </div>
+    </div>
   </main>
 
   <script>
     const { createClient } = window.supabase;
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     function toggleMenu() {
       document.getElementById("sidebar").classList.toggle("active");
     }
+
+    const mapeamentoPortas = {
+      "HTTP": { portas: [80, 8080], exemplos: ["Navegação web", "APIs HTTP"] },
+      "HTTPS": { portas: [443], exemplos: ["Sites seguros", "APIs HTTPS"] },
+      "FTP": { portas: [21], exemplos: ["Transferência de arquivos"] },
+      "DNS": { portas: [53], exemplos: ["Resolução de nomes"] },
+      "SMTP": { portas: [25, 587], exemplos: ["Envio de emails"] },
+      "Desconhecido": { portas: [], exemplos: ["Tráfego não identificado"] }
+    };
+
+    let dadosAtuais = [];
 
     async function carregarDados() {
       const { data, error } = await supabase
@@ -209,6 +218,7 @@
         console.error("Erro ao buscar dados:", error);
         return;
       }
+      dadosAtuais = data;
       desenharGrafico(data);
     }
 
@@ -219,13 +229,14 @@
         contagem[tipo] = (contagem[tipo] || 0) + 1;
       });
 
+      const total = data.length;
       const ctx = document.getElementById('graficoTrafego').getContext('2d');
-      new Chart(ctx, {
+
+      const chart = new Chart(ctx, {
         type: 'pie',
         data: {
           labels: Object.keys(contagem),
           datasets: [{
-            label: 'Tipos de Tráfego',
             data: Object.values(contagem),
             backgroundColor: ['#4e9cff', '#f54291', '#33cc33', '#ffa500', '#cc33ff', '#ff3333', '#00cccc'],
             borderColor: 'white',
@@ -234,16 +245,38 @@
         },
         options: {
           responsive: true,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: (context) => `${context.label}: ${context.parsed}`
-              }
+          plugins: { legend: { display: false } },
+          onClick: (evt, elements) => {
+            if (elements.length > 0) {
+              const index = elements[0].index;
+              const categoria = chart.data.labels[index];
+              const qtd = chart.data.datasets[0].data[index];
+              const porcentagem = ((qtd / total) * 100).toFixed(2) + '%';
+              mostrarInfo(categoria, porcentagem);
             }
           }
         }
       });
+    }
+
+    function mostrarInfo(categoria, porcentagem) {
+      const infoCaixa = document.getElementById("infoCaixa");
+      const map = mapeamentoPortas[categoria] || { portas: [], exemplos: [] };
+      document.getElementById("infoCategoria").innerText = categoria;
+      document.getElementById("infoPorcentagem").innerText = `Porcentagem: ${porcentagem}`;
+      document.getElementById("infoPortas").innerText = map.portas.join(', ') || "N/A";
+      document.getElementById("infoExemplos").innerText = map.exemplos.join(', ') || "N/A";
+
+      const ultimos = dadosAtuais.filter(d => d.tipo === categoria).slice(0, 5);
+      const lista = document.getElementById("infoRegistros");
+      lista.innerHTML = "";
+      ultimos.forEach(r => {
+        const li = document.createElement("li");
+        li.innerText = `${r.timestamp} - Porta ${r.porta}`;
+        lista.appendChild(li);
+      });
+
+      infoCaixa.style.display = "block";
     }
 
     function goToHome() { window.location.href = 'base.html'; }
@@ -262,5 +295,4 @@
     };
   </script>
 </body>
-
 </html>
