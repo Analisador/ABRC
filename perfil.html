@@ -7,52 +7,41 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
+      padding: 0;
+    }
+
+    body {
       font-family: Arial, Helvetica, sans-serif;
       height: 100vh;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      background-image: linear-gradient(-45deg, #c2142b, #2165ac, #f2c546, #c2142b);
-      background-size: 300% 300%;
+      color: white;
       animation: gradientAnimation 12s ease infinite;
+      background-size: 300% 300%;
+      background-image: linear-gradient(-45deg, #c2142b, #2165ac, #f2c546, #c2142b);
     }
 
     @keyframes gradientAnimation {
-      0% {
-        background-position: 0% 50%;
-      }
-      50% {
-        background-position: 100% 50%;
-      }
-      100% {
-        background-position: 0% 50%;
-      }
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
-    /* Barra lateral ajustada */
     nav.sidebar {
-      background: rgba(0, 0, 0, 0.7); /* Transparência mais leve */
+      background: rgba(0, 0, 0, 0.8);
       width: 220px;
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
       padding: 20px;
-      box-sizing: border-box;
       gap: 25px;
-      position: relative;
-      height: 100vh; /* Isso vai fazer a barra lateral ocupar toda a altura da tela */
     }
 
     nav.sidebar h2 {
-      margin: 0;
       font-size: 22px;
       text-align: center;
-      color: white;
-      flex-grow: 1; /* Isso vai fazer com que o título "A.B.R.C." ocupe o restante da altura disponível */
-      display: flex;
-      justify-content: center;
-      align-items: center;
     }
 
     nav.sidebar button {
@@ -69,263 +58,240 @@
       transition: background-color 0.3s ease;
     }
 
-    nav.sidebar button:hover { 
-      background-color: #ff4e4e; 
+    nav.sidebar button:hover {
+      background-color: rgba(242, 197, 70, 0.4);
     }
 
-    nav.sidebar button svg { 
-      stroke: white; 
-      width: 20px; 
-      height: 20px; 
+    nav.sidebar button svg {
+      stroke: white;
+      width: 20px;
+      height: 20px;
     }
 
-    /* Logo na parte inferior */
     .sidebar-logo {
-      margin-top: auto;
-      width: 140px;
+      width: 120px;
+      margin: 20px auto 0 auto;
       display: block;
-      margin-left: auto;
-      margin-right: auto;
     }
 
-    /* Seção principal */
     main.container {
       flex-grow: 1;
-      background-color: rgba(0, 0, 0, 0.8);
+      background-color: rgba(0, 0, 0, 0.75);
       margin: 40px;
-      padding: 28px 24px 40px;
+      padding: 40px;
       border-radius: 20px;
       overflow-y: auto;
-      box-sizing: border-box;
-    }
-
-    .page-header {
       display: flex;
-      align-items: center;
+      flex-wrap: wrap;
+      gap: 30px;
       justify-content: center;
-      margin-bottom: 16px;
     }
 
-    .page-header h1 {
-      margin: 0;
-      text-align: center;
-      line-height: 1.2;
-      color: white;
-    }
-
-    .profile-section {
+    .grafico-box {
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin: 16px auto 30px;
+    }
+
+    .grafico-pequeno {
+      width: 350px;
+      height: 350px;
+    }
+
+    .grafico-legenda {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 10px;
     }
 
-    .profile-pic {
-      border-radius: 50%;
-      width: 140px;
-      height: 140px;
-      object-fit: cover;
-      border: 4px solid white;
-      background: rgba(255,255,255,0.06);
-      display: block;
-    }
-
-    input[type="file"] { 
-      display: none; 
-    }
-
-    .upload-label {
-      background-color: #ffffff;
-      color: black;
-      padding: 8px 16px;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.3s ease;
-    }
-
-    .upload-label:hover { 
-      background-color: #cccccc; 
-    }
-
-    .explanation {
-      max-width: 600px;
-      margin: 12px auto 20px;
-      text-align: center;
-      font-size: 16px;
-      background-color: rgba(255, 255, 255, 0.1);
-      padding: 15px;
-      border-radius: 12px;
-      color: white;
-    }
-
-    .form-group {
-      max-width: 400px;
-      margin: 0 auto 20px;
+    .grafico-legenda span {
       display: flex;
-      flex-direction: column;
-      gap: 8px;
+      align-items: center;
+      font-size: 14px;
     }
 
-    label { 
-      font-weight: bold; 
-      color: white;
+    .grafico-legenda i {
+      width: 14px;
+      height: 14px;
+      display: inline-block;
+      margin-right: 6px;
+      border-radius: 3px;
     }
 
-    input[type="time"] {
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-    }
-
-    button.save-btn {
-      background-color: #ffffff;
-      color: black;
-      border: none;
-      padding: 12px 20px;
+    .info-box {
+      flex: 1 1 300px;
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 20px;
       border-radius: 12px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s ease;
-      margin-top: 20px;
+      max-width: 400px;
     }
 
-    button.save-btn:hover { 
-      background-color: #cccccc; 
+    .info-box h3 {
+      margin-bottom: 10px;
+      color: #f2c546;
     }
 
-    /* ====== Responsividade: barra lateral móvel ====== */
-    #mobileMenuBtn {
-      position: fixed;
-      top: 14px;
-      left: 14px;
-      z-index: 1001;
-      background: rgba(0,0,0,0.85);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 10px;
-      padding: 10px 12px;
-      cursor: pointer;
-      display: none; /* desktop some */
-    }
-
-    #backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.5);
-      z-index: 1000;
-      display: none;
-    }
-
-    nav.sidebar.mobile-hidden { 
-      transform: translateX(-100%); 
+    .info-box p, .info-box li {
+      margin-bottom: 6px;
+      font-size: 14px;
+      line-height: 1.4em;
     }
 
     @media (max-width: 768px) {
-      #mobileMenuBtn { display: inline-flex; align-items: center; gap: 8px; }
-      nav.sidebar {
-        position: fixed;
-        top: 0; left: 0; bottom: 0;
-        height: 100vh;
-        z-index: 1002;
-        transform: translateX(0);
-        transition: transform .3s ease;
-        width: 80vw;
-        max-width: 300px;
-        border-right: 1px solid rgba(255,255,255,0.1);
-      }
-      nav.sidebar.mobile-hidden { 
-        transform: translateX(-100%); 
-      }
-
-      main.container {
-        margin: 70px 12px 12px 12px;
-        padding: 16px;
-        border-radius: 14px;
-      }
-    }
-
-    @media (min-width: 769px) {
-      #mobileMenuBtn, #backdrop { display: none !important; }
-      nav.sidebar { position: relative; transform: none !important; }
+      body { flex-direction: column; }
+      nav.sidebar { display: none; }
+      main.container { margin: 20px; padding: 20px; }
+      .grafico-pequeno { width: 250px; height: 250px; }
     }
   </style>
 </head>
 
 <body>
-  <!-- Botão hamburguer (mobile) -->
-  <button id="mobileMenuBtn" aria-label="Abrir menu">
-    <i data-lucide="menu"></i>
-  </button>
-
-  <!-- Backdrop (clica e fecha) -->
-  <div id="backdrop"></div>
-
   <nav class="sidebar">
-    <h2>A.B.R.C</h2>
-    <button onclick="goToHome()"><i data-lucide="home"></i> Speed Test</button>
-    <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
-    <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Classificação</button>
-    <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
-    <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
-
-    <!-- Logo na parte inferior -->
+    <div>
+      <h2>A.B.R.C</h2>
+      <button onclick="goToHome()"><i data-lucide="gauge"></i> Speed Test</button>
+      <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
+      <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Classificação</button>
+      <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
+      <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
+    </div>
     <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
   </nav>
 
   <main class="container">
-    <div class="page-header">
-      <h1>Seu Perfil</h1>
+    <div class="grafico-box">
+      <canvas id="graficoTrafego" class="grafico-pequeno"></canvas>
+      <div id="graficoLegenda" class="grafico-legenda"></div>
     </div>
-
-    <div class="profile-section">
-      <img id="preview" class="profile-pic" alt="Foto de Perfil" />
-      <label for="foto" class="upload-label">Escolher Foto</label>
-      <input type="file" id="foto" accept="image/*" />
-    </div>
-
-    <div class="explanation">
-      Os horários abaixo determinam quando os testes de velocidade serão executados automaticamente.
-      Escolha até três horários do seu dia para que o sistema colete os dados de forma automática.
-    </div>
-
-    <div class="form-group">
-      <label for="primeiro">Horário 1:</label>
-      <input type="time" id="primeiro" />
-      <label for="segundo">Horário 2:</label>
-      <input type="time" id="segundo" />
-      <label for="terceiro">Horário 3:</label>
-      <input type="time" id="terceiro" />
-    </div>
-
-    <div style="text-align: center;">
-      <button class="save-btn" onclick="salvarHorarios()">Salvar Horários</button>
+    <div id="infoTrafego" class="info-box">
+      <h3>Detalhes do Tráfego</h3>
+      <p>Clique em uma fatia para ver descrição e últimos registros reais.</p>
     </div>
   </main>
 
   <script>
-    const { createClient } = supabase;
+    const { createClient } = window.supabase;
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs';
-    const supabaseClient = createClient(supabaseUrl, supabaseKey);
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Navegação entre as páginas
-    function goToHome() { window.location.assign('base.html'); }
-    function verLogs() { window.location.assign('logs.html'); }
-    function verClassificacao() { window.location.assign('classificação.html'); }
-    function verPerfil() { window.location.assign('perfil.html'); }
+    const descricoes = {
+      HTTP: "Tráfego HTTP refere-se à navegação em sites, APIs e comunicação baseada em protocolo web.",
+      FTP: "Tráfego FTP é usado para transferir arquivos entre cliente e servidor.",
+      DNS: "Tráfego DNS resolve nomes de domínio para endereços IP.",
+      SMTP: "Tráfego SMTP é usado para envio de e-mails.",
+      HTTPS: "Tráfego HTTPS é HTTP seguro, criptografado para proteger dados.",
+      Outros: "Tráfego que não se encaixa nas categorias principais."
+    };
 
-    function logout() {
-      supabaseClient.auth.signOut().then(() => {
-        window.location.href = 'index.html';
+    let chart;
+
+    async function carregarDados() {
+      const { data, error } = await supabase
+        .from('trafego')
+        .select('timestamp, tipo, porta');
+
+      if (error) {
+        console.error("Erro:", error);
+        return;
+      }
+
+      const contagem = {};
+      data.forEach(reg => {
+        const tipo = reg.tipo || 'Outros';
+        contagem[tipo] = (contagem[tipo] || 0) + 1;
+      });
+
+      desenharGrafico(contagem, data.length, data);
+    }
+
+    function desenharGrafico(contagem, total, todosDados) {
+      const ctx = document.getElementById('graficoTrafego').getContext('2d');
+      chart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(contagem),
+          datasets: [{
+            data: Object.values(contagem),
+            backgroundColor: ['#4e9cff', '#f54291', '#33cc33', '#ffa500', '#cc33ff', '#ff3333', '#00cccc'],
+            borderColor: 'white',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  const label = context.label || '';
+                  const value = context.parsed;
+                  const pct = ((value / total) * 100).toFixed(1);
+                  return `${label}: ${value} • ${pct}%`;
+                }
+              }
+            }
+          },
+          onClick: async (event, elements) => {
+            if (elements.length) {
+              const label = chart.data.labels[elements[0].index];
+              await mostrarInfoHibrido(label, todosDados);
+            }
+          }
+        }
+      });
+
+      gerarLegenda(contagem, total);
+    }
+
+    function gerarLegenda(contagem, total) {
+      const legendaDiv = document.getElementById('graficoLegenda');
+      legendaDiv.innerHTML = '';
+      const cores = ['#4e9cff', '#f54291', '#33cc33', '#ffa500', '#cc33ff', '#ff3333', '#00cccc'];
+      Object.keys(contagem).forEach((tipo, i) => {
+        const pct = ((contagem[tipo] / total) * 100).toFixed(1);
+        const item = document.createElement('span');
+        item.innerHTML = `<i style="background-color:${cores[i]}"></i>${tipo} (${pct}%)`;
+        legendaDiv.appendChild(item);
       });
     }
 
+    async function mostrarInfoHibrido(tipo, todosDados) {
+      const registros = todosDados
+        .filter(r => (r.tipo || 'Outros') === tipo)
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .slice(0, 5);
+
+      let html = `<h3>${tipo}</h3>`;
+      html += `<p>${descricoes[tipo] || "Tipo de tráfego não identificado."}</p>`;
+
+      if (registros.length === 0) {
+        html += `<p>Não há registros recentes deste tipo.</p>`;
+      } else {
+        html += `<p>Últimos registros:</p><ul>`;
+        registros.forEach(reg => {
+          const hora = new Date(reg.timestamp).toLocaleString();
+          html += `<li>Porta: ${reg.porta} — ${hora}</li>`;
+        });
+        html += `</ul>`;
+      }
+      document.getElementById('infoTrafego').innerHTML = html;
+    }
+
+    function goToHome() { window.location.href = 'base.html'; }
+    function verLogs() { window.location.href = 'logs.html'; }
+    function verClassificacao() { window.location.href = 'classificação.html'; }
+    function verPerfil() { window.location.href = 'perfil.html'; }
+    function logout() {
+      supabase.auth.signOut().then(() => window.location.href = 'index.html');
+    }
+
     window.onload = () => {
-      carregarUsuario();
+      carregarDados();
       lucide.createIcons();
     };
   </script>
