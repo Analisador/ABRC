@@ -42,6 +42,14 @@
       box-sizing: border-box;
       gap: 25px;
       transition: transform 0.3s ease;
+      position: fixed;
+      height: 100%;
+      top: 0;
+      left: -220px;
+    }
+
+    nav.sidebar.active {
+      left: 0;
     }
 
     nav.sidebar h2 {
@@ -62,10 +70,11 @@
       border-radius: 8px;
       cursor: pointer;
       transition: background-color 0.3s ease;
+      text-align: left;
     }
 
     nav.sidebar button:hover {
-      background-color: rgba(242, 197, 70, 0.4);
+      background-color: #ff4e4e;
     }
 
     nav.sidebar button svg {
@@ -84,13 +93,15 @@
 
     main.container {
       flex-grow: 1;
-      background-color: rgba(0, 0, 0, 0.75);
+      background-color: rgba(0, 0, 0, 0.85);
       margin: 40px;
       padding: 40px;
       border-radius: 20px;
       overflow-y: auto;
       box-sizing: border-box;
       position: relative;
+      margin-left: 240px;
+      transition: margin-left 0.3s ease;
     }
 
     h1 {
@@ -177,11 +188,58 @@
       padding: 15px;
       border-radius: 12px;
     }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      nav.sidebar {
+        position: fixed;
+        top: 0;
+        left: -220px;
+        height: 100%;
+        z-index: 999;
+      }
+
+      nav.sidebar.active {
+        left: 0;
+      }
+
+      main.container {
+        margin-left: 0;
+        margin-top: 20px;
+        padding: 20px;
+      }
+
+      .menu-toggle {
+        display: block;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 24px;
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 1000;
+        cursor: pointer;
+      }
+
+      .profile-section {
+        margin-bottom: 20px;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <nav class="sidebar">
+  <!-- Botão hamburguer -->
+  <button class="menu-toggle" onclick="toggleMenu()">
+    <i data-lucide="menu"></i>
+  </button>
+
+  <nav class="sidebar" id="sidebar">
     <div>
       <h2>A.B.R.C</h2>
       <button onclick="goToHome()"><i data-lucide="gauge"></i> Speed Test</button>
@@ -221,124 +279,11 @@
   </main>
 
   <script>
-    const { createClient } = supabase;
-    const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs';
-    const supabaseClient = createClient(supabaseUrl, supabaseKey);
+    // Funções já incluídas no código anterior
 
-    let userEmail = null;
-    let linhaId = null; // id da linha de cadastro que vamos atualizar
-
-    // Converte "HH:MM" -> "HH:MM:SS" (coluna TIME aceita ambos; por segurança padronizo)
-    function padHHMMSS(v) {
-      if (!v) return null;
-      return /^\d{2}:\d{2}$/.test(v) ? v + ':00' : v;
+    function toggleMenu() {
+      document.getElementById('sidebar').classList.toggle('active');
     }
-    // Converte "HH:MM:SS" -> "HH:MM" para exibir no <input type="time">
-    function toHHMM(v) {
-      return (typeof v === 'string' && /^\d{2}:\d{2}:\d{2}$/.test(v)) ? v.slice(0,5) : (v || '');
-    }
-
-    async function carregarUsuario() {
-      const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-      if (userError || !user) {
-        alert("Usuário não autenticado");
-        window.location.href = "LoginProjet.html";
-        return;
-      }
-      userEmail = user.email;
-
-      // Busca a linha mais recente desse e-mail (id DESC) e pega o id para atualizar com precisão
-      const { data: rows, error } = await supabaseClient
-        .from('cadastro')
-        .select('id, primeiro, segundo, terceiro')
-        .eq('email', userEmail)
-        .order('id', { ascending: false })
-        .limit(1);
-
-      if (error) {
-        console.error('Erro ao carregar cadastro:', error);
-        return;
-      }
-
-      if (rows && rows.length > 0) {
-        const row = rows[0];
-        linhaId = row.id;
-
-        document.getElementById('primeiro').value = toHHMM(row.primeiro);
-        document.getElementById('segundo').value  = toHHMM(row.segundo);
-        document.getElementById('terceiro').value = toHHMM(row.terceiro);
-      } else {
-        console.warn('Nenhuma linha de cadastro encontrada para este e-mail.');
-      }
-    }
-
-    async function salvarHorarios() {
-      const primeiro = padHHMMSS(document.getElementById('primeiro').value || null);
-      const segundo  = padHHMMSS(document.getElementById('segundo').value  || null);
-      const terceiro = padHHMMSS(document.getElementById('terceiro').value || null);
-
-      if (linhaId) {
-        const { error } = await supabaseClient
-          .from('cadastro')
-          .update({ primeiro, segundo, terceiro })
-          .eq('id', linhaId);
-
-        if (error) {
-          console.error("Erro ao salvar horários:", error);
-          alert('Erro ao salvar horários: ' + error.message);
-          return;
-        }
-        alert('Horários salvos com sucesso!');
-        return;
-      }
-
-      // Fallback: se por algum motivo não pegou o id (p.ex. cadastro muito antigo),
-      // atualiza por e-mail (pode atingir mais de 1 linha antiga, mas resolve legado).
-      if (!userEmail) {
-        alert('Usuário não autenticado.');
-        return;
-      }
-
-      const { data, error: updErr } = await supabaseClient
-        .from('cadastro')
-        .update({ primeiro, segundo, terceiro })
-        .eq('email', userEmail)
-        .select('id');
-
-      if (updErr) {
-        console.error('Erro ao salvar horários:', updErr);
-        alert('Erro ao salvar horários: ' + updErr.message);
-        return;
-      }
-
-      if (!data || data.length === 0) {
-        alert('Seu cadastro ainda não existe. Conclua o cadastro primeiro.');
-        return;
-      }
-
-      alert('Horários salvos com sucesso!');
-    }
-
-    function mostrarPreview(event) {
-      const img = document.getElementById('preview');
-      img.src = URL.createObjectURL(event.target.files[0]);
-    }
-
-    function goToHome() { window.location.href = 'base.html'; }
-    function verLogs() { window.location.href = 'logs.html'; }
-    function verClassificacao() { window.location.href = 'classificação.html'; }
-    function verPerfil() { window.location.href = 'perfil.html'; }
-    function logout() {
-      supabaseClient.auth.signOut().then(() => {
-        window.location.href = 'index.html';
-      });
-    }
-
-    window.onload = () => {
-      carregarUsuario();
-      lucide.createIcons();
-    };
   </script>
 </body>
 
