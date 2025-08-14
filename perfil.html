@@ -42,14 +42,6 @@
       box-sizing: border-box;
       gap: 25px;
       transition: transform 0.3s ease;
-      position: fixed;
-      height: 100%;
-      top: 0;
-      left: -220px;
-    }
-
-    nav.sidebar.active {
-      left: 0;
     }
 
     nav.sidebar h2 {
@@ -70,11 +62,10 @@
       border-radius: 8px;
       cursor: pointer;
       transition: background-color 0.3s ease;
-      text-align: left;
     }
 
     nav.sidebar button:hover {
-      background-color: #ff4e4e;
+      background-color: rgba(242, 197, 70, 0.4);
     }
 
     nav.sidebar button svg {
@@ -93,15 +84,14 @@
 
     main.container {
       flex-grow: 1;
-      background-color: rgba(0, 0, 0, 0.85);
+      background-color: rgba(0, 0, 0, 0.75);
       margin: 40px;
       padding: 40px;
       border-radius: 20px;
       overflow-y: auto;
       box-sizing: border-box;
       position: relative;
-      margin-left: 240px;
-      transition: margin-left 0.3s ease;
+      margin-left: 220px; /* Ajustando a largura da sidebar */
     }
 
     h1 {
@@ -189,7 +179,7 @@
       border-radius: 12px;
     }
 
-    /* Mobile */
+    /* Responsividade */
     @media (max-width: 768px) {
       body {
         flex-direction: column;
@@ -198,13 +188,14 @@
       nav.sidebar {
         position: fixed;
         top: 0;
-        left: -220px;
+        left: 0;
         height: 100%;
-        z-index: 999;
+        transform: translateX(-100%);
+        z-index: 1000;
       }
 
       nav.sidebar.active {
-        left: 0;
+        transform: translateX(0);
       }
 
       main.container {
@@ -229,15 +220,17 @@
       .profile-section {
         margin-bottom: 20px;
       }
+
+      .sidebar-logo {
+        width: 100px;
+      }
     }
   </style>
 </head>
 
 <body>
-  <!-- Botão hamburguer -->
-  <button class="menu-toggle" onclick="toggleMenu()">
-    <i data-lucide="menu"></i>
-  </button>
+  <!-- Botão hamburguer (visível apenas em telas menores) -->
+  <button class="menu-toggle" onclick="toggleMenu()">☰</button>
 
   <nav class="sidebar" id="sidebar">
     <div>
@@ -279,7 +272,7 @@
   </main>
 
   <script>
-    // Funções já incluídas no código anterior
+    // Funções de carregamento de usuário e salvar horários
 
     function toggleMenu() {
       document.getElementById('sidebar').classList.toggle('active');
