@@ -15,6 +15,8 @@
       background-size: 300% 300%;
       background-image: linear-gradient(-45deg, #c2142b, #2165ac, #f2c546, #c2142b);
       display: flex;
+      justify-content: center; /* Centraliza horizontalmente */
+      align-items: flex-start; /* Não centraliza verticalmente */
       height: 100vh;
       color: white;
     }
@@ -92,13 +94,14 @@
     main.container {
       flex-grow: 1;
       background-color: rgba(0, 0, 0, 0.75);
-      margin: 40px;
+      margin: 40px auto; /* Centraliza horizontalmente */
       padding: 40px;
       border-radius: 20px;
       overflow-y: auto;
       box-sizing: border-box;
       position: relative;
-      margin-left: 240px;
+      width: 90%; /* Ajusta a largura para que o conteúdo ocupe uma largura menor */
+      max-width: 600px; /* Definindo um tamanho máximo para a caixa */
     }
 
     h1 {
