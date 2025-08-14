@@ -17,6 +17,7 @@
       display: flex;
       height: 100vh;
       color: white;
+      flex-direction: column;
     }
 
     @keyframes gradientAnimation {
@@ -42,6 +43,15 @@
       box-sizing: border-box;
       gap: 25px;
       transition: transform 0.3s ease;
+      position: fixed;
+      top: 0;
+      left: -220px;
+      height: 100%;
+      z-index: 1000;
+    }
+
+    nav.sidebar.active {
+      left: 0;
     }
 
     nav.sidebar h2 {
@@ -91,6 +101,9 @@
       overflow-y: auto;
       box-sizing: border-box;
       position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     h1 {
@@ -189,12 +202,12 @@
         top: 0;
         left: 0;
         height: 100%;
-        transform: translateX(-100%); /* Inicialmente oculta */
+        transform: translateX(-100%);
         z-index: 999;
       }
 
       nav.sidebar.active {
-        transform: translateX(0); /* Exibe a sidebar ao clicar no botão */
+        transform: translateX(0);
       }
 
       .menu-toggle {
