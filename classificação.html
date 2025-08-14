@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -31,24 +32,23 @@
       100% { background-position: 0% 50%; }
     }
 
-    /* Sidebar */
+    /* Sidebar igual à do Speed Test */
     nav.sidebar {
       background: rgba(0, 0, 0, 0.8);
-      width: 220px;
+      width: 250px;
       display: flex;
       flex-direction: column;
-      padding: 20px;
-      gap: 25px; /* Ajustando o espaçamento entre os botões */
-      transition: transform 0.3s ease;
       justify-content: space-between;
+      padding: 20px;
+      gap: 25px; /* Ajustado o espaçamento entre os botões */
+      transition: transform 0.3s ease;
     }
 
     nav.sidebar h2 {
-      margin: 0 0 30px 0;
-      font-weight: 700;
       font-size: 22px;
+      font-weight: 700;
       text-align: center;
-      user-select: none;
+      margin: 0 0 30px 0; /* Aumentando o espaçamento abaixo do título para dar mais altura */
     }
 
     nav.sidebar button {
@@ -56,19 +56,18 @@
       border: none;
       color: white;
       font-size: 18px;
-      text-align: left;
-      cursor: pointer;
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 10px 12px;
+      padding: 15px 12px; /* Aumentando a altura dos botões */
       border-radius: 8px;
+      cursor: pointer;
       transition: background-color 0.3s ease;
-      user-select: none;
+      height: 50px; /* Aumentando a altura dos botões para ficarem mais altos */
     }
 
     nav.sidebar button:hover {
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: rgba(242, 197, 70, 0.4);
     }
 
     nav.sidebar button svg {
@@ -78,23 +77,11 @@
     }
 
     .sidebar-logo {
-      margin-top: auto;
-      text-align: center;
+      width: 150px; /* logo maior */
+      margin: 20px auto 0 auto;
+      display: block;
     }
 
-    .sidebar-logo .logo {
-      max-width: 150px;
-      width: 100%;
-      height: auto;
-      opacity: 0.9;
-      transition: opacity 0.3s ease;
-    }
-
-    .sidebar-logo .logo:hover {
-      opacity: 1;
-    }
-
-    /* Conteúdo */
     main.container {
       flex-grow: 1;
       background-color: rgba(0, 0, 0, 0.75);
@@ -102,14 +89,16 @@
       padding: 40px;
       border-radius: 20px;
       overflow-y: auto;
-      box-sizing: border-box;
       position: relative;
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
     }
 
     h1 {
       text-align: center;
       margin-bottom: 30px;
-      user-select: none;
+      width: 100%;
     }
 
     .grafico-pequeno {
@@ -134,7 +123,6 @@
       margin-bottom: 6px;
     }
 
-    /* Botão hamburguer */
     .menu-toggle {
       display: none;
       position: absolute;
@@ -149,34 +137,21 @@
       z-index: 1000;
     }
 
-    /* Mobile */
     @media (max-width: 768px) {
-      body {
-        flex-direction: column;
-      }
-
+      body { flex-direction: column; }
       nav.sidebar {
         position: fixed;
-        top: 0;
-        left: 0;
+        top: 0; left: 0;
         height: 100%;
         transform: translateX(-100%);
         z-index: 999;
       }
-
-      nav.sidebar.active {
-        transform: translateX(0);
-      }
-
-      .menu-toggle {
-        display: block;
-      }
-
+      nav.sidebar.active { transform: translateX(0); }
+      .menu-toggle { display: block; }
       main.container {
         margin: 20px;
         padding: 20px;
       }
-
       .grafico-pequeno {
         width: 250px;
         height: 250px;
@@ -193,7 +168,7 @@
       <h2>A.B.R.C</h2>
       <button onclick="goToHome()"><i data-lucide="gauge"></i> Speed Test</button>
       <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
-      <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Tráfego</button>
+      <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i>Tráfego</button>
       <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
       <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
     </div>
@@ -203,10 +178,129 @@
   <main class="container">
     <h1>Classificação de Tráfego</h1>
     <canvas id="graficoTrafego" class="grafico-pequeno"></canvas>
+
+    <div class="info-caixa" id="infoCaixa">
+      <h2 id="infoCategoria"></h2>
+      <p id="infoPorcentagem"></p>
+      <p><strong>Portas:</strong> <span id="infoPortas"></span></p>
+      <p><strong>Exemplos:</strong> <span id="infoExemplos"></span></p>
+      <div>
+        <strong>Últimos Registros:</strong>
+        <ul id="infoRegistros"></ul>
+      </div>
+    </div>
   </main>
 
   <script>
-    // Restante do script conforme o código original.
+    const { createClient } = window.supabase;
+    const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    function toggleMenu() {
+      document.getElementById("sidebar").classList.toggle("active");
+    }
+
+    const mapeamentoPortas = {
+      80: ["HTTP", "Navegação web, APIs HTTP"],
+      8080: ["HTTP Alternativa", "Servidores de teste, proxies"],
+      443: ["HTTPS", "Sites seguros, APIs HTTPS, VPNs TLS"],
+      21: ["FTP", "Transferência de arquivos"],
+      53: ["DNS", "Resolução de nomes"],
+      25: ["SMTP", "Envio de e-mails"],
+      587: ["SMTP Seguro", "Envio de e-mails autenticado"]
+    };
+
+    let dadosAtuais = [];
+
+    async function carregarDados() {
+      const { data, error } = await supabase
+        .from('trafego')
+        .select('timestamp, tipo, porta')
+        .order('timestamp', { ascending: false });
+
+      if (error) {
+        console.error("Erro ao buscar dados:", error);
+        return;
+      }
+      dadosAtuais = data;
+      desenharGrafico(data);
+    }
+
+    function desenharGrafico(data) {
+      const contagem = {};
+      data.forEach(registro => {
+        const tipo = registro.tipo || 'Desconhecido';
+        contagem[tipo] = (contagem[tipo] || 0) + 1;
+      });
+
+      const total = data.length;
+      const ctx = document.getElementById('graficoTrafego').getContext('2d');
+
+      const chart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(contagem),
+          datasets: [{
+            data: Object.values(contagem),
+            backgroundColor: ['#4e9cff', '#f54291', '#33cc33', '#ffa500', '#cc33ff', '#ff3333', '#00cccc'],
+            borderColor: 'white',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          onClick: (evt, elements) => {
+            if (elements.length > 0) {
+              const index = elements[0].index;
+              const categoria = chart.data.labels[index];
+              const qtd = chart.data.datasets[0].data[index];
+              const porcentagem = ((qtd / total) * 100).toFixed(2) + '%';
+              mostrarInfo(categoria, porcentagem);
+            }
+          }
+        }
+      });
+    }
+
+    function mostrarInfo(categoria, porcentagem) {
+      const infoCaixa = document.getElementById("infoCaixa");
+      const registrosCategoria = dadosAtuais.filter(d => d.tipo === categoria);
+      const portasUsadas = [...new Set(registrosCategoria.map(r => r.porta).filter(Boolean))];
+      const exemplos = portasUsadas.map(p => mapeamentoPortas[p]?.[1] || "Desconhecido");
+
+      document.getElementById("infoCategoria").innerText = categoria;
+      document.getElementById("infoPorcentagem").innerText = `Porcentagem: ${porcentagem}`;
+      document.getElementById("infoPortas").innerText = portasUsadas.length ? portasUsadas.join(', ') : "N/A";
+      document.getElementById("infoExemplos").innerText = exemplos.length ? [...new Set(exemplos)].join('; ') : "N/A";
+
+      const lista = document.getElementById("infoRegistros");
+      lista.innerHTML = "";
+      registrosCategoria.slice(0, 5).forEach(r => {
+        const li = document.createElement("li");
+        li.innerText = `${r.timestamp} - Porta ${r.porta || "N/A"}`;
+        lista.appendChild(li);
+      });
+
+      infoCaixa.style.display = "block";
+    }
+
+    function goToHome() { window.location.href = 'base.html'; }
+    function verLogs() { window.location.href = 'logs.html'; }
+    function verClassificacao() { window.location.href = 'classificação.html'; }
+    function verPerfil() { window.location.href = 'perfil.html'; }
+    function logout() {
+      supabase.auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      });
+    }
+
+    window.onload = () => {
+      carregarDados();
+      lucide.createIcons();
+    };
   </script>
 </body>
+
 </html>
