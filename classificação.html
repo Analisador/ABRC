@@ -7,6 +7,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+
   <style>
     * {
       box-sizing: border-box;
@@ -37,7 +38,7 @@
       display: flex;
       flex-direction: column;
       padding: 20px;
-      gap: 25px; /* Espaçamento entre os botões */
+      gap: 25px; /* Ajustando o espaçamento entre os botões */
       transition: transform 0.3s ease;
       justify-content: space-between;
     }
@@ -111,42 +112,26 @@
       user-select: none;
     }
 
-    .card-container {
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-      margin-bottom: 30px;
-      flex-wrap: wrap;
+    .grafico-pequeno {
+      width: 350px;
+      height: 350px;
     }
 
-    .card {
-      background-color: #ffffff;
-      color: black;
+    .info-caixa {
+      flex: 1;
+      min-width: 250px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 20px;
       border-radius: 15px;
-      padding: 25px 30px;
-      font-size: 20px;
-      font-weight: bold;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      transition: transform 0.3s ease;
-      cursor: pointer;
-      min-width: 180px;
-      text-align: center;
+      display: none;
     }
 
-    .card:hover {
-      transform: scale(1.05);
+    .info-caixa h2 {
+      margin-bottom: 10px;
     }
 
-    .chart-block {
-      margin-top: 20px;
-    }
-
-    canvas {
-      background-color: white;
-      border-radius: 10px;
-      padding: 15px;
-      max-height: 400px;
-      width: 100% !important;
+    .info-caixa p {
+      margin-bottom: 6px;
     }
 
     /* Botão hamburguer */
@@ -192,21 +177,16 @@
         padding: 20px;
       }
 
-      .card-container {
-        flex-direction: column;
-        align-items: center;
-      }
-
-      canvas {
-        max-height: 300px;
+      .grafico-pequeno {
+        width: 250px;
+        height: 250px;
       }
     }
   </style>
 </head>
+
 <body>
-  <button class="menu-toggle" onclick="toggleMenu()">
-    <i data-lucide="menu"></i>
-  </button>
+  <button class="menu-toggle" onclick="toggleMenu()"><i data-lucide="menu"></i></button>
 
   <nav class="sidebar" id="sidebar">
     <div>
@@ -217,9 +197,7 @@
       <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
       <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
     </div>
-    <div class="sidebar-logo">
-      <img src="images/logo-abrc.png" alt="Logo" class="logo">
-    </div>
+    <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
   </nav>
 
   <main class="container">
