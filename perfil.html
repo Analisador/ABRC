@@ -18,6 +18,8 @@
       height: 100vh;
       color: white;
       flex-direction: column;
+      justify-content: center;
+      align-items: center;
     }
 
     @keyframes gradientAnimation {
@@ -103,7 +105,10 @@
       position: relative;
       display: flex;
       flex-direction: column;
+      justify-content: center;
       align-items: center;
+      width: 100%;
+      max-width: 800px;
     }
 
     h1 {
@@ -207,7 +212,7 @@
       }
 
       nav.sidebar.active {
-        transform: translateX(0);
+        transform: translateX(0); /* Exibe a sidebar ao clicar no hamburguer */
       }
 
       .menu-toggle {
