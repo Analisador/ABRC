@@ -33,6 +33,7 @@
       }
     }
 
+    /* Sidebar */
     nav.sidebar {
       background: rgba(0, 0, 0, 0.8);
       width: 220px;
@@ -42,6 +43,11 @@
       box-sizing: border-box;
       gap: 25px;
       transition: transform 0.3s ease;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      z-index: 999;
     }
 
     nav.sidebar h2 {
@@ -62,6 +68,7 @@
       border-radius: 8px;
       cursor: pointer;
       transition: background-color 0.3s ease;
+      text-align: left;
     }
 
     nav.sidebar button:hover {
@@ -91,6 +98,7 @@
       overflow-y: auto;
       box-sizing: border-box;
       position: relative;
+      margin-left: 240px;
     }
 
     h1 {
@@ -177,11 +185,58 @@
       padding: 15px;
       border-radius: 12px;
     }
+
+    /* Menu hamburguer */
+    .menu-toggle {
+      display: none;
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      border: none;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      nav.sidebar {
+        position: fixed;
+        top: 0;
+        left: -220px;
+        height: 100%;
+        transform: translateX(0);
+      }
+
+      nav.sidebar.active {
+        transform: translateX(220px);
+      }
+
+      main.container {
+        margin: 20px;
+        padding: 20px;
+        margin-left: 0;
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <nav class="sidebar">
+  <button class="menu-toggle" onclick="toggleMenu()">
+    <i data-lucide="menu"></i>
+  </button>
+
+  <nav class="sidebar" id="sidebar">
     <div>
       <h2>A.B.R.C</h2>
       <button onclick="goToHome()"><i data-lucide="gauge"></i> Speed Test</button>
@@ -227,14 +282,13 @@
     const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
     let userEmail = null;
-    let linhaId = null; // id da linha de cadastro que vamos atualizar
+    let linhaId = null;
 
-    // Converte "HH:MM" -> "HH:MM:SS" (coluna TIME aceita ambos; por segurança padronizo)
     function padHHMMSS(v) {
       if (!v) return null;
       return /^\d{2}:\d{2}$/.test(v) ? v + ':00' : v;
     }
-    // Converte "HH:MM:SS" -> "HH:MM" para exibir no <input type="time">
+
     function toHHMM(v) {
       return (typeof v === 'string' && /^\d{2}:\d{2}:\d{2}$/.test(v)) ? v.slice(0,5) : (v || '');
     }
@@ -248,7 +302,6 @@
       }
       userEmail = user.email;
 
-      // Busca a linha mais recente desse e-mail (id DESC) e pega o id para atualizar com precisão
       const { data: rows, error } = await supabaseClient
         .from('cadastro')
         .select('id, primeiro, segundo, terceiro')
@@ -293,8 +346,6 @@
         return;
       }
 
-      // Fallback: se por algum motivo não pegou o id (p.ex. cadastro muito antigo),
-      // atualiza por e-mail (pode atingir mais de 1 linha antiga, mas resolve legado).
       if (!userEmail) {
         alert('Usuário não autenticado.');
         return;
@@ -339,6 +390,10 @@
       carregarUsuario();
       lucide.createIcons();
     };
+
+    function toggleMenu() {
+      document.getElementById('sidebar').classList.toggle('active');
+    }
   </script>
 </body>
 
