@@ -177,11 +177,66 @@
       padding: 15px;
       border-radius: 12px;
     }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      nav.sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        transform: translateX(-100%); /* Inicialmente oculta */
+        z-index: 999;
+      }
+
+      nav.sidebar.active {
+        transform: translateX(0); /* Exibe a sidebar ao clicar no botão */
+      }
+
+      .menu-toggle {
+        display: block;
+        background: rgba(0, 0, 0, 0.8);
+        border: none;
+        color: white;
+        padding: 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        z-index: 1000;
+      }
+
+      main.container {
+        margin-left: 0;
+        margin-top: 20px;
+        padding: 20px;
+      }
+
+      .sidebar-logo {
+        width: 100px;
+      }
+
+      .profile-section {
+        margin-bottom: 20px;
+      }
+
+      nav.sidebar button {
+        font-size: 16px;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <nav class="sidebar">
+  <!-- Botão hamburguer -->
+  <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+
+  <nav class="sidebar" id="sidebar">
     <div>
       <h2>A.B.R.C</h2>
       <button onclick="goToHome()"><i data-lucide="gauge"></i> Speed Test</button>
@@ -333,6 +388,10 @@
       supabaseClient.auth.signOut().then(() => {
         window.location.href = 'index.html';
       });
+    }
+
+    function toggleMenu() {
+      document.getElementById('sidebar').classList.toggle('active');
     }
 
     window.onload = () => {
