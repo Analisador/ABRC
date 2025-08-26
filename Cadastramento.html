@@ -146,10 +146,6 @@
       text-decoration: none;
     }
 
-    .radio-group {
-      margin: 10px 0;
-    }
-
     .senha-feedback {
       font-size: 14px;
       color: red;
@@ -266,34 +262,9 @@
           </button>
         </div>
 
-        <div class="radio-group">
-          <p>Sexo:</p>
-          <input type="radio" id="feminino" name="genero" value="feminino" required>
-          <label for="feminino">Feminino</label><br>
-          <input type="radio" id="masculino" name="genero" value="masculino" required>
-          <label for="masculino">Masculino</label><br>
-          <input type="radio" id="outro" name="genero" value="outro" required>
-          <label for="outro">Outro</label>
-        </div>
-
         <div class="inputBox dataBox">
           <label for="data_nascimento"><b>Data de nascimento</b></label><br>
           <input type="date" name="data_nascimento" id="data_nascimento" required>
-        </div>
-
-        <div class="inputBox">
-          <input type="text" name="cidade" id="cidade" class="inputUser" required>
-          <label for="cidade" class="labelInput">Cidade</label>
-        </div>
-
-        <div class="inputBox">
-          <input type="text" name="estado" id="estado" class="inputUser" required>
-          <label for="estado" class="labelInput">Estado</label>
-        </div>
-
-        <div class="inputBox">
-          <input type="text" name="endereco" id="endereco" class="inputUser" required>
-          <label for="endereco" class="labelInput">Endereço</label>
         </div>
 
         <input type="submit" value="Cadastrar" id="submit">
@@ -308,9 +279,9 @@
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
+    const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
-     const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
     const form = document.getElementById('cadastro-form');
     const senhaInput = document.getElementById('senha');
@@ -338,11 +309,7 @@
       const confirmarSenha = confirmarInput.value;
       const nome = document.getElementById('nome').value;
       const telefone = telefoneInput.value;
-      const sexo = document.querySelector('input[name="genero"]:checked')?.value;
       const data_nascimento = document.getElementById('data_nascimento').value;
-      const cidade = document.getElementById('cidade').value;
-      const estado = document.getElementById('estado').value;
-      const endereco = document.getElementById('endereco').value;
 
       if (senha !== confirmarSenha) {
         senhaFeedback.textContent = "As senhas não coincidem.";
@@ -371,11 +338,7 @@
         email,
         nome,
         telefone,
-        sexo,
-        data_de_nascimento: data_nascimento,
-        cidade,
-        estado,
-        endereco
+        data_de_nascimento: data_nascimento
       }]);
 
       if (insertError) {
