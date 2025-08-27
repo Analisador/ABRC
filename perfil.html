@@ -48,6 +48,11 @@
       left: 0;
       height: 100%;
       z-index: 999;
+      transform: translateX(-220px);
+    }
+
+    nav.sidebar.active {
+      transform: translateX(0);
     }
 
     nav.sidebar h2 {
@@ -209,13 +214,14 @@
       nav.sidebar {
         position: fixed;
         top: 0;
-        left: -220px;
+        left: 0;
         height: 100%;
-        transform: translateX(0);
+        transform: translateX(-100%);
+        z-index: 999;
       }
 
       nav.sidebar.active {
-        transform: translateX(220px);
+        transform: translateX(0);
       }
 
       main.container {
