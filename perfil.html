@@ -95,6 +95,7 @@
       position: relative;
       width: 90%;
       max-width: 1200px; /* Define the maximum width */
+      margin-left: 240px;
     }
 
     h1 {
@@ -202,13 +203,17 @@
       nav.sidebar {
         position: fixed;
         top: 0;
-        left: 0;
+        left: -220px;
         height: 100%;
-        transform: translateX(-100%);
+        transform: translateX(0);
         z-index: 999;
       }
-      nav.sidebar.active { transform: translateX(0); }
-      .menu-toggle { display: block; }
+      nav.sidebar.active {
+        transform: translateX(220px);
+      }
+      .menu-toggle {
+        display: block;
+      }
       main.container {
         margin: 20px;
         padding: 20px;
