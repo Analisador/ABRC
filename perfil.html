@@ -48,11 +48,6 @@
       left: 0;
       height: 100%;
       z-index: 999;
-      transform: translateX(-220px);
-    }
-
-    nav.sidebar.active {
-      transform: translateX(0);
     }
 
     nav.sidebar h2 {
@@ -97,14 +92,13 @@
     main.container {
       flex-grow: 1;
       background-color: rgba(0, 0, 0, 0.75);
-      margin: 40px auto; /* Ajuste para centralizar com margem igual dos dois lados */
+      margin: 40px;
       padding: 40px;
       border-radius: 20px;
       overflow-y: auto;
       box-sizing: border-box;
       position: relative;
-      width: calc(100% - 280px); /* Calculando a largura para a barra lateral */
-      max-width: 1200px; /* Largura máxima para telas grandes */
+      margin-left: 240px;
     }
 
     h1 {
@@ -192,7 +186,7 @@
       border-radius: 12px;
     }
 
-    /* Menu hambúrguer */
+    /* Menu hamburguer */
     .menu-toggle {
       display: none;
       position: absolute;
@@ -215,25 +209,23 @@
       nav.sidebar {
         position: fixed;
         top: 0;
-        left: 0;
+        left: -220px;
         height: 100%;
-        transform: translateX(-100%);
-        z-index: 999;
+        transform: translateX(0);
       }
 
       nav.sidebar.active {
-        transform: translateX(0);
+        transform: translateX(220px);
+      }
+
+      main.container {
+        margin: 20px;
+        padding: 20px;
+        margin-left: 0;
       }
 
       .menu-toggle {
         display: block;
-      }
-
-      main.container {
-        margin-left: 0;
-        margin-right: 0;
-        padding: 20px;
-        width: 100%;
       }
     }
   </style>
@@ -327,7 +319,7 @@
         linhaId = row.id;
 
         document.getElementById('primeiro').value = toHHMM(row.primeiro);
-        document.getElementById('segundo').value  = toHHMM(row.segundo);
+        document.getElementById('segundo').value = toHHMM(row.segundo);
         document.getElementById('terceiro').value = toHHMM(row.terceiro);
       } else {
         console.warn('Nenhuma linha de cadastro encontrada para este e-mail.');
@@ -336,7 +328,7 @@
 
     async function salvarHorarios() {
       const primeiro = padHHMMSS(document.getElementById('primeiro').value || null);
-      const segundo  = padHHMMSS(document.getElementById('segundo').value  || null);
+      const segundo = padHHMMSS(document.getElementById('segundo').value || null);
       const terceiro = padHHMMSS(document.getElementById('terceiro').value || null);
 
       if (linhaId) {
