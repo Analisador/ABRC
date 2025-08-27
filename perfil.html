@@ -97,13 +97,14 @@
     main.container {
       flex-grow: 1;
       background-color: rgba(0, 0, 0, 0.75);
-      margin: 40px;
+      margin: 40px auto; /* Ajuste para centralizar com margem igual dos dois lados */
       padding: 40px;
       border-radius: 20px;
       overflow-y: auto;
       box-sizing: border-box;
       position: relative;
-      margin-left: 240px;
+      width: calc(100% - 280px); /* Calculando a largura para a barra lateral */
+      max-width: 1200px; /* Largura máxima para telas grandes */
     }
 
     h1 {
@@ -191,7 +192,7 @@
       border-radius: 12px;
     }
 
-    /* Menu hamburguer */
+    /* Menu hambúrguer */
     .menu-toggle {
       display: none;
       position: absolute;
@@ -224,14 +225,15 @@
         transform: translateX(0);
       }
 
-      main.container {
-        margin: 20px;
-        padding: 20px;
-        margin-left: 0;
-      }
-
       .menu-toggle {
         display: block;
+      }
+
+      main.container {
+        margin-left: 0;
+        margin-right: 0;
+        padding: 20px;
+        width: 100%;
       }
     }
   </style>
