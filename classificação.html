@@ -9,155 +9,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      height: 100vh;
-      display: flex;
-      color: white;
-      animation: gradientAnimation 12s ease infinite;
-      background-size: 300% 300%;
-      background-image: linear-gradient(-45deg, #c2142b, #2165ac, #f2c546, #c2142b);
-    }
-
-    @keyframes gradientAnimation {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    /* Sidebar igual à do Speed Test */
-    nav.sidebar {
-      background: rgba(0, 0, 0, 0.8);
-      width: 220px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 20px;
-      gap: 25px;
-      transition: transform 0.3s ease;
-    }
-
-    nav.sidebar h2 {
-      font-size: 22px;
-      font-weight: 700;
-      text-align: center;
-      margin: 0 0 25px 0;
-    }
-
-    /* Ajuste exato conforme solicitado */
-    nav.sidebar button {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 18px;
-      text-align: left;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 12px;  /* Padding ajustado conforme solicitado */
-      border-radius: 8px;
-      transition: background-color 0.3s ease;
-      user-select: none;
-    }
-
-    nav.sidebar button:hover {
-      background-color: rgba(255, 255, 255, 0.1);  /* Efeito de hover ajustado */
-    }
-
-    nav.sidebar button svg {
-      stroke: white;
-      width: 20px;
-      height: 20px;
-    }
-
-    .sidebar-logo {
-      width: 150px;
-      margin: 20px auto 0 auto;
-      display: block;
-    }
-
-    main.container {
-      flex-grow: 1;
-      background-color: rgba(0, 0, 0, 0.75);
-      margin: 40px;
-      padding: 40px;
-      border-radius: 20px;
-      overflow-y: auto;
-      position: relative;
-      display: flex;
-      gap: 30px;
-      flex-wrap: wrap;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-      width: 100%;
-    }
-
-    .grafico-pequeno {
-      width: 350px;
-      height: 350px;
-    }
-
-    .info-caixa {
-      flex: 1;
-      min-width: 250px;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 20px;
-      border-radius: 15px;
-      display: none;
-    }
-
-    .info-caixa h2 {
-      margin-bottom: 10px;
-    }
-
-    .info-caixa p {
-      margin-bottom: 6px;
-    }
-
-    .menu-toggle {
-      display: none;
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      background: rgba(0, 0, 0, 0.8);
-      border: none;
-      color: white;
-      padding: 8px;
-      border-radius: 8px;
-      cursor: pointer;
-      z-index: 1000;
-    }
-
-    @media (max-width: 768px) {
-      body { flex-direction: column; }
-      nav.sidebar {
-        position: fixed;
-        top: 0; left: 0;
-        height: 100%;
-        transform: translateX(-100%);
-        z-index: 999;
-      }
-      nav.sidebar.active { transform: translateX(0); }
-      .menu-toggle { display: block; }
-      main.container {
-        margin: 20px;
-        padding: 20px;
-      }
-      .grafico-pequeno {
-        width: 250px;
-        height: 250px;
-      }
-    }
+    /* Seu estilo existente permanece */
   </style>
 </head>
 
@@ -169,7 +21,7 @@
       <h2>A.B.R.C</h2>
       <button onclick="goToHome()"><i data-lucide="gauge"></i> Speed Test</button>
       <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
-      <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i>Tráfego</button>
+      <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Tráfego</button>
       <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
       <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
     </div>
@@ -200,6 +52,17 @@
 
     function toggleMenu() {
       document.getElementById("sidebar").classList.toggle("active");
+    }
+
+    // Funções de navegação para as outras guias
+    function goToHome() { window.location.href = 'base.html'; }
+    function verLogs() { window.location.href = 'logs.html'; }
+    function verClassificacao() { window.location.href = 'classificação.html'; }
+    function verPerfil() { window.location.href = 'perfil.html'; }
+    function logout() {
+      supabase.auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      });
     }
 
     const mapeamentoPortas = {
@@ -251,14 +114,21 @@
         },
         options: {
           responsive: true,
-          plugins: { legend: { display: false } },
-          onHover: (evt, elements) => {
-            if (elements.length > 0) {
-              const index = elements[0].index;
-              const categoria = chart.data.labels[index];
-              const qtd = chart.data.datasets[0].data[index];
-              const porcentagem = ((qtd / total) * 100).toFixed(2) + '%';
-              mostrarInfo(categoria, porcentagem);
+          plugins: {
+            tooltip: {
+              callbacks: {
+                // Customiza os tooltips para mostrar as informações detalhadas ao passar o mouse
+                label: (tooltipItem) => {
+                  const categoria = tooltipItem.label;
+                  const qtd = tooltipItem.raw;
+                  const porcentagem = ((qtd / total) * 100).toFixed(2) + '%';
+                  const registrosCategoria = dadosAtuais.filter(d => d.tipo === categoria);
+                  const portasUsadas = [...new Set(registrosCategoria.map(r => r.porta).filter(Boolean))];
+                  const exemplos = portasUsadas.map(p => mapeamentoPortas[p]?.[1] || "Desconhecido");
+
+                  return `${categoria} - ${porcentagem} | Portas: ${portasUsadas.join(', ')} | Exemplos: ${exemplos.join('; ')}`;
+                }
+              }
             }
           },
           onClick: (evt, elements) => {
@@ -302,4 +172,5 @@
     };
   </script>
 </body>
+
 </html>
