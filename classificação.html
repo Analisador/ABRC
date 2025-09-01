@@ -40,7 +40,7 @@
       }
     }
 
-    /* Sidebar */
+    /* Sidebar original */
     nav.sidebar {
       background: rgba(0, 0, 0, 0.8);
       width: 220px;
@@ -301,49 +301,24 @@
   <script>
     const { createClient } = window.supabase;
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
-    const supabaseKey = 'SEU_SUPABASE_KEY';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     function toggleMenu() {
       document.getElementById("sidebar").classList.toggle("active");
     }
 
-    function goToHome() {
-      window.location.href = 'home.html';  // Página inicial ou de seu interesse
-    }
+    const mapeamentoPortas = {
+      80: ["HTTP", "Navegação web, APIs HTTP"],
+      8080: ["HTTP Alternativa", "Servidores de teste, proxies"],
+      443: ["HTTPS", "Sites seguros, APIs HTTPS, VPNs TLS"],
+      21: ["FTP", "Transferência de arquivos"],
+      53: ["DNS", "Resolução de nomes"],
+      25: ["SMTP", "Envio de e-mails"],
+      587: ["SMTP Seguro", "Envio de e-mails autenticado"]
+    };
 
-    function verLogs() {
-      window.location.href = 'logs.html';  // Redirecionar para página de logs
-    }
-
-    function verClassificacao() {
-      window.location.href = 'classificacao.html';  // Redirecionar para a página de tráfego
-    }
-
-    function verPerfil() {
-      window.location.href = 'perfil.html';  // Redirecionar para página de perfil
-    }
-
-    function logout() {
-      showLogoutPopup();  // Mostrar o popup de logout
-    }
-
-    // Função para mostrar o popup de logout
-    function showLogoutPopup() {
-      document.getElementById("logoutPopup").style.display = "flex";
-    }
-
-    // Função para fechar o popup de logout
-    function closeLogoutPopup() {
-      document.getElementById("logoutPopup").style.display = "none";
-    }
-
-    // Função para confirmar o logout e redirecionar
-    function confirmLogout() {
-      supabase.auth.signOut().then(() => {
-        window.location.href = 'index.html';  // Redireciona para a página de login ou home
-      });
-    }
+    let dadosAtuais = [];
 
     async function carregarDados() {
       const { data, error } = await supabase
@@ -355,6 +330,7 @@
         console.error("Erro ao buscar dados:", error);
         return;
       }
+      dadosAtuais = data;
       desenharGrafico(data);
     }
 
@@ -397,8 +373,23 @@
 
     function mostrarInfo(categoria, porcentagem) {
       const infoCaixa = document.getElementById("infoCaixa");
+      const registrosCategoria = dadosAtuais.filter(d => d.tipo === categoria);
+      const portasUsadas = [...new Set(registrosCategoria.map(r => r.porta).filter(Boolean))];
+      const exemplos = portasUsadas.map(p => mapeamentoPortas[p]?.[1] || "Desconhecido");
+
       document.getElementById("infoCategoria").innerText = categoria;
       document.getElementById("infoPorcentagem").innerText = `Porcentagem: ${porcentagem}`;
+      document.getElementById("infoPortas").innerText = portasUsadas.length ? portasUsadas.join(', ') : "N/A";
+      document.getElementById("infoExemplos").innerText = exemplos.length ? [...new Set(exemplos)].join('; ') : "N/A";
+
+      const lista = document.getElementById("infoRegistros");
+      lista.innerHTML = "";
+      registrosCategoria.slice(0, 5).forEach(r => {
+        const li = document.createElement("li");
+        li.innerText = `${r.timestamp} - Porta ${r.porta || "N/A"}`;
+        lista.appendChild(li);
+      });
+
       infoCaixa.style.display = "block";
     }
 
@@ -406,6 +397,28 @@
       carregarDados();
       lucide.createIcons();
     };
+
+    // Logout com popup
+    function logout() {
+      showLogoutPopup();
+    }
+
+    // Função para mostrar o popup de logout
+    function showLogoutPopup() {
+      document.getElementById("logoutPopup").style.display = "flex";
+    }
+
+    // Função para fechar o popup de logout
+    function closeLogoutPopup() {
+      document.getElementById("logoutPopup").style.display = "none";
+    }
+
+    // Função para confirmar o logout e redirecionar
+    function confirmLogout() {
+      supabase.auth.signOut().then(() => {
+        window.location.href = 'index.html';  // Redireciona para a página de login ou home
+      });
+    }
   </script>
 </body>
 
