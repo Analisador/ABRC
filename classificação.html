@@ -254,11 +254,8 @@
   <nav class="sidebar" id="sidebar">
     <div>
       <h2>A.B.R.C</h2>
-      <button onclick="goToHome()"><i data-lucide="gauge"></i> Speed Test</button>
-      <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
       <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Tráfego</button>
       <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
-      <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
     </div>
     <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
   </nav>
@@ -277,16 +274,8 @@
       <h2>Perfil</h2>
       <!-- Conteúdo de Perfil aqui -->
     </div>
-  </main>
 
-  <!-- Popup Logout -->
-  <div class="popup-overlay" id="logoutPopup">
-    <div class="popup">
-      <h3>Deseja realmente sair?</h3>
-      <button class="yes" onclick="confirmLogout()">Sim</button>
-      <button class="no" onclick="closeLogoutPopup()">Não</button>
-    </div>
-  </div>
+  </main>
 
   <script>
     // Função para ocultar todas as abas
@@ -295,19 +284,11 @@
       abas.forEach(aba => aba.style.display = "none");
     }
 
-    // Função para mostrar a aba inicial (Home)
-    function goToHome() {
-      esconderTodasAbas();
-      setTimeout(() => {
-        document.getElementById("home").style.display = "block";
-      }, 0);
-    }
-
     // Função para mostrar a aba de "Tráfego"
     function verClassificacao() {
       esconderTodasAbas();
       setTimeout(() => {
-        document.getElementById("trafego").style.display = "block";
+        document.getElementById("trafego").style.display = "block"; // Exibe a aba "Tráfego"
       }, 0);
     }
 
@@ -315,13 +296,12 @@
     function verPerfil() {
       esconderTodasAbas();
       setTimeout(() => {
-        document.getElementById("perfil").style.display = "block";
+        document.getElementById("perfil").style.display = "block"; // Exibe a aba "Perfil"
       }, 0);
     }
 
-    // Função para inicializar e exibir a primeira aba
     window.onload = () => {
-      goToHome();
+      verClassificacao(); // Exibe a aba inicial de "Tráfego" ao carregar a página
     };
   </script>
 </body>
