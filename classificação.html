@@ -344,6 +344,68 @@
         window.location.href = 'index.html';  // Redireciona para a página de login ou home
       });
     }
+
+    async function carregarDados() {
+      const { data, error } = await supabase
+        .from('trafego')
+        .select('timestamp, tipo, porta')
+        .order('timestamp', { ascending: false });
+
+      if (error) {
+        console.error("Erro ao buscar dados:", error);
+        return;
+      }
+      desenharGrafico(data);
+    }
+
+    function desenharGrafico(data) {
+      const contagem = {};
+      data.forEach(registro => {
+        const tipo = registro.tipo || 'Desconhecido';
+        contagem[tipo] = (contagem[tipo] || 0) + 1;
+      });
+
+      const total = data.length;
+      const ctx = document.getElementById('graficoTrafego').getContext('2d');
+
+      const chart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(contagem),
+          datasets: [{
+            data: Object.values(contagem),
+            backgroundColor: ['#4e9cff', '#f54291', '#33cc33', '#ffa500', '#cc33ff', '#ff3333', '#00cccc'],
+            borderColor: 'white',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          onClick: (evt, elements) => {
+            if (elements.length > 0) {
+              const index = elements[0].index;
+              const categoria = chart.data.labels[index];
+              const qtd = chart.data.datasets[0].data[index];
+              const porcentagem = ((qtd / total) * 100).toFixed(2) + '%';
+              mostrarInfo(categoria, porcentagem);
+            }
+          }
+        }
+      });
+    }
+
+    function mostrarInfo(categoria, porcentagem) {
+      const infoCaixa = document.getElementById("infoCaixa");
+      document.getElementById("infoCategoria").innerText = categoria;
+      document.getElementById("infoPorcentagem").innerText = `Porcentagem: ${porcentagem}`;
+      infoCaixa.style.display = "block";
+    }
+
+    window.onload = () => {
+      carregarDados();
+      lucide.createIcons();
+    };
   </script>
 </body>
 
