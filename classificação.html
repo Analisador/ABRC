@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -253,6 +252,15 @@
         options: {
           responsive: true,
           plugins: { legend: { display: false } },
+          onHover: (evt, elements) => {
+            if (elements.length > 0) {
+              const index = elements[0].index;
+              const categoria = chart.data.labels[index];
+              const qtd = chart.data.datasets[0].data[index];
+              const porcentagem = ((qtd / total) * 100).toFixed(2) + '%';
+              mostrarInfo(categoria, porcentagem);
+            }
+          },
           onClick: (evt, elements) => {
             if (elements.length > 0) {
               const index = elements[0].index;
@@ -288,21 +296,10 @@
       infoCaixa.style.display = "block";
     }
 
-    function goToHome() { window.location.href = 'base.html'; }
-    function verLogs() { window.location.href = 'logs.html'; }
-    function verClassificacao() { window.location.href = 'classificação.html'; }
-    function verPerfil() { window.location.href = 'perfil.html'; }
-    function logout() {
-      supabase.auth.signOut().then(() => {
-        window.location.href = 'index.html';
-      });
-    }
-
     window.onload = () => {
       carregarDados();
       lucide.createIcons();
     };
   </script>
 </body>
-
 </html>
