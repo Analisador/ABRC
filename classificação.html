@@ -274,7 +274,6 @@
       <h2>Perfil</h2>
       <!-- Conteúdo de Perfil aqui -->
     </div>
-
   </main>
 
   <script>
@@ -287,21 +286,18 @@
     // Função para mostrar a aba de "Tráfego"
     function verClassificacao() {
       esconderTodasAbas();
-      setTimeout(() => {
-        document.getElementById("trafego").style.display = "block"; // Exibe a aba "Tráfego"
-      }, 0);
+      document.getElementById("trafego").style.display = "block";
     }
 
     // Função para mostrar a aba de "Perfil"
     function verPerfil() {
       esconderTodasAbas();
-      setTimeout(() => {
-        document.getElementById("perfil").style.display = "block"; // Exibe a aba "Perfil"
-      }, 0);
+      document.getElementById("perfil").style.display = "block";
     }
 
+    // Ação inicial ao carregar a página
     window.onload = () => {
-      verClassificacao(); // Exibe a aba inicial de "Tráfego" ao carregar a página
+      verClassificacao(); // Começa com a aba "Tráfego" aberta
     };
   </script>
 </body>
