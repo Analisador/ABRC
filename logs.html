@@ -153,14 +153,13 @@
 
     /* Modal de Logout */
     .modal-overlay {
-      display: none;
+      display: none; /* <-- mantém invisível até ser ativada */
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.6);
-      display: flex;
       align-items: center;
       justify-content: center;
       z-index: 2000;
@@ -297,113 +296,4 @@
       <h2>Deseja realmente sair?</h2>
       <div class="modal-buttons">
         <button class="btn-sim" onclick="confirmarLogout()">Sim</button>
-        <button class="btn-nao" onclick="fecharModal()">Não</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const supabase = window.supabase.createClient(
-      'https://epruvcgigotpcptjaqyr.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs'
-    );
-
-    let graficoInstance = null;
-
-    async function carregarLogs() {
-      const { data, error } = await supabase
-        .from('logs')
-        .select('timestamp, mensagem, nivel')
-        .order('timestamp', { ascending: false })
-        .limit(10);
-
-      if (error) {
-        console.error('Erro ao carregar logs:', error);
-        return;
-      }
-
-      const tbody = document.querySelector('#logsTable tbody');
-      tbody.innerHTML = '';
-
-      const contagem = {};
-      data.forEach(log => {
-        contagem[log.nivel] = (contagem[log.nivel] || 0) + 1;
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${new Date(log.timestamp).toLocaleString()}</td>
-          <td>${log.mensagem}</td>
-          <td>${log.nivel}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      document.getElementById('totalLogsCard').textContent = `Total de Logs: ${data.length}`;
-      document.getElementById('ultimoNivelCard').textContent = `Último Nível: ${data[0]?.nivel || '--'}`;
-
-      desenharGrafico(contagem);
-    }
-
-    function desenharGrafico(contagem) {
-      const ctx = document.getElementById('graficoNiveis').getContext('2d');
-      const cores = ['#ff3b3b', '#ff7300', '#ffd700', '#a5d608', '#1abc9c', '#3498db', '#9b59b6', '#95a5a6', '#ffffff'];
-
-      const labels = Object.keys(contagem);
-      const data = Object.values(contagem);
-
-      if (graficoInstance) {
-        graficoInstance.destroy();
-      }
-
-      graficoInstance = new Chart(ctx, {
-        type: 'pie',
-        data: {
-          labels: labels,
-          datasets: [{
-            data: data,
-            backgroundColor: cores.slice(0, labels.length),
-            borderWidth: 1
-          }]
-        },
-        options: {
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: { color: 'white' }
-            }
-          }
-        }
-      });
-    }
-
-    // Funções de navegação
-    function goToHome() { window.location.href = 'base.html'; }
-    function verLogs() { window.location.href = 'logs.html'; }
-    function verClassificacao() { window.location.href = 'classificação.html'; }
-    function verPerfil() { window.location.href = 'perfil.html'; }
-
-    // Funções do modal
-    function abrirModalLogout() {
-      document.getElementById("logoutModal").style.display = "flex";
-    }
-    function fecharModal() {
-      document.getElementById("logoutModal").style.display = "none";
-    }
-    function confirmarLogout() {
-      supabase.auth.signOut().then(() => {
-        window.location.href = "index.html";
-      });
-    }
-
-    function toggleMenu() {
-      document.getElementById('sidebar').classList.toggle('active');
-    }
-
-    window.onload = () => {
-      carregarLogs();
-      lucide.createIcons();
-    };
-  </script>
-</body>
-
-</html>
+        <button class="btn-nao" onclick="fechar
