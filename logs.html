@@ -1,145 +1,429 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sistema com Logout</title>
+  <title>Logs</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
+      font-family: Arial, Helvetica, sans-serif;
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-    }
-
-    header {
-      background: #333;
-      color: white;
-      padding: 10px 20px;
-    }
-
-    nav ul {
-      list-style: none;
       padding: 0;
-      margin: 0;
-      display: flex;
-      gap: 15px;
-    }
-
-    nav a {
       color: white;
-      text-decoration: none;
-    }
-
-    /* Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 2000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      backdrop-filter: blur(4px);
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal-content {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      text-align: center;
-      width: 300px;
-      animation: aparecer 0.3s ease;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    }
-
-    .modal-content h2 {
-      margin-bottom: 20px;
-      font-size: 18px;
-      color: #333;
-    }
-
-    .modal-actions {
       display: flex;
-      justify-content: center;
-      gap: 12px;
+      height: 100vh;
+      overflow: hidden;
+      animation: gradientAnimation 12s ease infinite;
+      background-size: 300% 300%;
+      background-image: linear-gradient(-45deg, #c2142b, #2165ac, #f2c546, #c2142b);
     }
 
-    .btn {
-      padding: 8px 20px;
+    @keyframes gradientAnimation {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    /* Sidebar */
+    nav.sidebar {
+      background: rgba(0, 0, 0, 0.8);
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      box-sizing: border-box;
+      gap: 25px;
+      transition: transform 0.3s ease;
+    }
+
+    nav.sidebar h2 {
+      margin: 0 0 30px 0;
+      font-size: 22px;
+      text-align: center;
+    }
+
+    nav.sidebar button {
+      background: none;
       border: none;
+      color: white;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
       border-radius: 8px;
       cursor: pointer;
-      font-weight: bold;
-      transition: all 0.2s ease;
+      transition: background-color 0.3s ease;
+      text-align: left;
     }
 
-    .btn.sim {
-      background: #c62828;
+    nav.sidebar button:hover {
+      background-color: #ff4e4e;
+    }
+
+    nav.sidebar button svg {
+      stroke: white;
+      width: 20px;
+      height: 20px;
+    }
+
+    .sidebar-logo {
+      width: 120px;
+      margin-top: auto;
+      display: block;
+      margin-bottom: 20px;
+      align-self: center;
+    }
+
+    main.container {
+      flex-grow: 1;
+      background-color: rgba(0, 0, 0, 0.85);
+      margin: 40px;
+      padding: 40px;
+      border-radius: 20px;
+      overflow-y: auto;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .card-container {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background-color: #ffffff;
+      color: black;
+      border-radius: 15px;
+      padding: 25px 30px;
+      font-size: 20px;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    table.vscode-style {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #1e1e1e;
+      color: #d4d4d4;
+      font-family: Consolas, 'Courier New', monospace;
+      border: 1px solid #3c3c3c;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    table.vscode-style th,
+    table.vscode-style td {
+      border: 1px solid #3c3c3c;
+      padding: 10px;
+      text-align: left;
+    }
+
+    table.vscode-style th {
+      background-color: #333;
+      color: #fff;
+    }
+
+    table.vscode-style tr:nth-child(even) {
+      background-color: #252526;
+    }
+
+    table.vscode-style tr:hover {
+      background-color: #37373d;
+    }
+
+    .nivel-1 {
+      color: red;
+      font-weight: bold;
+    }
+
+    .nivel-2 {
+      color: orangered;
+    }
+
+    .nivel-3 {
+      color: orange;
+    }
+
+    .nivel-4 {
+      color: gold;
+    }
+
+    .nivel-5 {
+      color: yellowgreen;
+    }
+
+    .nivel-6 {
+      color: green;
+    }
+
+    .nivel-7 {
+      color: teal;
+    }
+
+    .nivel-8 {
+      color: skyblue;
+    }
+
+    .nivel-9 {
       color: white;
     }
-    .btn.sim:hover {
-      background: #a81f1f;
+
+    .legenda {
+      margin-top: 20px;
+      background-color: #333;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 14px;
     }
 
-    .btn.nao {
-      background: #e0e0e0;
-      color: #333;
-    }
-    .btn.nao:hover {
-      background: #cfcfcf;
+    .legenda span {
+      display: inline-block;
+      margin: 5px 15px 5px 0;
     }
 
-    @keyframes aparecer {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
+    .grafico-container {
+      max-width: 400px;
+      margin: 0 auto 30px auto;
+    }
+
+    /* Botão hamburguer */
+    .menu-toggle {
+      display: none;
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: rgba(0, 0, 0, 0.8);
+      border: none;
+      color: white;
+      padding: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      nav.sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        transform: translateX(-100%);
+        z-index: 999;
+      }
+
+      nav.sidebar.active {
+        transform: translateX(0);
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+
+      main.container {
+        margin: 20px;
+        padding: 20px;
+      }
     }
   </style>
 </head>
+
 <body>
+  <!-- Botão hamburguer -->
+  <button class="menu-toggle" onclick="toggleMenu()">
+    <i data-lucide="menu"></i>
+  </button>
 
-  <header>
-    <h1>Meu Sistema</h1>
-    <nav>
-      <ul>
-        <li><a href="#">Início</a></li>
-        <li><a href="#">Perfil</a></li>
-        <li><a href="#" onclick="abrirLogout()">🚪 Logout</a></li>
-      </ul>
-    </nav>
-  </header>
+  <nav class="sidebar" id="sidebar">
+    <div>
+      <h2>A.B.R.C</h2>
+      <button onclick="goToHome()"><i data-lucide="gauge"></i> Speed Test</button>
+      <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
+      <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Tráfego</button>
+      <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
+      <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
+    </div>
+    <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
+  </nav>
 
-  <main style="padding:20px;">
-    <h2>Bem-vindo(a)!</h2>
-    <p>Conteúdo principal do sistema aqui.</p>
+  <main class="container">
+    <h1>Logs</h1>
+
+    <div class="card-container">
+      <div class="card" id="totalLogsCard">Total de Logs: --</div>
+      <div class="card" id="ultimoNivelCard">Último Nível: --</div>
+    </div>
+
+    <table class="vscode-style" id="logsTable">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Mensagem</th>
+          <th>Nível</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div class="grafico-container">
+      <canvas id="graficoNiveis"></canvas>
+    </div>
+
+    <div class="legenda">
+      <strong>Gravidade dos Logs:</strong><br />
+      <span class="nivel-1">1 - Crítico</span>
+      <span class="nivel-2">2 - Alta gravidade</span>
+      <span class="nivel-3">3 - Grave</span>
+      <span class="nivel-4">4 - Atenção</span>
+      <span class="nivel-5">5 - Aviso</span>
+      <span class="nivel-6">6 - Normal</span>
+      <span class="nivel-7">7 - Info</span>
+      <span class="nivel-8">8 - Debug</span>
+      <span class="nivel-9">9 - Outros</span>
+    </div>
   </main>
 
-  <!-- Modal Logout -->
-  <div id="logoutModal" class="modal">
-    <div class="modal-content">
-      <h2>Deseja realmente sair?</h2>
-      <div class="modal-actions">
-        <button class="btn sim" onclick="logout()">Sim</button>
-        <button class="btn nao" onclick="fecharLogout()">Não</button>
-      </div>
-    </div>
-  </div>
-
   <script>
-    function abrirLogout() {
-      document.getElementById("logoutModal").style.display = "flex";
+    const supabase = window.supabase.createClient(
+      'https://epruvcgigotpcptjaqyr.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs'
+    );
+
+    const classificacaoGravidade = {
+      'CRITICAL': 1,
+      'FATAL': 1,
+      'ERROR': 2,
+      'ERRO': 2,
+      'WARNING': 4,
+      'WARN': 4,
+      'ALERTA': 4,
+      'NOTICE': 5,
+      'INFO': 7,
+      'INFORMAÇÃO': 7,
+      'DEBUG': 8,
+    };
+
+    function nivelParaClasse(nivel) {
+      const gravidade = classificacaoGravidade[nivel?.toUpperCase()] ?? 9;
+      return `nivel-${gravidade}`;
     }
 
-    function fecharLogout() {
-      document.getElementById("logoutModal").style.display = "none";
+    let graficoInstance = null;
+
+    async function carregarLogs() {
+      const { data, error } = await supabase
+        .from('logs')
+        .select('timestamp, mensagem, nivel')
+        .order('timestamp', { ascending: false })
+        .limit(10);
+
+      if (error) {
+        console.error('Erro ao carregar logs:', error);
+        return;
+      }
+
+      const tbody = document.querySelector('#logsTable tbody');
+      tbody.innerHTML = '';
+
+      const contagem = {};
+      data.forEach(log => {
+        const classe = nivelParaClasse(log.nivel);
+        contagem[log.nivel] = (contagem[log.nivel] || 0) + 1;
+
+        const tr = document.createElement('tr');
+        tr.className = classe;
+        tr.innerHTML = `
+          <td>${new Date(log.timestamp).toLocaleString()}</td>
+          <td>${log.mensagem}</td>
+          <td>${log.nivel}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('totalLogsCard').textContent = `Total de Logs: ${data.length}`;
+      document.getElementById('ultimoNivelCard').textContent = `Último Nível: ${data[0]?.nivel || '--'}`;
+
+      desenharGrafico(contagem);
     }
 
+    function desenharGrafico(contagem) {
+      const ctx = document.getElementById('graficoNiveis').getContext('2d');
+      const cores = ['#ff3b3b', '#ff7300', '#ffd700', '#a5d608', '#1abc9c', '#3498db', '#9b59b6', '#95a5a6', '#ffffff'];
+
+      const labels = Object.keys(contagem);
+      const data = Object.values(contagem);
+
+      if (graficoInstance) {
+        graficoInstance.destroy();
+      }
+
+      graficoInstance = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Distribuição de Níveis',
+            data: data,
+            backgroundColor: cores.slice(0, labels.length),
+            borderWidth: 1
+          }]
+        },
+        options: {
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: 'white' }
+            }
+          }
+        }
+      });
+    }
+
+    function goToHome() { window.location.href = 'base.html'; }
+    function verLogs() { window.location.href = 'logs.html'; }
+    function verClassificacao() { window.location.href = 'classificação.html'; }
+    function verPerfil() { window.location.href = 'perfil.html'; }
     function logout() {
-      // aqui vai sua lógica de logout
-      window.location.href = "index.html"; // exemplo: redireciona para login
+      supabase.auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      });
     }
+
+    function toggleMenu() {
+      document.getElementById('sidebar').classList.toggle('active');
+    }
+
+    window.onload = () => {
+      carregarLogs();
+      lucide.createIcons(); // Aqui garantimos que os ícones Lucide sejam criados
+    };
   </script>
 </body>
+
 </html>
+
