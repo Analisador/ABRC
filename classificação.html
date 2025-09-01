@@ -8,10 +8,28 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-
   <style>
     /* Estilos existentes */
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: white;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      animation: gradientAnimation 12s ease infinite;
+      background-size: 300% 300%;
+      background-image: linear-gradient(-45deg, #c2142b, #2165ac, #f2c546, #c2142b);
+    }
 
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Estilo da legenda */
     .legend {
       display: flex;
       justify-content: center;
@@ -35,8 +53,6 @@
 </head>
 
 <body>
-  <!-- Conteúdo existente -->
-
   <main class="container">
     <h1>Classificação de Tráfego</h1>
     <canvas id="graficoTrafego" class="grafico-pequeno"></canvas>
@@ -52,61 +68,71 @@
       <div><div class="legend-color" style="background-color: #00cccc;"></div> Outros</div>
     </div>
 
-    <!-- Caixa de informações (existente) -->
-    <div class="info-caixa" id="infoCaixa">
-      <h2 id="infoCategoria"></h2>
-      <p id="infoPorcentagem"></p>
-      <p><strong>Portas:</strong> <span id="infoPortas"></span></p>
-      <p><strong>Exemplos:</strong> <span id="infoExemplos"></span></p>
-      <div>
-        <strong>Últimos Registros:</strong>
-        <ul id="infoRegistros"></ul>
-      </div>
-    </div>
-  </main>
+    <script>
+      const { createClient } = window.supabase;
+      const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
+      const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
+      const supabase = createClient(supabaseUrl, supabaseKey);
 
-  <script>
-    // Funções JavaScript existentes
+      function desenharGrafico(data) {
+        const contagem = {};
+        data.forEach(registro => {
+          const tipo = registro.tipo || 'Desconhecido';
+          contagem[tipo] = (contagem[tipo] || 0) + 1;
+        });
 
-    function desenharGrafico(data) {
-      const contagem = {};
-      data.forEach(registro => {
-        const tipo = registro.tipo || 'Desconhecido';
-        contagem[tipo] = (contagem[tipo] || 0) + 1;
-      });
+        const total = data.length;
+        const ctx = document.getElementById('graficoTrafego').getContext('2d');
 
-      const total = data.length;
-      const ctx = document.getElementById('graficoTrafego').getContext('2d');
-
-      const chart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-          labels: Object.keys(contagem),
-          datasets: [{
-            data: Object.values(contagem),
-            backgroundColor: ['#4e9cff', '#f54291', '#33cc33', '#ffa500', '#cc33ff', '#ff3333', '#00cccc'],
-            borderColor: 'white',
-            borderWidth: 2
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: false } },
-          onClick: (evt, elements) => {
-            if (elements.length > 0) {
-              const index = elements[0].index;
-              const categoria = chart.data.labels[index];
-              const qtd = chart.data.datasets[0].data[index];
-              const porcentagem = ((qtd / total) * 100).toFixed(2) + '%';
-              mostrarInfo(categoria, porcentagem);
+        const chart = new Chart(ctx, {
+          type: 'pie',
+          data: {
+            labels: Object.keys(contagem),
+            datasets: [{
+              data: Object.values(contagem),
+              backgroundColor: ['#4e9cff', '#f54291', '#33cc33', '#ffa500', '#cc33ff', '#ff3333', '#00cccc'],
+              borderColor: 'white',
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            onClick: (evt, elements) => {
+              if (elements.length > 0) {
+                const index = elements[0].index;
+                const categoria = chart.data.labels[index];
+                const qtd = chart.data.datasets[0].data[index];
+                const porcentagem = ((qtd / total) * 100).toFixed(2) + '%';
+                mostrarInfo(categoria, porcentagem);
+              }
             }
           }
-        }
-      });
-    }
+        });
+      }
 
-    // Resto do código...
-  </script>
+      async function carregarDados() {
+        const { data, error } = await supabase
+          .from('trafego')
+          .select('timestamp, tipo, porta')
+          .order('timestamp', { ascending: false });
+
+        if (error) {
+          console.error("Erro ao buscar dados:", error);
+          return;
+        }
+        desenharGrafico(data);
+      }
+
+      function mostrarInfo(categoria, porcentagem) {
+        // Implementação da função que exibe as informações do gráfico
+      }
+
+      window.onload = () => {
+        carregarDados();
+      };
+    </script>
+  </main>
 </body>
 
 </html>
