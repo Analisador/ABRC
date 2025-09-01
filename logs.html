@@ -36,6 +36,7 @@
       }
     }
 
+    /* Sidebar */
     nav.sidebar {
       background: rgba(0, 0, 0, 0.8);
       width: 220px;
@@ -206,6 +207,7 @@
       margin: 0 auto 30px auto;
     }
 
+    /* Botão hamburguer */
     .menu-toggle {
       display: none;
       position: absolute;
@@ -220,6 +222,7 @@
       z-index: 1000;
     }
 
+    /* Mobile */
     @media (max-width: 768px) {
       body {
         flex-direction: column;
@@ -406,19 +409,11 @@
     function verClassificacao() { window.location.href = 'classificação.html'; }
     function verPerfil() { window.location.href = 'perfil.html'; }
 
-    // 🔴 Logout corrigido
-    async function logout() {
-      try {
-        const { error } = await supabase.auth.signOut();
-        if (error) {
-          console.error("Erro ao fazer logout:", error.message);
-          alert("Erro ao sair. Tente novamente.");
-          return;
-        }
-        window.location.href = 'index.html'; // Redireciona para login
-      } catch (err) {
-        console.error("Erro inesperado no logout:", err);
-        alert("Erro inesperado. Tente novamente.");
+    function logout() {
+      if (confirm("Deseja realmente sair?")) {
+        supabase.auth.signOut().then(() => {
+          window.location.href = 'index.html';
+        });
       }
     }
 
@@ -432,5 +427,4 @@
     };
   </script>
 </body>
-
 </html>
