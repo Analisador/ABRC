@@ -36,6 +36,7 @@
       }
     }
 
+    /* Sidebar */
     nav.sidebar {
       background: rgba(0, 0, 0, 0.8);
       width: 220px;
@@ -151,59 +152,62 @@
       background-color: #37373d;
     }
 
-    /* Modal de Logout */
-    .modal-overlay {
-      display: none; /* <-- mantém invisível até ser ativada */
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-    }
-
-    .modal {
-      background: white;
-      color: black;
-      padding: 25px 30px;
-      border-radius: 15px;
-      text-align: center;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    }
-
-    .modal h2 {
-      margin-bottom: 20px;
-      font-size: 18px;
-    }
-
-    .modal-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-    }
-
-    .modal-buttons button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
+    .nivel-1 {
+      color: red;
       font-weight: bold;
     }
 
-    .btn-sim {
-      background: #c2142b;
+    .nivel-2 {
+      color: orangered;
+    }
+
+    .nivel-3 {
+      color: orange;
+    }
+
+    .nivel-4 {
+      color: gold;
+    }
+
+    .nivel-5 {
+      color: yellowgreen;
+    }
+
+    .nivel-6 {
+      color: green;
+    }
+
+    .nivel-7 {
+      color: teal;
+    }
+
+    .nivel-8 {
+      color: skyblue;
+    }
+
+    .nivel-9 {
       color: white;
     }
 
-    .btn-nao {
-      background: #d3d3d3;
-      color: black;
+    .legenda {
+      margin-top: 20px;
+      background-color: #333;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 14px;
     }
 
-    /* Mobile */
+    .legenda span {
+      display: inline-block;
+      margin: 5px 15px 5px 0;
+    }
+
+    .grafico-container {
+      max-width: 400px;
+      margin: 0 auto 30px auto;
+    }
+
+    /* Botão hamburguer */
     .menu-toggle {
       display: none;
       position: absolute;
@@ -218,6 +222,7 @@
       z-index: 1000;
     }
 
+    /* Mobile */
     @media (max-width: 768px) {
       body {
         flex-direction: column;
@@ -261,7 +266,7 @@
       <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
       <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Tráfego</button>
       <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
-      <button onclick="abrirModalLogout()"><i data-lucide="log-out"></i> Logout</button>
+      <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
     </div>
     <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
   </nav>
@@ -288,12 +293,137 @@
     <div class="grafico-container">
       <canvas id="graficoNiveis"></canvas>
     </div>
+
+    <div class="legenda">
+      <strong>Gravidade dos Logs:</strong><br />
+      <span class="nivel-1">1 - Crítico</span>
+      <span class="nivel-2">2 - Alta gravidade</span>
+      <span class="nivel-3">3 - Grave</span>
+      <span class="nivel-4">4 - Atenção</span>
+      <span class="nivel-5">5 - Aviso</span>
+      <span class="nivel-6">6 - Normal</span>
+      <span class="nivel-7">7 - Info</span>
+      <span class="nivel-8">8 - Debug</span>
+      <span class="nivel-9">9 - Outros</span>
+    </div>
   </main>
 
-  <!-- Modal de Logout -->
-  <div class="modal-overlay" id="logoutModal">
-    <div class="modal">
-      <h2>Deseja realmente sair?</h2>
-      <div class="modal-buttons">
-        <button class="btn-sim" onclick="confirmarLogout()">Sim</button>
-        <button class="btn-nao" onclick="fechar
+  <script>
+    const supabase = window.supabase.createClient(
+      'https://epruvcgigotpcptjaqyr.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs'
+    );
+
+    const classificacaoGravidade = {
+      'CRITICAL': 1,
+      'FATAL': 1,
+      'ERROR': 2,
+      'ERRO': 2,
+      'WARNING': 4,
+      'WARN': 4,
+      'ALERTA': 4,
+      'NOTICE': 5,
+      'INFO': 7,
+      'INFORMAÇÃO': 7,
+      'DEBUG': 8,
+    };
+
+    function nivelParaClasse(nivel) {
+      const gravidade = classificacaoGravidade[nivel?.toUpperCase()] ?? 9;
+      return `nivel-${gravidade}`;
+    }
+
+    let graficoInstance = null;
+
+    async function carregarLogs() {
+      const { data, error } = await supabase
+        .from('logs')
+        .select('timestamp, mensagem, nivel')
+        .order('timestamp', { ascending: false })
+        .limit(10);
+
+      if (error) {
+        console.error('Erro ao carregar logs:', error);
+        return;
+      }
+
+      const tbody = document.querySelector('#logsTable tbody');
+      tbody.innerHTML = '';
+
+      const contagem = {};
+      data.forEach(log => {
+        const classe = nivelParaClasse(log.nivel);
+        contagem[log.nivel] = (contagem[log.nivel] || 0) + 1;
+
+        const tr = document.createElement('tr');
+        tr.className = classe;
+        tr.innerHTML = `
+          <td>${new Date(log.timestamp).toLocaleString()}</td>
+          <td>${log.mensagem}</td>
+          <td>${log.nivel}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('totalLogsCard').textContent = `Total de Logs: ${data.length}`;
+      document.getElementById('ultimoNivelCard').textContent = `Último Nível: ${data[0]?.nivel || '--'}`;
+
+      desenharGrafico(contagem);
+    }
+
+    function desenharGrafico(contagem) {
+      const ctx = document.getElementById('graficoNiveis').getContext('2d');
+      const cores = ['#ff3b3b', '#ff7300', '#ffd700', '#a5d608', '#1abc9c', '#3498db', '#9b59b6', '#95a5a6', '#ffffff'];
+
+      const labels = Object.keys(contagem);
+      const data = Object.values(contagem);
+
+      if (graficoInstance) {
+        graficoInstance.destroy();
+      }
+
+      graficoInstance = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Distribuição de Níveis',
+            data: data,
+            backgroundColor: cores.slice(0, labels.length),
+            borderWidth: 1
+          }]
+        },
+        options: {
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: 'white' }
+            }
+          }
+        }
+      });
+    }
+
+    function goToHome() { window.location.href = 'base.html'; }
+    function verLogs() { window.location.href = 'logs.html'; }
+    function verClassificacao() { window.location.href = 'classificação.html'; }
+    function verPerfil() { window.location.href = 'perfil.html'; }
+    function logout() {
+      supabase.auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      });
+    }
+
+    function toggleMenu() {
+      document.getElementById('sidebar').classList.toggle('active');
+    }
+
+    window.onload = () => {
+      carregarLogs();
+      lucide.createIcons(); // Aqui garantimos que os ícones Lucide sejam criados
+    };
+  </script>
+</body>
+
+</html>
+
