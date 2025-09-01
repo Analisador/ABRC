@@ -1,62 +1,53 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Classificação de Tráfego</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Speed Test</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-
   <style>
     * {
-      box-sizing: border-box;
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
 
     body {
       font-family: Arial, Helvetica, sans-serif;
-      height: 100vh;
-      display: flex;
       color: white;
+      display: flex;
+      height: 100vh;
       animation: gradientAnimation 12s ease infinite;
       background-size: 300% 300%;
       background-image: linear-gradient(-45deg, #c2142b, #2165ac, #f2c546, #c2142b);
     }
 
     @keyframes gradientAnimation {
-      0% {
-        background-position: 0% 50%;
-      }
-
-      50% {
-        background-position: 100% 50%;
-      }
-
-      100% {
-        background-position: 0% 50%;
-      }
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
-    /* Sidebar original */
     nav.sidebar {
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(0,0,0,0.8);
       width: 220px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
       padding: 20px;
       gap: 25px;
       transition: transform 0.3s ease;
+      justify-content: space-between;
     }
 
     nav.sidebar h2 {
-      font-size: 22px;
+      margin: 0 0 30px 0;
       font-weight: 700;
+      font-size: 22px;
       text-align: center;
-      margin: 0 0 25px 0;
+      user-select: none;
     }
 
     nav.sidebar button {
@@ -76,7 +67,7 @@
     }
 
     nav.sidebar button:hover {
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: rgba(255,255,255,0.1);
     }
 
     nav.sidebar button svg {
@@ -86,9 +77,20 @@
     }
 
     .sidebar-logo {
-      width: 150px;
-      margin: 20px auto 0 auto;
-      display: block;
+      margin-top: auto;
+      text-align: center;
+    }
+
+    .sidebar-logo .logo {
+      max-width: 150px;
+      width: 100%;
+      height: auto;
+      opacity: 0.9;
+      transition: opacity 0.3s ease;
+    }
+
+    .sidebar-logo .logo:hover {
+      opacity: 1;
     }
 
     main.container {
@@ -98,38 +100,65 @@
       padding: 40px;
       border-radius: 20px;
       overflow-y: auto;
+      box-sizing: border-box;
       position: relative;
-      display: flex;
-      gap: 30px;
-      flex-wrap: wrap;
     }
 
     h1 {
       text-align: center;
       margin-bottom: 30px;
-      width: 100%;
+      user-select: none;
     }
 
-    .grafico-pequeno {
-      width: 350px;
-      height: 350px;
+    .card-container {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
     }
 
-    .info-caixa {
-      flex: 1;
-      min-width: 250px;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 20px;
+    .card {
+      background-color: #ffffff;
+      color: black;
       border-radius: 15px;
-      display: none;
+      padding: 25px 30px;
+      font-size: 20px;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease;
+      cursor: pointer;
+      min-width: 180px;
+      text-align: center;
     }
 
-    .info-caixa h2 {
-      margin-bottom: 10px;
+    .card:hover {
+      transform: scale(1.05);
     }
 
-    .info-caixa p {
-      margin-bottom: 6px;
+    .chart-block {
+      margin-top: 20px;
+    }
+
+    .filter-block {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .filter-block select {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    canvas {
+      background-color: white;
+      border-radius: 10px;
+      padding: 15px;
+      max-height: 400px;
+      width: 100% !important;
     }
 
     .menu-toggle {
@@ -144,6 +173,52 @@
       border-radius: 8px;
       cursor: pointer;
       z-index: 1000;
+    }
+
+    /* Popup logout */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+
+    .popup {
+      background: white;
+      color: black;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      max-width: 300px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    .popup h3 {
+      margin-bottom: 15px;
+    }
+
+    .popup button {
+      padding: 8px 14px;
+      margin: 0 8px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .popup .yes {
+      background: #c2142b;
+      color: white;
+    }
+
+    .popup .no {
+      background: #ddd;
     }
 
     @media (max-width: 768px) {
@@ -173,133 +248,166 @@
         padding: 20px;
       }
 
-      .grafico-pequeno {
-        width: 250px;
-        height: 250px;
+      .card-container {
+        flex-direction: column;
+        align-items: center;
       }
-    }
 
-    /* Estilo da legenda */
-    .legend {
-      display: flex;
-      justify-content: center;
-      margin-top: 20px;
-      font-size: 14px;
-      color: white;
-    }
-
-    .legend div {
-      display: flex;
-      align-items: center;
-      margin: 0 10px;
-    }
-
-    .legend-color {
-      width: 20px;
-      height: 20px;
-      margin-right: 8px;
-    }
-
-    /* Popup Logout */
-    .popup-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-    }
-
-    .popup {
-      background: white;
-      color: black;
-      padding: 20px;
-      border-radius: 12px;
-      text-align: center;
-      max-width: 300px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-    }
-
-    .popup h3 {
-      margin-bottom: 15px;
-    }
-
-    .popup button {
-      padding: 8px 14px;
-      margin: 0 8px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .popup .yes {
-      background: #c2142b;
-      color: white;
-    }
-
-    .popup .no {
-      background: #ddd;
+      canvas {
+        max-height: 300px;
+      }
     }
   </style>
 </head>
-
 <body>
-  <button class="menu-toggle" onclick="toggleMenu()"><i data-lucide="menu"></i></button>
+  <button class="menu-toggle" onclick="toggleMenu()">
+    <i data-lucide="menu"></i>
+  </button>
 
   <nav class="sidebar" id="sidebar">
     <div>
       <h2>A.B.R.C</h2>
+      <button onclick="goToHome()"><i data-lucide="gauge"></i> Speed Test</button>
+      <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
       <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Tráfego</button>
       <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
+      <button onclick="showLogoutPopup()"><i data-lucide="log-out"></i> Logout</button>
     </div>
-    <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
+    <div class="sidebar-logo">
+      <img src="images/logo-abrc.png" alt="Logo" class="logo">
+    </div>
   </nav>
 
   <main class="container">
-    <h1>Classificação de Tráfego</h1>
-    <canvas id="graficoTrafego" class="grafico-pequeno"></canvas>
-
-    <!-- Seções de conteúdo -->
-    <div class="info-caixa" id="trafego">
-      <h2>Tráfego</h2>
-      <!-- Conteúdo de Tráfego aqui -->
+    <h1>Speed Test</h1>
+    <div class="card-container">
+      <div class="card" id="downloadCard">Download: -- Mbps</div>
+      <div class="card" id="uploadCard">Upload: -- Mbps</div>
     </div>
 
-    <div class="info-caixa" id="perfil">
-      <h2>Perfil</h2>
-      <!-- Conteúdo de Perfil aqui -->
+    <div class="chart-block">
+      <canvas id="speedChart"></canvas>
     </div>
   </main>
 
+  <!-- Popup Logout -->
+  <div class="popup-overlay" id="logoutPopup">
+    <div class="popup">
+      <h3>Deseja realmente sair?</h3>
+      <button class="yes" onclick="confirmLogout()">Sim</button>
+      <button class="no" onclick="closeLogoutPopup()">Não</button>
+    </div>
+  </div>
+
   <script>
-    // Função para ocultar todas as abas
-    function esconderTodasAbas() {
-      const abas = document.querySelectorAll(".info-caixa");
-      abas.forEach(aba => aba.style.display = "none");
+    const { createClient } = window.supabase;
+    const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    let speedChartInstance;
+    let allData = [];
+
+    function toggleMenu() {
+      document.getElementById("sidebar").classList.toggle("active");
     }
 
-    // Função para mostrar a aba de "Tráfego"
-    function verClassificacao() {
-      esconderTodasAbas();
-      document.getElementById("trafego").style.display = "block";
+    async function fetchSpeedtest() {
+      const { data, error } = await supabase
+        .from('speedtest')
+        .select('timestamp, download, upload')
+        .order('timestamp', { ascending: true });
+
+      if (error) {
+        console.error('Erro ao buscar speedtest:', error);
+        return [];
+      }
+
+      allData = data;
+      updateLatestCards(data);
+      return data;
     }
 
-    // Função para mostrar a aba de "Perfil"
-    function verPerfil() {
-      esconderTodasAbas();
-      document.getElementById("perfil").style.display = "block";
+    function updateLatestCards(data) {
+      if (!data.length) return;
+      const latest = data[data.length - 1];
+      document.getElementById('downloadCard').textContent = `Download: ${latest.download} Mbps`;
+      document.getElementById('uploadCard').textContent = `Upload: ${latest.upload} Mbps`;
     }
 
-    // Ação inicial ao carregar a página
+    function renderSpeedChart(data) {
+      const labels = data.map(d => new Date(d.timestamp).toLocaleString());
+      const download = data.map(d => d.download);
+      const upload = data.map(d => d.upload);
+
+      if (speedChartInstance) speedChartInstance.destroy();
+
+      speedChartInstance = new Chart(document.getElementById('speedChart'), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            { label: 'Download (Mbps)', data: download, borderColor: 'red', fill: false },
+            { label: 'Upload (Mbps)', data: upload, borderColor: 'blue', fill: false }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { labels: { color: 'black' } }
+          },
+          scales: {
+            x: { ticks: { color: 'black' } },
+            y: { ticks: { color: 'black' } }
+          }
+        }
+      });
+    }
+
+    // Filtro de dados
+    function applyFilter() {
+      const filter = document.getElementById("filter").value;
+      let filteredData = [...allData];
+      const now = new Date();
+
+      if (filter === "hour") {
+        filteredData = filteredData.filter(d => new Date(d.timestamp) >= new Date(now - 60 * 60 * 1000));
+      } else if (filter === "day") {
+        filteredData = filteredData.filter(d => new Date(d.timestamp).toDateString() === now.toDateString());
+      } else if (filter === "week") {
+        filteredData = filteredData.filter(d => new Date(d.timestamp) >= new Date(now - 7 * 24 * 60 * 60 * 1000));
+      }
+
+      renderSpeedChart(filteredData);
+    }
+
+    function verLogs() { window.location.href = 'logs.html'; }
+    function verClassificacao() { window.location.href = 'classificação.html'; }
+    function verPerfil() { window.location.href = 'perfil.html'; }
+
+    // Logout com popup
+    function showLogoutPopup() {
+      document.getElementById("logoutPopup").style.display = "flex";
+    }
+
+    function closeLogoutPopup() {
+      document.getElementById("logoutPopup").style.display = "none";
+    }
+
+    function confirmLogout() {
+      supabase.auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      });
+    }
+
+    function goToHome() {
+      fetchSpeedtest().then(data => renderSpeedChart(data));
+    }
+
     window.onload = () => {
-      verClassificacao(); // Começa com a aba "Tráfego" aberta
+      fetchSpeedtest().then(data => renderSpeedChart(data));
+      lucide.createIcons();
     };
   </script>
 </body>
-
 </html>
