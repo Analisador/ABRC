@@ -8,11 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: Arial, Helvetica, sans-serif;
@@ -69,21 +65,10 @@
       user-select: none;
     }
 
-    nav.sidebar button:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
+    nav.sidebar button:hover { background-color: rgba(255, 255, 255, 0.1); }
+    nav.sidebar button svg { stroke: white; width: 20px; height: 20px; }
 
-    nav.sidebar button svg {
-      stroke: white;
-      width: 20px;
-      height: 20px;
-    }
-
-    .sidebar-logo {
-      width: 150px;
-      margin: 20px auto 0 auto;
-      display: block;
-    }
+    .sidebar-logo { width: 150px; margin: 20px auto 0 auto; display: block; }
 
     main.container {
       flex-grow: 1;
@@ -94,15 +79,11 @@
       overflow-y: auto;
       position: relative;
       width: 90%;
-      max-width: 1200px; /* Define the maximum width */
+      max-width: 1200px;
       margin-left: 240px;
     }
 
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-      width: 100%;
-    }
+    h1 { text-align: center; margin-bottom: 30px; width: 100%; }
 
     .profile-section {
       display: flex;
@@ -120,9 +101,7 @@
       margin-bottom: 10px;
     }
 
-    input[type="file"] {
-      display: none;
-    }
+    input[type="file"] { display: none; }
 
     .upload-label {
       background-color: #ffffff;
@@ -134,9 +113,7 @@
       transition: background .3s;
     }
 
-    .upload-label:hover {
-      background-color: #cccccc;
-    }
+    .upload-label:hover { background-color: #cccccc; }
 
     .form-group {
       max-width: 400px;
@@ -146,9 +123,7 @@
       gap: 8px;
     }
 
-    label {
-      font-weight: bold;
-    }
+    label { font-weight: bold; }
 
     input[type="time"] {
       padding: 10px;
@@ -170,9 +145,7 @@
       margin-top: 20px;
     }
 
-    .save-btn:hover {
-      background-color: #cccccc;
-    }
+    .save-btn:hover { background-color: #cccccc; }
 
     .explanation {
       max-width: 600px;
@@ -198,28 +171,52 @@
       z-index: 1000;
     }
 
+    /* Popup logout */
+    .popup-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+
+    .popup {
+      background: white;
+      color: black;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      max-width: 300px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    .popup h3 { margin-bottom: 15px; }
+
+    .popup button {
+      padding: 8px 14px;
+      margin: 0 8px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .popup .yes { background: #c2142b; color: white; }
+    .popup .no { background: #ddd; }
+
     @media (max-width: 768px) {
       body { flex-direction: column; }
       nav.sidebar {
-        position: fixed;
-        top: 0;
-        left: -220px;
-        height: 100%;
+        position: fixed; top: 0; left: -220px; height: 100%;
         transform: translateX(0);
         z-index: 999;
       }
-      nav.sidebar.active {
-        transform: translateX(220px);
-      }
-      .menu-toggle {
-        display: block;
-      }
-      main.container {
-        margin: 20px;
-        padding: 20px;
-        margin-left: 0;
-        width: 100%;
-      }
+      nav.sidebar.active { transform: translateX(220px); }
+      .menu-toggle { display: block; }
+      main.container { margin: 20px; padding: 20px; margin-left: 0; width: 100%; }
     }
   </style>
 </head>
@@ -234,7 +231,7 @@
       <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
       <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Tráfego</button>
       <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
-      <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
+      <button onclick="showLogoutPopup()"><i data-lucide="log-out"></i> Logout</button>
     </div>
     <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
   </nav>
@@ -266,6 +263,15 @@
     </div>
   </main>
 
+  <!-- Popup Logout -->
+  <div class="popup-overlay" id="logoutPopup">
+    <div class="popup">
+      <h3>Deseja realmente sair?</h3>
+      <button class="yes" onclick="confirmLogout()">Sim</button>
+      <button class="no" onclick="closeLogoutPopup()">Não</button>
+    </div>
+  </div>
+
   <script>
     const { createClient } = supabase;
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
@@ -275,14 +281,8 @@
     let userEmail = null;
     let linhaId = null;
 
-    function padHHMMSS(v) {
-      if (!v) return null;
-      return /^\d{2}:\d{2}$/.test(v) ? v + ':00' : v;
-    }
-
-    function toHHMM(v) {
-      return (typeof v === 'string' && /^\d{2}:\d{2}:\d{2}$/.test(v)) ? v.slice(0,5) : (v || '');
-    }
+    function padHHMMSS(v) { if (!v) return null; return /^\d{2}:\d{2}$/.test(v) ? v + ':00' : v; }
+    function toHHMM(v) { return (typeof v === 'string' && /^\d{2}:\d{2}:\d{2}$/.test(v)) ? v.slice(0,5) : (v || ''); }
 
     async function carregarUsuario() {
       const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
@@ -300,20 +300,12 @@
         .order('id', { ascending: false })
         .limit(1);
 
-      if (error) {
-        console.error('Erro ao carregar cadastro:', error);
-        return;
-      }
-
       if (rows && rows.length > 0) {
         const row = rows[0];
         linhaId = row.id;
-
         document.getElementById('primeiro').value = toHHMM(row.primeiro);
         document.getElementById('segundo').value = toHHMM(row.segundo);
         document.getElementById('terceiro').value = toHHMM(row.terceiro);
-      } else {
-        console.warn('Nenhuma linha de cadastro encontrada para este e-mail.');
       }
     }
 
@@ -323,69 +315,36 @@
       const terceiro = padHHMMSS(document.getElementById('terceiro').value || null);
 
       if (linhaId) {
-        const { error } = await supabaseClient
-          .from('cadastro')
-          .update({ primeiro, segundo, terceiro })
-          .eq('id', linhaId);
-
-        if (error) {
-          console.error("Erro ao salvar horários:", error);
-          alert('Erro ao salvar horários: ' + error.message);
-          return;
-        }
+        await supabaseClient.from('cadastro').update({ primeiro, segundo, terceiro }).eq('id', linhaId);
         alert('Horários salvos com sucesso!');
         return;
       }
-
-      if (!userEmail) {
-        alert('Usuário não autenticado.');
-        return;
-      }
-
-      const { data, error: updErr } = await supabaseClient
-        .from('cadastro')
-        .update({ primeiro, segundo, terceiro })
-        .eq('email', userEmail)
-        .select('id');
-
-      if (updErr) {
-        console.error('Erro ao salvar horários:', updErr);
-        alert('Erro ao salvar horários: ' + updErr.message);
-        return;
-      }
-
-      if (!data || data.length === 0) {
-        alert('Seu cadastro ainda não existe. Conclua o cadastro primeiro.');
-        return;
-      }
-
+      if (!userEmail) { alert('Usuário não autenticado.'); return; }
+      const { data } = await supabaseClient.from('cadastro').update({ primeiro, segundo, terceiro }).eq('email', userEmail).select('id');
+      if (!data || data.length === 0) { alert('Seu cadastro ainda não existe. Conclua o cadastro primeiro.'); return; }
       alert('Horários salvos com sucesso!');
     }
 
     function mostrarPreview(event) {
-      const img = document.getElementById('preview');
-      img.src = URL.createObjectURL(event.target.files[0]);
+      document.getElementById('preview').src = URL.createObjectURL(event.target.files[0]);
     }
 
     function goToHome() { window.location.href = 'base.html'; }
     function verLogs() { window.location.href = 'logs.html'; }
     function verClassificacao() { window.location.href = 'classificação.html'; }
     function verPerfil() { window.location.href = 'perfil.html'; }
-    function logout() {
+
+    // Logout popup
+    function showLogoutPopup() { document.getElementById("logoutPopup").style.display = "flex"; }
+    function closeLogoutPopup() { document.getElementById("logoutPopup").style.display = "none"; }
+    function confirmLogout() {
       supabaseClient.auth.signOut().then(() => {
         window.location.href = 'index.html';
       });
     }
 
-    window.onload = () => {
-      carregarUsuario();
-      lucide.createIcons();
-    };
-
-    function toggleMenu() {
-      document.getElementById('sidebar').classList.toggle('active');
-    }
+    window.onload = () => { carregarUsuario(); lucide.createIcons(); };
+    function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); }
   </script>
 </body>
-
 </html>
