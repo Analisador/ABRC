@@ -8,6 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+
   <style>
     * {
       box-sizing: border-box;
@@ -29,14 +30,17 @@
       0% {
         background-position: 0% 50%;
       }
+
       50% {
         background-position: 100% 50%;
       }
+
       100% {
         background-position: 0% 50%;
       }
     }
 
+    /* Sidebar original */
     nav.sidebar {
       background: rgba(0, 0, 0, 0.8);
       width: 220px;
@@ -250,11 +254,11 @@
   <nav class="sidebar" id="sidebar">
     <div>
       <h2>A.B.R.C</h2>
-      <button onclick="window.location.href='home.html'"><i data-lucide="gauge"></i> Speed Test</button>
-      <button onclick="window.location.href='logs.html'"><i data-lucide="file-text"></i> Logs</button>
-      <button onclick="window.location.href='classificacao.html'"><i data-lucide="bar-chart-2"></i> Tráfego</button>
-      <button onclick="window.location.href='perfil.html'"><i data-lucide="user"></i> Perfil</button>
-      <button onclick="showLogoutPopup()"><i data-lucide="log-out"></i> Logout</button>
+      <button onclick="goToHome()"><i data-lucide="gauge"></i> Speed Test</button>
+      <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
+      <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i>Tráfego</button>
+      <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
+      <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
     </div>
     <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
   </nav>
@@ -304,7 +308,117 @@
       document.getElementById("sidebar").classList.toggle("active");
     }
 
-    // Restante do código JavaScript (Carregamento de dados, gráfico, etc.)
+    const mapeamentoPortas = {
+      80: ["HTTP", "Navegação web, APIs HTTP"],
+      8080: ["HTTP Alternativa", "Servidores de teste, proxies"],
+      443: ["HTTPS", "Sites seguros, APIs HTTPS, VPNs TLS"],
+      21: ["FTP", "Transferência de arquivos"],
+      53: ["DNS", "Resolução de nomes"],
+      25: ["SMTP", "Envio de e-mails"],
+      587: ["SMTP Seguro", "Envio de e-mails autenticado"]
+    };
+
+    let dadosAtuais = [];
+
+    async function carregarDados() {
+      const { data, error } = await supabase
+        .from('trafego')
+        .select('timestamp, tipo, porta')
+        .order('timestamp', { ascending: false });
+
+      if (error) {
+        console.error("Erro ao buscar dados:", error);
+        return;
+      }
+      dadosAtuais = data;
+      desenharGrafico(data);
+    }
+
+    function desenharGrafico(data) {
+      const contagem = {};
+      data.forEach(registro => {
+        const tipo = registro.tipo || 'Desconhecido';
+        contagem[tipo] = (contagem[tipo] || 0) + 1;
+      });
+
+      const total = data.length;
+      const ctx = document.getElementById('graficoTrafego').getContext('2d');
+
+      const chart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(contagem),
+          datasets: [{
+            data: Object.values(contagem),
+            backgroundColor: ['#4e9cff', '#f54291', '#33cc33', '#ffa500', '#cc33ff', '#ff3333', '#00cccc'],
+            borderColor: 'white',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          onClick: (evt, elements) => {
+            if (elements.length > 0) {
+              const index = elements[0].index;
+              const categoria = chart.data.labels[index];
+              const qtd = chart.data.datasets[0].data[index];
+              const porcentagem = ((qtd / total) * 100).toFixed(2) + '%';
+              mostrarInfo(categoria, porcentagem);
+            }
+          }
+        }
+      });
+    }
+
+    function mostrarInfo(categoria, porcentagem) {
+      const infoCaixa = document.getElementById("infoCaixa");
+      const registrosCategoria = dadosAtuais.filter(d => d.tipo === categoria);
+      const portasUsadas = [...new Set(registrosCategoria.map(r => r.porta).filter(Boolean))];
+      const exemplos = portasUsadas.map(p => mapeamentoPortas[p]?.[1] || "Desconhecido");
+
+      document.getElementById("infoCategoria").innerText = categoria;
+      document.getElementById("infoPorcentagem").innerText = `Porcentagem: ${porcentagem}`;
+      document.getElementById("infoPortas").innerText = portasUsadas.length ? portasUsadas.join(', ') : "N/A";
+      document.getElementById("infoExemplos").innerText = exemplos.length ? [...new Set(exemplos)].join('; ') : "N/A";
+
+      const lista = document.getElementById("infoRegistros");
+      lista.innerHTML = "";
+      registrosCategoria.slice(0, 5).forEach(r => {
+        const li = document.createElement("li");
+        li.innerText = `${r.timestamp} - Porta ${r.porta || "N/A"}`;
+        lista.appendChild(li);
+      });
+
+      infoCaixa.style.display = "block";
+    }
+
+    window.onload = () => {
+      carregarDados();
+      lucide.createIcons();
+    };
+
+    // Logout com popup
+    function logout() {
+      showLogoutPopup();
+    }
+
+    // Função para mostrar o popup de logout
+    function showLogoutPopup() {
+      document.getElementById("logoutPopup").style.display = "flex";
+    }
+
+    // Função para fechar o popup de logout
+    function closeLogoutPopup() {
+      document.getElementById("logoutPopup").style.display = "none";
+    }
+
+    // Função para confirmar o logout e redirecionar
+    function confirmLogout() {
+      supabase.auth.signOut().then(() => {
+        window.location.href = 'index.html';  // Redireciona para a página de login ou home
+      });
+    }
   </script>
 </body>
 
