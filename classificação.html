@@ -27,17 +27,9 @@
     }
 
     @keyframes gradientAnimation {
-      0% {
-        background-position: 0% 50%;
-      }
-
-      50% {
-        background-position: 100% 50%;
-      }
-
-      100% {
-        background-position: 0% 50%;
-      }
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     nav.sidebar {
@@ -123,14 +115,6 @@
       display: none;
     }
 
-    .info-caixa h2 {
-      margin-bottom: 10px;
-    }
-
-    .info-caixa p {
-      margin-bottom: 6px;
-    }
-
     .menu-toggle {
       display: none;
       position: absolute;
@@ -146,46 +130,26 @@
     }
 
     @media (max-width: 768px) {
-      body {
-        flex-direction: column;
-      }
-
+      body { flex-direction: column; }
       nav.sidebar {
         position: fixed;
-        top: 0;
-        left: 0;
+        top: 0; left: 0;
         height: 100%;
         transform: translateX(-100%);
         z-index: 999;
       }
-
-      nav.sidebar.active {
-        transform: translateX(0);
-      }
-
-      .menu-toggle {
-        display: block;
-      }
-
-      main.container {
-        margin: 20px;
-        padding: 20px;
-      }
-
-      .grafico-pequeno {
-        width: 250px;
-        height: 250px;
-      }
+      nav.sidebar.active { transform: translateX(0); }
+      .menu-toggle { display: block; }
+      main.container { margin: 20px; padding: 20px; }
+      .grafico-pequeno { width: 250px; height: 250px; }
     }
 
-    /* Modal de confirmação */
+    /* Modal de logout */
     .modal-overlay {
       display: none;
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       background: rgba(0, 0, 0, 0.6);
       align-items: center;
       justify-content: center;
@@ -200,11 +164,6 @@
       text-align: center;
       max-width: 320px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    }
-
-    .modal-content h3 {
-      margin-bottom: 20px;
-      font-size: 18px;
     }
 
     .modal-buttons {
@@ -243,7 +202,7 @@
       <h2>A.B.R.C</h2>
       <button onclick="goToHome()"><i data-lucide="gauge"></i> Speed Test</button>
       <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
-      <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i>Tráfego</button>
+      <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Tráfego</button>
       <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
       <button onclick="confirmLogout()"><i data-lucide="log-out"></i> Logout</button>
     </div>
@@ -266,7 +225,7 @@
     </div>
   </main>
 
-  <!-- Modal de confirmação de logout -->
+  <!-- Modal logout -->
   <div class="modal-overlay" id="logoutModal">
     <div class="modal-content">
       <h3>Deseja realmente sair?</h3>
@@ -280,70 +239,101 @@
   <script>
     const { createClient } = window.supabase;
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.6-DzG70MDDo_vg0HD5XGl9cCwWWSneflrk2Qy7xIpuQ';
+    const supabaseKey = 'SEU_KEY_AQUI';
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     async function verificarAutenticacao() {
-      const { data, error } = await supabase.auth.getSession();
-      if (!data.session) {
-        window.location.href = "index.html";
-      }
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) window.location.href = "index.html";
     }
     verificarAutenticacao();
 
-    function goToHome() {
-      window.location.href = "home.html";
-    }
+    function goToHome() { window.location.href = "base.html"; } // corrigido
+    function verLogs() { window.location.href = "logs.html"; }
+    function verClassificacao() { window.location.href = "classificacao.html"; }
+    function verPerfil() { window.location.href = "perfil.html"; }
 
-    function verLogs() {
-      window.location.href = "logs.html";
-    }
-
-    function verClassificacao() {
-      window.location.href = "classificacao.html";
-    }
-
-    function verPerfil() {
-      window.location.href = "perfil.html";
-    }
-
-    function toggleMenu() {
-      document.getElementById("sidebar").classList.toggle("active");
-    }
-
-    // Funções do modal de logout
-    function confirmLogout() {
-      document.getElementById("logoutModal").style.display = "flex";
-    }
-
-    function fecharModal() {
-      document.getElementById("logoutModal").style.display = "none";
-    }
-
+    function toggleMenu() { document.getElementById("sidebar").classList.toggle("active"); }
+    function confirmLogout() { document.getElementById("logoutModal").style.display = "flex"; }
+    function fecharModal() { document.getElementById("logoutModal").style.display = "none"; }
     function logout() {
-      supabase.auth.signOut().then(() => {
-        window.location.href = 'index.html';
+      supabase.auth.signOut().then(() => window.location.href = 'index.html');
+    }
+
+    lucide.createIcons();
+
+    // -------- Gráfico com estética do primeiro código --------
+    let dadosAtuais = [];
+
+    async function carregarDados() {
+      const { data, error } = await supabase
+        .from('trafego')
+        .select('timestamp, tipo, porta')
+        .order('timestamp', { ascending: false });
+
+      if (error) {
+        console.error("Erro:", error);
+        return;
+      }
+      dadosAtuais = data;
+      desenharGrafico(data);
+    }
+
+    function desenharGrafico(data) {
+      const contagem = {};
+      data.forEach(registro => {
+        const tipo = registro.tipo || 'Desconhecido';
+        contagem[tipo] = (contagem[tipo] || 0) + 1;
+      });
+
+      const total = data.length;
+      const ctx = document.getElementById('graficoTrafego').getContext('2d');
+
+      new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(contagem),
+          datasets: [{
+            data: Object.values(contagem),
+            backgroundColor: ['#4e9cff', '#f54291', '#33cc33', '#ffa500', '#cc33ff', '#ff3333', '#00cccc'],
+            borderColor: 'white',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          onClick: (evt, elements, chart) => {
+            if (elements.length > 0) {
+              const index = elements[0].index;
+              const categoria = chart.chart.data.labels[index];
+              const qtd = chart.chart.data.datasets[0].data[index];
+              const porcentagem = ((qtd / total) * 100).toFixed(2) + '%';
+              mostrarInfo(categoria, porcentagem);
+            }
+          }
+        }
       });
     }
 
-    // Lucide ícones
-    lucide.createIcons();
+    function mostrarInfo(categoria, porcentagem) {
+      const registrosCategoria = dadosAtuais.filter(d => d.tipo === categoria);
+      document.getElementById("infoCategoria").innerText = categoria;
+      document.getElementById("infoPorcentagem").innerText = `Porcentagem: ${porcentagem}`;
+      document.getElementById("infoPortas").innerText = registrosCategoria.map(r => r.porta).join(", ") || "N/A";
 
-    // Aqui ficaria o código do gráfico de tráfego...
-    // Exemplo:
-    const ctx = document.getElementById('graficoTrafego').getContext('2d');
-    new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: ['HTTP', 'HTTPS', 'FTP', 'P2P', 'VoIP'],
-        datasets: [{
-          label: 'Tráfego',
-          data: [25, 35, 15, 10, 15],
-          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#AA66CC', '#2ecc71']
-        }]
-      }
-    });
+      const lista = document.getElementById("infoRegistros");
+      lista.innerHTML = "";
+      registrosCategoria.slice(0, 5).forEach(r => {
+        const li = document.createElement("li");
+        li.innerText = `${r.timestamp} - Porta ${r.porta || "N/A"}`;
+        lista.appendChild(li);
+      });
+
+      document.getElementById("infoCaixa").style.display = "block";
+    }
+
+    window.onload = carregarDados;
   </script>
 </body>
-
 </html>
