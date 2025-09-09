@@ -78,8 +78,8 @@
       overflow-y: auto;
       position: relative;
       display: flex;
+      flex-direction: column;
       gap: 30px;
-      flex-wrap: wrap;
     }
     h1 {
       text-align: center;
@@ -89,6 +89,7 @@
     .grafico-pequeno {
       width: 350px;
       height: 350px;
+      margin: 0 auto;
     }
     .info-caixa {
       flex: 1;
@@ -166,6 +167,21 @@
       cursor: pointer;
       font-weight: bold;
     }
+    /* Legenda do gráfico */
+    #legendaGrafico {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-top: 15px;
+    }
+    #legendaGrafico div {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #legendaGrafico div span { font-size: 14px; }
   </style>
 </head>
 
@@ -188,32 +204,14 @@
     <h1>Classificação de Tráfego</h1>
     <canvas id="graficoTrafego" class="grafico-pequeno"></canvas>
 
-    <!-- Legenda do gráfico -->
-    <div id="legendaGrafico" style="width: 350px; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px;">
-      <div style="display: flex; align-items: center; gap: 6px;">
-        <div style="width: 20px; height: 20px; background-color: #4e9cff; border-radius: 4px;"></div>
-        <span>OUTRO</span>
-      </div>
-      <div style="display: flex; align-items: center; gap: 6px;">
-        <div style="width: 20px; height: 20px; background-color: #ff3333; border-radius: 4px;"></div>
-        <span>HTTP (Navegação não segura)</span>
-      </div>
-      <div style="display: flex; align-items: center; gap: 6px;">
-        <div style="width: 20px; height: 20px; background-color: #f54291; border-radius: 4px;"></div>
-        <span>VPNs</span>
-      </div>
-      <div style="display: flex; align-items: center; gap: 6px;">
-        <div style="width: 20px; height: 20px; background-color: #33cc33; border-radius: 4px;"></div>
-        <span>DNS</span>
-      </div>
-      <div style="display: flex; align-items: center; gap: 6px;">
-        <div style="width: 20px; height: 20px; background-color: #ffa500; border-radius: 4px;"></div>
-        <span>HTTP (Navegação web padrão)</span>
-      </div>
-      <div style="display: flex; align-items: center; gap: 6px;">
-        <div style="width: 20px; height: 20px; background-color: #cc33ff; border-radius: 4px;"></div>
-        <span>HTTPS</span>
-      </div>
+    <!-- Legenda centralizada abaixo do gráfico -->
+    <div id="legendaGrafico">
+      <div><div style="width: 20px; height: 20px; background-color: #4e9cff; border-radius: 4px;"></div><span>OUTRO</span></div>
+      <div><div style="width: 20px; height: 20px; background-color: #ff3333; border-radius: 4px;"></div><span>HTTP (Navegação não segura)</span></div>
+      <div><div style="width: 20px; height: 20px; background-color: #f54291; border-radius: 4px;"></div><span>VPNs</span></div>
+      <div><div style="width: 20px; height: 20px; background-color: #33cc33; border-radius: 4px;"></div><span>DNS</span></div>
+      <div><div style="width: 20px; height: 20px; background-color: #ffa500; border-radius: 4px;"></div><span>HTTP (Navegação web padrão)</span></div>
+      <div><div style="width: 20px; height: 20px; background-color: #cc33ff; border-radius: 4px;"></div><span>HTTPS</span></div>
     </div>
 
     <div class="info-caixa" id="infoCaixa">
