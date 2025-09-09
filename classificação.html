@@ -115,6 +115,14 @@
       display: none;
     }
 
+    .info-caixa h2 {
+      margin-bottom: 10px;
+    }
+
+    .info-caixa p {
+      margin-bottom: 6px;
+    }
+
     .menu-toggle {
       display: none;
       position: absolute;
@@ -143,54 +151,6 @@
       main.container { margin: 20px; padding: 20px; }
       .grafico-pequeno { width: 250px; height: 250px; }
     }
-
-    /* Modal de logout */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-    }
-
-    .modal-content {
-      background: white;
-      color: black;
-      padding: 25px;
-      border-radius: 12px;
-      text-align: center;
-      max-width: 320px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    }
-
-    .modal-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-    }
-
-    .btn-sim {
-      background: #c2142b;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .btn-nao {
-      background: #ccc;
-      color: black;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
   </style>
 </head>
 
@@ -204,7 +164,7 @@
       <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
       <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Tráfego</button>
       <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
-      <button onclick="confirmLogout()"><i data-lucide="log-out"></i> Logout</button>
+      <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
     </div>
     <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
   </nav>
@@ -225,44 +185,26 @@
     </div>
   </main>
 
-  <!-- Modal logout -->
-  <div class="modal-overlay" id="logoutModal">
-    <div class="modal-content">
-      <h3>Deseja realmente sair?</h3>
-      <div class="modal-buttons">
-        <button class="btn-sim" onclick="logout()">Sim</button>
-        <button class="btn-nao" onclick="fecharModal()">Não</button>
-      </div>
-    </div>
-  </div>
-
   <script>
     const { createClient } = window.supabase;
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
-    const supabaseKey = 'SEU_KEY_AQUI';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    async function verificarAutenticacao() {
-      const { data } = await supabase.auth.getSession();
-      if (!data.session) window.location.href = "index.html";
-    }
-    verificarAutenticacao();
-
-    function goToHome() { window.location.href = "base.html"; } // corrigido
-    function verLogs() { window.location.href = "logs.html"; }
-    function verClassificacao() { window.location.href = "classificacao.html"; }
-    function verPerfil() { window.location.href = "perfil.html"; }
-
-    function toggleMenu() { document.getElementById("sidebar").classList.toggle("active"); }
-    function confirmLogout() { document.getElementById("logoutModal").style.display = "flex"; }
-    function fecharModal() { document.getElementById("logoutModal").style.display = "none"; }
-    function logout() {
-      supabase.auth.signOut().then(() => window.location.href = 'index.html');
+    function toggleMenu() {
+      document.getElementById("sidebar").classList.toggle("active");
     }
 
-    lucide.createIcons();
+    const mapeamentoPortas = {
+      80: ["HTTP", "Navegação web, APIs HTTP"],
+      8080: ["HTTP Alternativa", "Servidores de teste, proxies"],
+      443: ["HTTPS", "Sites seguros, APIs HTTPS, VPNs TLS"],
+      21: ["FTP", "Transferência de arquivos"],
+      53: ["DNS", "Resolução de nomes"],
+      25: ["SMTP", "Envio de e-mails"],
+      587: ["SMTP Seguro", "Envio de e-mails autenticado"]
+    };
 
-    // -------- Gráfico com estética do primeiro código --------
     let dadosAtuais = [];
 
     async function carregarDados() {
@@ -272,7 +214,7 @@
         .order('timestamp', { ascending: false });
 
       if (error) {
-        console.error("Erro:", error);
+        console.error("Erro ao buscar dados:", error);
         return;
       }
       dadosAtuais = data;
@@ -289,7 +231,7 @@
       const total = data.length;
       const ctx = document.getElementById('graficoTrafego').getContext('2d');
 
-      new Chart(ctx, {
+      const chart = new Chart(ctx, {
         type: 'pie',
         data: {
           labels: Object.keys(contagem),
@@ -303,11 +245,11 @@
         options: {
           responsive: true,
           plugins: { legend: { display: false } },
-          onClick: (evt, elements, chart) => {
+          onClick: (evt, elements) => {
             if (elements.length > 0) {
               const index = elements[0].index;
-              const categoria = chart.chart.data.labels[index];
-              const qtd = chart.chart.data.datasets[0].data[index];
+              const categoria = chart.data.labels[index];
+              const qtd = chart.data.datasets[0].data[index];
               const porcentagem = ((qtd / total) * 100).toFixed(2) + '%';
               mostrarInfo(categoria, porcentagem);
             }
@@ -317,10 +259,15 @@
     }
 
     function mostrarInfo(categoria, porcentagem) {
+      const infoCaixa = document.getElementById("infoCaixa");
       const registrosCategoria = dadosAtuais.filter(d => d.tipo === categoria);
+      const portasUsadas = [...new Set(registrosCategoria.map(r => r.porta).filter(Boolean))];
+      const exemplos = portasUsadas.map(p => mapeamentoPortas[p]?.[1] || "Desconhecido");
+
       document.getElementById("infoCategoria").innerText = categoria;
       document.getElementById("infoPorcentagem").innerText = `Porcentagem: ${porcentagem}`;
-      document.getElementById("infoPortas").innerText = registrosCategoria.map(r => r.porta).join(", ") || "N/A";
+      document.getElementById("infoPortas").innerText = portasUsadas.length ? portasUsadas.join(', ') : "N/A";
+      document.getElementById("infoExemplos").innerText = exemplos.length ? [...new Set(exemplos)].join('; ') : "N/A";
 
       const lista = document.getElementById("infoRegistros");
       lista.innerHTML = "";
@@ -330,10 +277,23 @@
         lista.appendChild(li);
       });
 
-      document.getElementById("infoCaixa").style.display = "block";
+      infoCaixa.style.display = "block";
     }
 
-    window.onload = carregarDados;
+    function goToHome() { window.location.href = 'base.html'; }
+    function verLogs() { window.location.href = 'logs.html'; }
+    function verClassificacao() { window.location.href = 'classificacao.html'; }
+    function verPerfil() { window.location.href = 'perfil.html'; }
+    function logout() {
+      supabase.auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      });
+    }
+
+    window.onload = () => {
+      carregarDados();
+      lucide.createIcons();
+    };
   </script>
 </body>
 </html>
