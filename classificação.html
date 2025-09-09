@@ -10,12 +10,177 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
-    /* Aqui vão todos os estilos do código original */
-    /* Não altere nada aqui, mantemos o estilo do seu código intacto */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      height: 100vh;
+      display: flex;
+      color: white;
+      animation: gradientAnimation 12s ease infinite;
+      background-size: 300% 300%;
+      background-image: linear-gradient(-45deg, #c2142b, #2165ac, #f2c546, #c2142b);
+    }
+
+    @keyframes gradientAnimation {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    nav.sidebar {
+      background: rgba(0, 0, 0, 0.8);
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px;
+      gap: 25px;
+      transition: transform 0.3s ease;
+    }
+
+    nav.sidebar h2 {
+      font-size: 22px;
+      font-weight: 700;
+      text-align: center;
+      margin: 0 0 25px 0;
+    }
+
+    nav.sidebar button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 18px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+
+    nav.sidebar button:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    nav.sidebar button svg {
+      stroke: white;
+      width: 20px;
+      height: 20px;
+    }
+
+    .sidebar-logo {
+      width: 150px;
+      margin: 20px auto 0 auto;
+      display: block;
+    }
+
+    main.container {
+      flex-grow: 1;
+      background-color: rgba(0, 0, 0, 0.75);
+      margin: 40px;
+      padding: 40px;
+      border-radius: 20px;
+      overflow-y: auto;
+      position: relative;
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      width: 100%;
+    }
+
+    .grafico-pequeno {
+      width: 350px;
+      height: 350px;
+    }
+
+    .info-caixa {
+      flex: 1;
+      min-width: 250px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 20px;
+      border-radius: 15px;
+      display: none;
+    }
+
+    .info-caixa h2 {
+      margin-bottom: 10px;
+    }
+
+    .info-caixa p {
+      margin-bottom: 6px;
+    }
+
+    .menu-toggle {
+      display: none;
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: rgba(0, 0, 0, 0.8);
+      border: none;
+      color: white;
+      padding: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      nav.sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        transform: translateX(-100%);
+        z-index: 999;
+      }
+
+      nav.sidebar.active {
+        transform: translateX(0);
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+
+      main.container {
+        margin: 20px;
+        padding: 20px;
+      }
+
+      .grafico-pequeno {
+        width: 250px;
+        height: 250px;
+      }
+    }
 
     /* Modal de confirmação */
     .modal-overlay {
-      display: none; /* começa escondido */
+      display: none;
       position: fixed;
       top: 0;
       left: 0;
@@ -101,7 +266,7 @@
     </div>
   </main>
 
-  <!-- Modal de confirmação -->
+  <!-- Modal de confirmação de logout -->
   <div class="modal-overlay" id="logoutModal">
     <div class="modal-content">
       <h3>Deseja realmente sair?</h3>
@@ -115,39 +280,69 @@
   <script>
     const { createClient } = window.supabase;
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.6-DzG70MDDo_vg0HD5XGl9cCwWWSneflrk2Qy7xIpuQ';
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    async function verificarAutenticacao() {
+      const { data, error } = await supabase.auth.getSession();
+      if (!data.session) {
+        window.location.href = "index.html";
+      }
+    }
+    verificarAutenticacao();
+
+    function goToHome() {
+      window.location.href = "home.html";
+    }
+
+    function verLogs() {
+      window.location.href = "logs.html";
+    }
+
+    function verClassificacao() {
+      window.location.href = "classificacao.html";
+    }
+
+    function verPerfil() {
+      window.location.href = "perfil.html";
+    }
 
     function toggleMenu() {
       document.getElementById("sidebar").classList.toggle("active");
     }
 
-    function goToHome() { window.location.href = 'base.html'; }
-    function verLogs() { window.location.href = 'logs.html'; }
-    function verClassificacao() { window.location.href = 'classificação.html'; }
-    function verPerfil() { window.location.href = 'perfil.html'; }
-
-    // Função para abrir modal
+    // Funções do modal de logout
     function confirmLogout() {
       document.getElementById("logoutModal").style.display = "flex";
     }
 
-    // Fechar modal
     function fecharModal() {
       document.getElementById("logoutModal").style.display = "none";
     }
 
-    // Executar logout de fato
     function logout() {
       supabase.auth.signOut().then(() => {
         window.location.href = 'index.html';
       });
     }
 
-    window.onload = () => {
-      carregarDados();
-      lucide.createIcons();
-    };
+    // Lucide ícones
+    lucide.createIcons();
+
+    // Aqui ficaria o código do gráfico de tráfego...
+    // Exemplo:
+    const ctx = document.getElementById('graficoTrafego').getContext('2d');
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['HTTP', 'HTTPS', 'FTP', 'P2P', 'VoIP'],
+        datasets: [{
+          label: 'Tráfego',
+          data: [25, 35, 15, 10, 15],
+          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#AA66CC', '#2ecc71']
+        }]
+      }
+    });
   </script>
 </body>
 
