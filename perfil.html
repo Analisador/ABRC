@@ -1,122 +1,379 @@
-<script>
-  const { createClient } = supabase;
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perfil</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      height: 100vh;
+      display: flex;
+      color: white;
+      animation: gradientAnimation 12s ease infinite;
+      background-size: 300% 300%;
+      background-image: linear-gradient(-45deg, #c2142b, #2165ac, #f2c546, #c2142b);
+    }
+
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    nav.sidebar {
+      background: rgba(0, 0, 0, 0.8);
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px;
+      gap: 25px;
+      transition: transform 0.3s ease;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+    }
+
+    nav.sidebar h2 {
+      font-size: 22px;
+      font-weight: 700;
+      text-align: center;
+      margin: 0 0 25px 0;
+    }
+
+    nav.sidebar button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 18px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+
+    nav.sidebar button:hover { background-color: rgba(255, 255, 255, 0.1); }
+    nav.sidebar button svg { stroke: white; width: 20px; height: 20px; }
+
+    .sidebar-logo { width: 150px; margin: 20px auto 0 auto; display: block; }
+
+    main.container {
+      flex-grow: 1;
+      background-color: rgba(0, 0, 0, 0.75);
+      margin: 40px auto;
+      padding: 40px;
+      border-radius: 20px;
+      overflow-y: auto;
+      position: relative;
+      width: 90%;
+      max-width: 1200px;
+      margin-left: 240px;
+    }
+
+    h1 { text-align: center; margin-bottom: 30px; width: 100%; }
+
+    .profile-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .profile-pic {
+      border-radius: 50%;
+      width: 140px;
+      height: 140px;
+      object-fit: cover;
+      border: 4px solid white;
+      margin-bottom: 10px;
+    }
+
+    input[type="file"] { display: none; }
+
+    .upload-label {
+      background-color: #ffffff;
+      color: black;
+      padding: 8px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background .3s;
+    }
+
+    .upload-label:hover { background-color: #cccccc; }
+
+    .form-group {
+      max-width: 400px;
+      margin: 0 auto 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label { font-weight: bold; }
+
+    input[type="time"] {
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    .save-btn {
+      background-color: #ffffff;
+      color: black;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background .3s;
+      margin-top: 20px;
+    }
+
+    .save-btn:hover { background-color: #cccccc; }
+
+    .explanation {
+      max-width: 600px;
+      margin: 20px auto;
+      text-align: center;
+      font-size: 16px;
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 12px;
+    }
+
+    .menu-toggle {
+      display: none;
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: rgba(0, 0, 0, 0.8);
+      border: none;
+      color: white;
+      padding: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    .popup-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+
+    .popup {
+      background: white;
+      color: black;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      max-width: 300px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    .popup h3 { margin-bottom: 15px; }
+
+    .popup button {
+      padding: 8px 14px;
+      margin: 0 8px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .popup .yes { background: #c2142b; color: white; }
+    .popup .no { background: #ddd; }
+
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      nav.sidebar {
+        position: fixed; top: 0; left: -220px; height: 100%;
+        transform: translateX(0);
+        z-index: 999;
+      }
+      nav.sidebar.active { transform: translateX(220px); }
+      .menu-toggle { display: block; }
+      main.container { margin: 20px; padding: 20px; margin-left: 0; width: 100%; }
+    }
+  </style>
+</head>
+
+<body>
+  <button class="menu-toggle" onclick="toggleMenu()"><i data-lucide="menu"></i></button>
+
+  <nav class="sidebar" id="sidebar">
+    <div>
+      <h2>A.B.R.C</h2>
+      <button onclick="goToHome()"><i data-lucide="gauge"></i> Speed Test</button>
+      <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
+      <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Tráfego</button>
+      <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
+      <button onclick="showLogoutPopup()"><i data-lucide="log-out"></i> Logout</button>
+    </div>
+    <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
+  </nav>
+
+  <main class="container">
+    <h1>Seu Perfil</h1>
+    <div class="profile-section">
+      <img src="https://via.placeholder.com/140" id="preview" class="profile-pic" alt="Foto de Perfil" />
+      <label for="foto" class="upload-label">Escolher Foto</label>
+      <input type="file" id="foto" accept="image/*" onchange="mostrarPreview(event)" />
+    </div>
+
+    <div class="explanation">
+      Os horários abaixo determinam quando os testes de velocidade serão executados automaticamente.
+      Escolha até três horários do seu dia para que o sistema colete os dados de forma automática.
+    </div>
+
+    <div class="form-group">
+      <label for="primeiro">Horário 1:</label>
+      <input type="time" id="primeiro" />
+      <label for="segundo">Horário 2:</label>
+      <input type="time" id="segundo" />
+      <label for="terceiro">Horário 3:</label>
+      <input type="time" id="terceiro" />
+    </div>
+
+    <div style="text-align:center;">
+      <button class="save-btn" onclick="salvarHorarios()">Salvar Horários</button>
+    </div>
+  </main>
+
+  <div class="popup-overlay" id="logoutPopup">
+    <div class="popup">
+      <h3>Deseja realmente sair?</h3>
+      <button class="yes" onclick="confirmLogout()">Sim</button>
+      <button class="no" onclick="closeLogoutPopup()">Não</button>
+    </div>
+  </div>
+
+  <script>
+    const { createClient } = supabase;
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
- const supabaseClient = createClient(supabaseUrl, supabaseKey);
+   const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
-  let userEmail = null;
-  let linhaId = null;
+    let userEmail = null;
+    let linhaId = null;
 
-  async function carregarUsuario() {
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-    if (userError || !user) {
-      alert("Usuário não autenticado");
-      window.location.href = "LoginProjet.html";
-      return;
-    }
-    userEmail = user.email;
+    function padHHMMSS(v) { if (!v) return null; return /^\d{2}:\d{2}$/.test(v) ? v + ':00' : v; }
+    function toHHMM(v) { return (typeof v === 'string' && /^\d{2}:\d{2}:\d{2}$/.test(v)) ? v.slice(0,5) : (v || ''); }
 
-    const { data: rows } = await supabaseClient
-      .from('cadastro')
-      .select('id, primeiro, segundo, terceiro, foto_url')
-      .eq('email', userEmail)
-      .order('id', { ascending: false })
-      .limit(1);
+    async function carregarUsuario() {
+      const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+      if (userError || !user) {
+        alert("Usuário não autenticado");
+        window.location.href = "LoginProjet.html";
+        return;
+      }
+      userEmail = user.email;
 
-    if (rows && rows.length > 0) {
-      const row = rows[0];
-      linhaId = row.id;
-      document.getElementById('primeiro').value = toHHMM(row.primeiro);
-      document.getElementById('segundo').value = toHHMM(row.segundo);
-      document.getElementById('terceiro').value = toHHMM(row.terceiro);
+      const { data: rows } = await supabaseClient
+        .from('cadastro')
+        .select('id, primeiro, segundo, terceiro, foto_url')
+        .eq('email', userEmail)
+        .order('id', { ascending: false })
+        .limit(1);
 
-      if (row.foto_url) {
-        document.getElementById('preview').src = row.foto_url;
+      if (rows && rows.length > 0) {
+        const row = rows[0];
+        linhaId = row.id;
+        document.getElementById('primeiro').value = toHHMM(row.primeiro);
+        document.getElementById('segundo').value = toHHMM(row.segundo);
+        document.getElementById('terceiro').value = toHHMM(row.terceiro);
+
+        if (row.foto_url) {
+          document.getElementById('preview').src = row.foto_url;
+        }
       }
     }
-  }
 
-  async function salvarHorarios() {
-    const primeiro = padHHMMSS(document.getElementById('primeiro').value || null);
-    const segundo = padHHMMSS(document.getElementById('segundo').value || null);
-    const terceiro = padHHMMSS(document.getElementById('terceiro').value || null);
+    async function salvarHorarios() {
+      const primeiro = padHHMMSS(document.getElementById('primeiro').value || null);
+      const segundo = padHHMMSS(document.getElementById('segundo').value || null);
+      const terceiro = padHHMMSS(document.getElementById('terceiro').value || null);
 
-    if (linhaId) {
-      await supabaseClient.from('cadastro').update({ primeiro, segundo, terceiro }).eq('id', linhaId);
+      if (linhaId) {
+        await supabaseClient.from('cadastro').update({ primeiro, segundo, terceiro }).eq('id', linhaId);
+        alert('Horários salvos com sucesso!');
+        return;
+      }
+      if (!userEmail) { alert('Usuário não autenticado.'); return; }
+      const { data } = await supabaseClient.from('cadastro').update({ primeiro, segundo, terceiro }).eq('email', userEmail).select('id');
+      if (!data || data.length === 0) { alert('Seu cadastro ainda não existe. Conclua o cadastro primeiro.'); return; }
       alert('Horários salvos com sucesso!');
-      return;
-    }
-    if (!userEmail) { alert('Usuário não autenticado.'); return; }
-    const { data } = await supabaseClient.from('cadastro').update({ primeiro, segundo, terceiro }).eq('email', userEmail).select('id');
-    if (!data || data.length === 0) { alert('Seu cadastro ainda não existe. Conclua o cadastro primeiro.'); return; }
-    alert('Horários salvos com sucesso!');
-  }
-
-  function mostrarPreview(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    // Mostra preview
-    document.getElementById('preview').src = URL.createObjectURL(file);
-
-    // Faz upload
-    uploadFoto(file);
-  }
-
-  async function uploadFoto(file) {
-    if (!userEmail) {
-      alert("Usuário não autenticado");
-      return;
     }
 
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${userEmail.replace(/[@.]/g, "_")}_${Date.now()}.${fileExt}`;
-    const filePath = `avatars/${fileName}`;
+    function mostrarPreview(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      document.getElementById('preview').src = URL.createObjectURL(file);
+      uploadFoto(file);
+    }
 
-    let { error: uploadError } = await supabaseClient.storage
-      .from('avatars') // bucket precisa existir
-      .upload(filePath, file, {
-        upsert: true,
+    async function uploadFoto(file) {
+      if (!userEmail) return;
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${userEmail.replace(/[@.]/g, "_")}_${Date.now()}.${fileExt}`;
+      const filePath = `avatars/${fileName}`;
+
+      let { error: uploadError } = await supabaseClient.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) {
+        alert("Erro ao enviar foto: " + uploadError.message);
+        return;
+      }
+
+      const { data } = supabaseClient.storage.from('avatars').getPublicUrl(filePath);
+      const publicUrl = data.publicUrl;
+
+      if (linhaId) {
+        await supabaseClient.from('cadastro').update({ foto_url: publicUrl }).eq('id', linhaId);
+      } else {
+        await supabaseClient.from('cadastro').update({ foto_url: publicUrl }).eq('email', userEmail);
+      }
+    }
+
+    function goToHome() { window.location.href = 'base.html'; }
+    function verLogs() { window.location.href = 'logs.html'; }
+    function verClassificacao() { window.location.href = 'classificação.html'; }
+    function verPerfil() { window.location.href = 'perfil.html'; }
+
+    function showLogoutPopup() { document.getElementById("logoutPopup").style.display = "flex"; }
+    function closeLogoutPopup() { document.getElementById("logoutPopup").style.display = "none"; }
+    function confirmLogout() {
+      supabaseClient.auth.signOut().then(() => {
+        window.location.href = 'index.html';
       });
-
-    if (uploadError) {
-      alert("Erro ao enviar foto: " + uploadError.message);
-      return;
     }
 
-    // Gera URL pública
-    const { data } = supabaseClient.storage.from('avatars').getPublicUrl(filePath);
-    const publicUrl = data.publicUrl;
-
-    // Salva URL no banco
-    if (linhaId) {
-      await supabaseClient.from('cadastro').update({ foto_url: publicUrl }).eq('id', linhaId);
-    } else {
-      await supabaseClient.from('cadastro').update({ foto_url: publicUrl }).eq('email', userEmail);
-    }
-
-    alert("Foto atualizada com sucesso!");
-  }
-
-  // Utils
-  function padHHMMSS(v) { if (!v) return null; return /^\d{2}:\d{2}$/.test(v) ? v + ':00' : v; }
-  function toHHMM(v) { return (typeof v === 'string' && /^\d{2}:\d{2}:\d{2}$/.test(v)) ? v.slice(0,5) : (v || ''); }
-
-  // Navegação
-  function goToHome() { window.location.href = 'base.html'; }
-  function verLogs() { window.location.href = 'logs.html'; }
-  function verClassificacao() { window.location.href = 'classificação.html'; }
-  function verPerfil() { window.location.href = 'perfil.html'; }
-
-  // Logout popup
-  function showLogoutPopup() { document.getElementById("logoutPopup").style.display = "flex"; }
-  function closeLogoutPopup() { document.getElementById("logoutPopup").style.display = "none"; }
-  function confirmLogout() {
-    supabaseClient.auth.signOut().then(() => {
-      window.location.href = 'index.html';
-    });
-  }
-
-  window.onload = () => { carregarUsuario(); lucide.createIcons(); };
-  function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); }
-</script>
+    window.onload = () => { carregarUsuario(); lucide.createIcons(); };
+    function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); }
+  </script>
+</body>
+</html>
