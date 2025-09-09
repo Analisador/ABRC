@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Classificação de Tráfego</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
@@ -249,10 +250,10 @@
   <nav class="sidebar" id="sidebar">
     <div>
       <h2>A.B.R.C</h2>
-      <button><a href="home.html" style="color: white; text-decoration: none;"><i data-lucide="gauge"></i> Speed Test</a></button>
-      <button><a href="logs.html" style="color: white; text-decoration: none;"><i data-lucide="file-text"></i> Logs</a></button>
-      <button><a href="classificacao.html" style="color: white; text-decoration: none;"><i data-lucide="bar-chart-2"></i> Tráfego</a></button>
-      <button><a href="perfil.html" style="color: white; text-decoration: none;"><i data-lucide="user"></i> Perfil</a></button>
+      <button onclick="window.location.href='home.html'"><i data-lucide="gauge"></i> Speed Test</button>
+      <button onclick="window.location.href='logs.html'"><i data-lucide="file-text"></i> Logs</button>
+      <button onclick="window.location.href='classificacao.html'"><i data-lucide="bar-chart-2"></i> Tráfego</button>
+      <button onclick="window.location.href='perfil.html'"><i data-lucide="user"></i> Perfil</button>
       <button onclick="showLogoutPopup()"><i data-lucide="log-out"></i> Logout</button>
     </div>
     <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
@@ -303,8 +304,8 @@
       document.getElementById("sidebar").classList.toggle("active");
     }
 
-    // Restante do código JavaScript
-    // Funções de carregamento de dados e renderização do gráfico
+    // Restante do código JavaScript (Carregamento de dados, gráfico, etc.)
   </script>
 </body>
+
 </html>
