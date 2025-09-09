@@ -10,12 +10,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: Arial, Helvetica, sans-serif;
       height: 100vh;
@@ -25,13 +20,11 @@
       background-size: 300% 300%;
       background-image: linear-gradient(-45deg, #c2142b, #2165ac, #f2c546, #c2142b);
     }
-
     @keyframes gradientAnimation {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-
     nav.sidebar {
       background: rgba(0, 0, 0, 0.8);
       width: 220px;
@@ -42,14 +35,12 @@
       gap: 25px;
       transition: transform 0.3s ease;
     }
-
     nav.sidebar h2 {
       font-size: 22px;
       font-weight: 700;
       text-align: center;
       margin: 0 0 25px 0;
     }
-
     nav.sidebar button {
       background: none;
       border: none;
@@ -65,23 +56,19 @@
       transition: background-color 0.3s ease;
       user-select: none;
     }
-
     nav.sidebar button:hover {
       background-color: rgba(255, 255, 255, 0.1);
     }
-
     nav.sidebar button svg {
       stroke: white;
       width: 20px;
       height: 20px;
     }
-
     .sidebar-logo {
       width: 150px;
       margin: 20px auto 0 auto;
       display: block;
     }
-
     main.container {
       flex-grow: 1;
       background-color: rgba(0, 0, 0, 0.75);
@@ -94,18 +81,15 @@
       gap: 30px;
       flex-wrap: wrap;
     }
-
     h1 {
       text-align: center;
       margin-bottom: 30px;
       width: 100%;
     }
-
     .grafico-pequeno {
       width: 350px;
       height: 350px;
     }
-
     .info-caixa {
       flex: 1;
       min-width: 250px;
@@ -114,15 +98,8 @@
       border-radius: 15px;
       display: none;
     }
-
-    .info-caixa h2 {
-      margin-bottom: 10px;
-    }
-
-    .info-caixa p {
-      margin-bottom: 6px;
-    }
-
+    .info-caixa h2 { margin-bottom: 10px; }
+    .info-caixa p { margin-bottom: 6px; }
     .menu-toggle {
       display: none;
       position: absolute;
@@ -136,7 +113,6 @@
       cursor: pointer;
       z-index: 1000;
     }
-
     @media (max-width: 768px) {
       body { flex-direction: column; }
       nav.sidebar {
@@ -151,6 +127,45 @@
       main.container { margin: 20px; padding: 20px; }
       .grafico-pequeno { width: 250px; height: 250px; }
     }
+    /* Modal logout */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+    .modal-content {
+      background: white;
+      color: black;
+      padding: 25px;
+      border-radius: 12px;
+      text-align: center;
+      max-width: 320px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    .modal-buttons { display: flex; justify-content: center; gap: 15px; }
+    .btn-sim {
+      background: #c2142b;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-nao {
+      background: #ccc;
+      color: black;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
   </style>
 </head>
 
@@ -164,7 +179,7 @@
       <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
       <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Tráfego</button>
       <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
-      <button onclick="logout()"><i data-lucide="log-out"></i> Logout</button>
+      <button onclick="confirmLogout()"><i data-lucide="log-out"></i> Logout</button>
     </div>
     <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
   </nav>
@@ -185,15 +200,22 @@
     </div>
   </main>
 
+  <!-- Modal logout -->
+  <div class="modal-overlay" id="logoutModal">
+    <div class="modal-content">
+      <h3>Deseja realmente sair?</h3>
+      <div class="modal-buttons">
+        <button class="btn-sim" onclick="logout()">Sim</button>
+        <button class="btn-nao" onclick="fecharModal()">Não</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const { createClient } = window.supabase;
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
     const supabase = createClient(supabaseUrl, supabaseKey);
-
-    function toggleMenu() {
-      document.getElementById("sidebar").classList.toggle("active");
-    }
 
     const mapeamentoPortas = {
       80: ["HTTP", "Navegação web, APIs HTTP"],
@@ -280,15 +302,14 @@
       infoCaixa.style.display = "block";
     }
 
+    function toggleMenu() { document.getElementById("sidebar").classList.toggle("active"); }
     function goToHome() { window.location.href = 'base.html'; }
     function verLogs() { window.location.href = 'logs.html'; }
-    function verClassificacao() { window.location.href = 'classificacao.html'; }
+    function verClassificacao() { window.location.href = 'classificação.html'; }
     function verPerfil() { window.location.href = 'perfil.html'; }
-    function logout() {
-      supabase.auth.signOut().then(() => {
-        window.location.href = 'index.html';
-      });
-    }
+    function confirmLogout() { document.getElementById("logoutModal").style.display = "flex"; }
+    function fecharModal() { document.getElementById("logoutModal").style.display = "none"; }
+    function logout() { supabase.auth.signOut().then(() => window.location.href = 'index.html'); }
 
     window.onload = () => {
       carregarDados();
@@ -296,4 +317,5 @@
     };
   </script>
 </body>
+
 </html>
