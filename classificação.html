@@ -1,51 +1,44 @@
 <script>
   const { createClient } = window.supabase;
-  const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
+    const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
   const supabase = createClient(supabaseUrl, supabaseKey);
 
-  // Configuração das categorias fixas (agora com explicação leiga)
+  // Configuração das categorias fixas
   const categoriasConfig = {
     OUTRO: {
       cor: "#4e9cff",
       portas: [],
-      exemplos: "Tráfego genérico ou não identificado",
-      definicao: "Dados que não se encaixam em nenhuma categoria específica."
+      exemplos: "Tráfego genérico ou não identificado"
     },
     HTTP: {
       cor: "#ff3333",
       portas: [80, 8080],
-      exemplos: "Navegação não segura, APIs HTTP",
-      definicao: "Sites comuns sem segurança (http://). Exemplo: páginas antigas ou não criptografadas."
+      exemplos: "Navegação não segura, APIs HTTP"
     },
     VPN: {
       cor: "#f54291",
       portas: [1194, 1701, 500, 4500],
-      exemplos: "OpenVPN, L2TP, IPSec",
-      definicao: "Conexões privadas seguras usadas para esconder ou proteger navegação."
+      exemplos: "OpenVPN, L2TP, IPSec"
     },
     DNS: {
       cor: "#33cc33",
       portas: [53],
-      exemplos: "Resolução de nomes de domínio",
-      definicao: "Tráfego usado para transformar endereços como google.com em números IP."
+      exemplos: "Resolução de nomes de domínio"
     },
     "HTTP WEB": {
       cor: "#ffa500",
       portas: [8080],
-      exemplos: "Navegação web padrão em servidores alternativos",
-      definicao: "Tráfego de sites rodando em portas não padrão (ex: sistemas internos, APIs)."
+      exemplos: "Navegação web padrão em servidores alternativos"
     },
     HTTPS: {
       cor: "#cc33ff",
       portas: [443],
-      exemplos: "Sites seguros, APIs, apps como WhatsApp e streaming",
-      definicao: "Sites com segurança (https://). Exemplo: Google, YouTube, Netflix, WhatsApp Web."
+      exemplos: "Sites seguros, APIs, apps como WhatsApp e streaming"
     }
   };
 
   let dadosAtuais = [];
-  let chart = null;
 
   async function carregarDados() {
     const { data, error } = await supabase
@@ -71,8 +64,7 @@
     const total = data.length;
     const ctx = document.getElementById('graficoTrafego').getContext('2d');
 
-    if (chart) chart.destroy();
-    chart = new Chart(ctx, {
+    const chart = new Chart(ctx, {
       type: 'pie',
       data: {
         labels: Object.keys(contagem),
@@ -97,20 +89,6 @@
         }
       }
     });
-
-    gerarLegenda(Object.keys(contagem));
-  }
-
-  function gerarLegenda(categorias) {
-    const legendaDiv = document.getElementById("graficoLegenda");
-    if (!legendaDiv) return;
-    legendaDiv.innerHTML = "";
-    categorias.forEach(c => {
-      const item = document.createElement("div");
-      item.className = "legenda-item";
-      item.innerHTML = `<span class="legenda-cor" style="background:${categoriasConfig[c]?.cor || "#999"}"></span>${c}`;
-      legendaDiv.appendChild(item);
-    });
   }
 
   function mostrarInfo(categoria, porcentagem) {
@@ -124,7 +102,6 @@
     document.getElementById("infoPorcentagem").innerText = `Porcentagem: ${porcentagem}`;
     document.getElementById("infoPortas").innerText = portasDetectadas.length ? portasDetectadas.join(', ') : "N/A";
     document.getElementById("infoExemplos").innerText = config.exemplos;
-    document.getElementById("infoDefinicao").innerText = config.definicao || "Sem definição disponível";
 
     const lista = document.getElementById("infoRegistros");
     lista.innerHTML = "";
