@@ -1,162 +1,347 @@
-<script>
-  const { createClient } = window.supabase;
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Classificação de Tráfego</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      height: 100vh;
+      display: flex;
+      color: white;
+      animation: gradientAnimation 12s ease infinite;
+      background-size: 300% 300%;
+      background-image: linear-gradient(-45deg, #c2142b, #2165ac, #f2c546, #c2142b);
+    }
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    nav.sidebar {
+      background: rgba(0, 0, 0, 0.8);
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px;
+      gap: 25px;
+      transition: transform 0.3s ease;
+    }
+    nav.sidebar h2 {
+      font-size: 22px;
+      font-weight: 700;
+      text-align: center;
+      margin: 0 0 25px 0;
+    }
+    nav.sidebar button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 18px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    nav.sidebar button:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    nav.sidebar button svg {
+      stroke: white;
+      width: 20px;
+      height: 20px;
+    }
+    .sidebar-logo {
+      width: 150px;
+      margin: 20px auto 0 auto;
+      display: block;
+    }
+    main.container {
+      flex-grow: 1;
+      background-color: rgba(0, 0, 0, 0.75);
+      margin: 40px;
+      padding: 40px;
+      border-radius: 20px;
+      overflow-y: auto;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      width: 100%;
+    }
+    .grafico-pequeno {
+      width: 350px;
+      height: 350px;
+      margin: 0 auto;
+    }
+    .info-caixa {
+      flex: 1;
+      min-width: 250px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 20px;
+      border-radius: 15px;
+      display: none;
+    }
+    .info-caixa h2 { margin-bottom: 10px; }
+    .info-caixa p { margin-bottom: 6px; }
+    .menu-toggle {
+      display: none;
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: rgba(0, 0, 0, 0.8);
+      border: none;
+      color: white;
+      padding: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      nav.sidebar {
+        position: fixed;
+        top: 0; left: 0;
+        height: 100%;
+        transform: translateX(-100%);
+        z-index: 999;
+      }
+      nav.sidebar.active { transform: translateX(0); }
+      .menu-toggle { display: block; }
+      main.container { margin: 20px; padding: 20px; }
+      .grafico-pequeno { width: 250px; height: 250px; }
+    }
+    /* Modal logout */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+    .modal-content {
+      background: white;
+      color: black;
+      padding: 25px;
+      border-radius: 12px;
+      text-align: center;
+      max-width: 320px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    .modal-buttons { display: flex; justify-content: center; gap: 15px; }
+    .btn-sim {
+      background: #c2142b;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-nao {
+      background: #ccc;
+      color: black;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    /* Legenda do gráfico */
+    #legendaGrafico {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-top: 15px;
+    }
+    #legendaGrafico div {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #legendaGrafico div span { font-size: 14px; }
+  </style>
+</head>
+
+<body>
+  <button class="menu-toggle" onclick="toggleMenu()"><i data-lucide="menu"></i></button>
+
+  <nav class="sidebar" id="sidebar">
+    <div>
+      <h2>A.B.R.C</h2>
+      <button onclick="goToHome()"><i data-lucide="gauge"></i> Speed Test</button>
+      <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
+      <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Tráfego</button>
+      <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
+      <button onclick="confirmLogout()"><i data-lucide="log-out"></i> Logout</button>
+    </div>
+    <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
+  </nav>
+
+  <main class="container">
+    <h1>Classificação de Tráfego</h1>
+    <canvas id="graficoTrafego" class="grafico-pequeno"></canvas>
+
+    <!-- Legenda centralizada abaixo do gráfico -->
+    <div id="legendaGrafico">
+      <div><div style="width: 20px; height: 20px; background-color: #4e9cff; border-radius: 4px;"></div><span>OUTRO</span></div>
+      <div><div style="width: 20px; height: 20px; background-color: #ff3333; border-radius: 4px;"></div><span>HTTP (Navegação não segura)</span></div>
+      <div><div style="width: 20px; height: 20px; background-color: #f54291; border-radius: 4px;"></div><span>VPNs</span></div>
+      <div><div style="width: 20px; height: 20px; background-color: #33cc33; border-radius: 4px;"></div><span>DNS</span></div>
+      <div><div style="width: 20px; height: 20px; background-color: #ffa500; border-radius: 4px;"></div><span>HTTP (Navegação web padrão)</span></div>
+      <div><div style="width: 20px; height: 20px; background-color: #cc33ff; border-radius: 4px;"></div><span>HTTPS</span></div>
+    </div>
+
+    <div class="info-caixa" id="infoCaixa">
+      <h2 id="infoCategoria"></h2>
+      <p id="infoPorcentagem"></p>
+      <p><strong>Portas:</strong> <span id="infoPortas"></span></p>
+      <p><strong>Exemplos:</strong> <span id="infoExemplos"></span></p>
+      <div>
+        <strong>Últimos Registros:</strong>
+        <ul id="infoRegistros"></ul>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal logout -->
+  <div class="modal-overlay" id="logoutModal">
+    <div class="modal-content">
+      <h3>Deseja realmente sair?</h3>
+      <div class="modal-buttons">
+        <button class="btn-sim" onclick="logout()">Sim</button>
+        <button class="btn-nao" onclick="fecharModal()">Não</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { createClient } = window.supabase;
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
-  const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
-  // Configuração das categorias fixas
-  const categoriasConfig = {
-    OUTRO: {
-      cor: "#4e9cff",
-      portas: [],
-      exemplos: "Tráfego genérico ou não identificado"
-    },
-    HTTP: {
-      cor: "#ff3333",
-      portas: [80, 8080],
-      exemplos: "Sites comuns sem criptografia, APIs HTTP"
-    },
-    VPN: {
-      cor: "#f54291",
-      portas: [1194, 1701, 500, 4500],
-      exemplos: "Serviços de VPN como OpenVPN, L2TP, IPSec"
-    },
-    DNS: {
-      cor: "#33cc33",
-      portas: [53],
-      exemplos: "Tráfego usado para traduzir nomes de sites em endereços IP"
-    },
-    "HTTP WEB": {
-      cor: "#ffa500",
-      portas: [8080],
-      exemplos: "Acesso web em servidores alternativos"
-    },
-    HTTPS: {
-      cor: "#cc33ff",
-      portas: [443],
-      exemplos: "Sites seguros como Google, WhatsApp, Netflix, apps e streaming"
+    const mapeamentoPortas = {
+      80: ["HTTP", "Navegação web, APIs HTTP"],
+      8080: ["HTTP Alternativa", "Servidores de teste, proxies"],
+      443: ["HTTPS", "Sites seguros, APIs HTTPS, VPNs TLS"],
+      21: ["FTP", "Transferência de arquivos"],
+      53: ["DNS", "Resolução de nomes"],
+      25: ["SMTP", "Envio de e-mails"],
+      587: ["SMTP Seguro", "Envio de e-mails autenticado"]
+    };
+
+    let dadosAtuais = [];
+
+    async function carregarDados() {
+      const { data, error } = await supabase
+        .from('trafego')
+        .select('timestamp, tipo, porta')
+        .order('timestamp', { ascending: false });
+
+      if (error) {
+        console.error("Erro ao buscar dados:", error);
+        return;
+      }
+      dadosAtuais = data;
+      desenharGrafico(data);
     }
-  };
 
-  let dadosAtuais = [];
+    function desenharGrafico(data) {
+      const contagem = {};
+      data.forEach(registro => {
+        const tipo = registro.tipo || 'Desconhecido';
+        contagem[tipo] = (contagem[tipo] || 0) + 1;
+      });
 
-  async function carregarDados() {
-    const { data, error } = await supabase
-      .from('trafego')
-      .select('timestamp, tipo, porta')
-      .order('timestamp', { ascending: false });
+      const total = data.length;
+      const ctx = document.getElementById('graficoTrafego').getContext('2d');
 
-    if (error) {
-      console.error("Erro ao buscar dados:", error);
-      return;
-    }
-    dadosAtuais = data;
-    desenharGrafico(data);
-  }
-
-  function desenharGrafico(data) {
-    const contagem = {};
-    data.forEach(registro => {
-      const tipo = registro.tipo || 'OUTRO';
-      contagem[tipo] = (contagem[tipo] || 0) + 1;
-    });
-
-    const total = data.length;
-    const ctx = document.getElementById('graficoTrafego').getContext('2d');
-
-    new Chart(ctx, {
-      type: 'pie',
-      data: {
-        labels: Object.keys(contagem),
-        datasets: [{
-          data: Object.values(contagem),
-          backgroundColor: Object.keys(contagem).map(c => categoriasConfig[c]?.cor || "#999999"),
-          borderColor: 'white',
-          borderWidth: 2
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            display: true,
-            position: 'bottom',
-            labels: {
-              generateLabels: (chart) => {
-                const labels = chart.data.labels;
-                return labels.map((label, i) => ({
-                  text: label,
-                  fillStyle: categoriasConfig[label]?.cor || "#999999",
-                  strokeStyle: '#fff',
-                  lineWidth: 2,
-                  hidden: false,
-                  index: i
-                }));
-              }
-            }
-          },
-          tooltip: {
-            callbacks: {
-              label: function(context) {
-                const categoria = context.label;
-                const qtd = context.parsed;
-                const porcent = ((qtd / total) * 100).toFixed(1) + "%";
-                const desc = categoriasConfig[categoria]?.exemplos || "Sem descrição";
-                return `${categoria}: ${qtd} (${porcent}) - ${desc}`;
-              }
-            }
-          }
+      const chart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(contagem),
+          datasets: [{
+            data: Object.values(contagem),
+            backgroundColor: ['#4e9cff', '#f54291', '#33cc33', '#ffa500', '#cc33ff', '#ff3333', '#00cccc'],
+            borderColor: 'white',
+            borderWidth: 2
+          }]
         },
-        onClick: (evt, elements, chart) => {
-          if (elements.length > 0) {
-            const index = elements[0].index;
-            const categoria = chart.data.labels[index];
-            const qtd = chart.data.datasets[0].data[index];
-            const porcentagem = ((qtd / total) * 100).toFixed(2) + '%';
-            mostrarInfo(categoria, porcentagem);
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          onClick: (evt, elements) => {
+            if (elements.length > 0) {
+              const index = elements[0].index;
+              const categoria = chart.data.labels[index];
+              const qtd = chart.data.datasets[0].data[index];
+              const porcentagem = ((qtd / total) * 100).toFixed(2) + '%';
+              mostrarInfo(categoria, porcentagem);
+            }
           }
         }
-      }
-    });
-  }
+      });
+    }
 
-  function mostrarInfo(categoria, porcentagem) {
-    const infoCaixa = document.getElementById("infoCaixa");
-    const registrosCategoria = dadosAtuais.filter(d => d.tipo === categoria);
-    const portasDetectadas = [...new Set(registrosCategoria.map(r => r.porta).filter(Boolean))];
+    function mostrarInfo(categoria, porcentagem) {
+      const infoCaixa = document.getElementById("infoCaixa");
+      const registrosCategoria = dadosAtuais.filter(d => d.tipo === categoria);
+      const portasUsadas = [...new Set(registrosCategoria.map(r => r.porta).filter(Boolean))];
+      const exemplos = portasUsadas.map(p => mapeamentoPortas[p]?.[1] || "Desconhecido");
 
-    const config = categoriasConfig[categoria] || categoriasConfig.OUTRO;
+      document.getElementById("infoCategoria").innerText = categoria;
+      document.getElementById("infoPorcentagem").innerText = `Porcentagem: ${porcentagem}`;
+      document.getElementById("infoPortas").innerText = portasUsadas.length ? portasUsadas.join(', ') : "N/A";
+      document.getElementById("infoExemplos").innerText = exemplos.length ? [...new Set(exemplos)].join('; ') : "N/A";
 
-    document.getElementById("infoCategoria").innerText = categoria;
-    document.getElementById("infoCategoria").style.color = config.cor; // cor igual da legenda
-    document.getElementById("infoPorcentagem").innerText = `Porcentagem: ${porcentagem}`;
-    document.getElementById("infoPortas").innerText = portasDetectadas.length ? portasDetectadas.join(', ') : "N/A";
-    document.getElementById("infoExemplos").innerText = config.exemplos;
+      const lista = document.getElementById("infoRegistros");
+      lista.innerHTML = "";
+      registrosCategoria.slice(0, 5).forEach(r => {
+        const li = document.createElement("li");
+        li.innerText = `${r.timestamp} - Porta ${r.porta || "N/A"}`;
+        lista.appendChild(li);
+      });
 
-    const lista = document.getElementById("infoRegistros");
-    lista.innerHTML = "";
-    registrosCategoria.slice(0, 5).forEach(r => {
-      const li = document.createElement("li");
-      li.innerText = `${r.timestamp} - Porta ${r.porta || "N/A"}`;
-      lista.appendChild(li);
-    });
+      infoCaixa.style.display = "block";
+    }
 
-    infoCaixa.style.display = "block";
-  }
+    function toggleMenu() { document.getElementById("sidebar").classList.toggle("active"); }
+    function goToHome() { window.location.href = 'base.html'; }
+    function verLogs() { window.location.href = 'logs.html'; }
+    function verClassificacao() { window.location.href = 'classificação.html'; }
+    function verPerfil() { window.location.href = 'perfil.html'; }
+    function confirmLogout() { document.getElementById("logoutModal").style.display = "flex"; }
+    function fecharModal() { document.getElementById("logoutModal").style.display = "none"; }
+    function logout() { supabase.auth.signOut().then(() => window.location.href = 'index.html'); }
 
-  function toggleMenu() { document.getElementById("sidebar").classList.toggle("active"); }
-  function goToHome() { window.location.href = 'base.html'; }
-  function verLogs() { window.location.href = 'logs.html'; }
-  function verClassificacao() { window.location.href = 'classificação.html'; }
-  function verPerfil() { window.location.href = 'perfil.html'; }
-  function confirmLogout() { document.getElementById("logoutModal").style.display = "flex"; }
-  function fecharModal() { document.getElementById("logoutModal").style.display = "none"; }
-  function logout() { supabase.auth.signOut().then(() => window.location.href = 'index.html'); }
+    window.onload = () => {
+      carregarDados();
+      lucide.createIcons();
+    };
+  </script>
+</body>
 
-  window.onload = () => {
-    carregarDados();
-    lucide.createIcons();
-  };
-</script>
-
-
+</html>
