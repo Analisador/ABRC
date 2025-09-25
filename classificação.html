@@ -56,14 +56,8 @@
       transition: background-color 0.3s ease;
       user-select: none;
     }
-    nav.sidebar button:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-    nav.sidebar button svg {
-      stroke: white;
-      width: 20px;
-      height: 20px;
-    }
+    nav.sidebar button:hover { background-color: rgba(255, 255, 255, 0.1); }
+    nav.sidebar button svg { stroke: white; width: 20px; height: 20px; }
     .sidebar-logo {
       width: 150px;
       margin: 20px auto 0 auto;
@@ -81,16 +75,8 @@
       flex-direction: column;
       gap: 30px;
     }
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-      width: 100%;
-    }
-    .grafico-pequeno {
-      width: 350px;
-      height: 350px;
-      margin: 0 auto;
-    }
+    h1 { text-align: center; margin-bottom: 30px; width: 100%; }
+    .grafico-pequeno { width: 350px; height: 350px; margin: 0 auto; }
     .info-caixa {
       flex: 1;
       min-width: 250px;
@@ -167,21 +153,6 @@
       cursor: pointer;
       font-weight: bold;
     }
-    /* Legenda do gráfico */
-    #legendaGrafico {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 15px;
-      margin-top: 15px;
-    }
-    #legendaGrafico div {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    #legendaGrafico div span { font-size: 14px; }
   </style>
 </head>
 
@@ -204,18 +175,10 @@
     <h1>Classificação de Tráfego</h1>
     <canvas id="graficoTrafego" class="grafico-pequeno"></canvas>
 
-    <!-- Legenda centralizada abaixo do gráfico -->
-    <div id="legendaGrafico">
-      <div><div style="width: 20px; height: 20px; background-color: #4e9cff; border-radius: 4px;"></div><span>OUTRO</span></div>
-      <div><div style="width: 20px; height: 20px; background-color: #ff3333; border-radius: 4px;"></div><span>HTTP (Navegação não segura)</span></div>
-      <div><div style="width: 20px; height: 20px; background-color: #f54291; border-radius: 4px;"></div><span>VPNs</span></div>
-      <div><div style="width: 20px; height: 20px; background-color: #33cc33; border-radius: 4px;"></div><span>DNS</span></div>
-      <div><div style="width: 20px; height: 20px; background-color: #ffa500; border-radius: 4px;"></div><span>HTTP (Navegação web padrão)</span></div>
-      <div><div style="width: 20px; height: 20px; background-color: #cc33ff; border-radius: 4px;"></div><span>HTTPS</span></div>
-    </div>
-
+    <!-- Caixa informativa -->
     <div class="info-caixa" id="infoCaixa">
       <h2 id="infoCategoria"></h2>
+      <p id="infoDescricao"></p>
       <p id="infoPorcentagem"></p>
       <p><strong>Portas:</strong> <span id="infoPortas"></span></p>
       <p><strong>Exemplos:</strong> <span id="infoExemplos"></span></p>
@@ -240,8 +203,17 @@
   <script>
     const { createClient } = window.supabase;
     const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
+    const supabaseKey = 'ey...'; // sua chave original
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Descrições simples
+    const descricoes = {
+      "DNS": "Sistema de Nomes de Domínio, a 'agenda telefônica' da internet.",
+      "HTTP": "Protocolo de navegação não segura.",
+      "HTTPS": "Navegação segura, usada em sites como Google e WhatsApp.",
+      "VPNs": "Túneis de rede que protegem e mascaram a navegação.",
+      "OUTRO": "Tráfego que não se encaixa nas categorias principais."
+    };
 
     const mapeamentoPortas = {
       80: ["HTTP", "Navegação web, APIs HTTP"],
@@ -313,6 +285,7 @@
       const exemplos = portasUsadas.map(p => mapeamentoPortas[p]?.[1] || "Desconhecido");
 
       document.getElementById("infoCategoria").innerText = categoria;
+      document.getElementById("infoDescricao").innerText = descricoes[categoria] || "Sem descrição disponível.";
       document.getElementById("infoPorcentagem").innerText = `Porcentagem: ${porcentagem}`;
       document.getElementById("infoPortas").innerText = portasUsadas.length ? portasUsadas.join(', ') : "N/A";
       document.getElementById("infoExemplos").innerText = exemplos.length ? [...new Set(exemplos)].join('; ') : "N/A";
@@ -331,7 +304,7 @@
     function toggleMenu() { document.getElementById("sidebar").classList.toggle("active"); }
     function goToHome() { window.location.href = 'base.html'; }
     function verLogs() { window.location.href = 'logs.html'; }
-    function verClassificacao() { window.location.href = 'classificação.html'; }
+    function verClassificacao() { window.location.href = 'classificacao.html'; }
     function verPerfil() { window.location.href = 'perfil.html'; }
     function confirmLogout() { document.getElementById("logoutModal").style.display = "flex"; }
     function fecharModal() { document.getElementById("logoutModal").style.display = "none"; }
