@@ -293,6 +293,109 @@
   </div>
 
   <script>
+    const supabase = window.supabase.createClient(
+      'https://epruvcgigotpcptjaqyr.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs'
+    );
+
+    const classificacaoGravidade = {
+      'CRITICAL': 1,      // Crítico
+      'FATAL': 1,         // Crítico
+      'ERROR': 2,         // Alta gravidade
+      'ERRO': 2,          // Alta gravidade
+      'WARNING': 3,       // Grave
+      'WARN': 3,          // Grave
+      'ALERTA': 3,        // Grave
+      'NOTICE': 4,        // Atenção
+      'INFO': 5,          // Aviso
+      'INFORMAÇÃO': 5,    // Aviso
+      'DEBUG': 6,         // Normal
+      'DEBUGGING': 6,     // Normal
+      'TRACE': 7,         // Info
+      'INFORMATION': 7,   // Info
+      'LOG': 8,           // Debug
+      'OTHERS': 9         // Outros
+    };
+
+    function nivelParaClasse(nivel) {
+      const gravidade = classificacaoGravidade[nivel?.toUpperCase()] ?? 9;
+      return `nivel-${gravidade}`;
+    }
+
+    async function carregarLogs() {
+      const { data, error } = await supabase
+        .from('logs')
+        .select('timestamp, mensagem, nivel')
+        .order('timestamp', { ascending: false })
+        .limit(10); 
+
+      if (error) {
+        console.error('Erro ao carregar logs:', error);
+        return;
+      }
+
+      const tbody = document.querySelector('#logsTable tbody');
+      tbody.innerHTML = '';
+
+      const contagem = {};
+
+      data.forEach(log => {
+        const classe = nivelParaClasse(log.nivel);
+        contagem[log.nivel] = (contagem[log.nivel] || 0) + 1;
+
+        const tr = document.createElement('tr');
+        tr.className = classe;
+        tr.innerHTML = `
+          <td>${new Date(log.timestamp).toLocaleString()}</td>
+          <td>${log.mensagem}</td>
+          <td>${log.nivel}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('totalLogsCard').textContent = `Total de Logs: ${data.length}`;
+      document.getElementById('ultimoNivelCard').textContent = `Último Nível: ${data[0]?.nivel || '--'}`;
+
+      desenharGrafico(contagem);
+    }
+
+    function desenharGrafico(contagem) {
+      const ctx = document.getElementById('graficoNiveis').getContext('2d');
+
+      const cores = [
+        '#ff0000', '#ff4500', '#ff7f00', '#ffd700', '#adff2f', '#00fa9a', '#1e90ff', '#8a2be2', '#ffffff'
+      ];
+
+      const labels = Object.keys(contagem);
+      const data = Object.values(contagem);
+
+      const coresUsadas = labels.map(nivel => {
+        const nivelIndex = parseInt(nivel) - 1;
+        return cores[nivelIndex];
+      });
+
+      new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Distribuição de Níveis',
+            data: data,
+            backgroundColor: coresUsadas,  
+            borderWidth: 1
+          }]
+        },
+        options: {
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: 'white' }
+            }
+          }
+        }
+      });
+    }
+
     function toggleMenu() {
       document.getElementById("sidebar").classList.toggle("active");
     }
@@ -313,7 +416,7 @@
     }
 
     window.onload = () => {
-      // Você pode colocar aqui o carregamento dos dados da página
+      carregarLogs();
     };
   </script>
 </body>
