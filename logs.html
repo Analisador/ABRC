@@ -9,6 +9,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* estilos mantidos iguais ao seu código */
         body {
             font-family: Arial, Helvetica, sans-serif;
             margin: 0;
@@ -36,7 +37,6 @@
             }
         }
 
-        /* Sidebar */
         nav.sidebar {
             background: rgba(0, 0, 0, 0.8);
             width: 220px;
@@ -207,7 +207,6 @@
             margin: 0 auto 30px auto;
         }
 
-        /* Botão hamburguer */
         .menu-toggle {
             display: none;
             position: absolute;
@@ -222,10 +221,8 @@
             z-index: 1000;
         }
 
-        /* Modal de confirmação */
         .modal-overlay {
             display: none;
-            /* começa escondido */
             position: fixed;
             top: 0;
             left: 0;
@@ -278,7 +275,6 @@
             font-weight: bold;
         }
 
-        /* Mobile */
         @media (max-width: 768px) {
             body {
                 flex-direction: column;
@@ -310,16 +306,15 @@
 </head>
 
 <body>
-    <!-- Botão hamburguer -->
     <button class="menu-toggle" onclick="toggleMenu()"> <i data-lucide="menu"></i> </button>
     <nav class="sidebar" id="sidebar">
         <div>
             <h2>A.B.R.C</h2>
-            <button onclick="goToPage('base.html')"><i data-lucide="gauge"></i> Speed Test</button>
-            <button onclick="goToPage('logs.html')"><i data-lucide="file-text"></i> Logs</button>
-            <button onclick="goToPage('classificacao.html')"><i data-lucide="bar-chart-2"></i> Tráfego</button>
-            <button onclick="goToPage('perfil.html')"><i data-lucide="user"></i> Perfil</button>
-            <button onclick="confirmLogout()"><i data-lucide="log-out"></i> Logout</button>
+            <button type="button" onclick="goToPage('base.html')"><i data-lucide="gauge"></i> Speed Test</button>
+            <button type="button" onclick="goToPage('logs.html')"><i data-lucide="file-text"></i> Logs</button>
+            <button type="button" onclick="goToPage('classificacao.html')"><i data-lucide="bar-chart-2"></i> Tráfego</button>
+            <button type="button" onclick="goToPage('perfil.html')"><i data-lucide="user"></i> Perfil</button>
+            <button type="button" onclick="confirmLogout()"><i data-lucide="log-out"></i> Logout</button>
         </div>
         <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
     </nav>
@@ -357,7 +352,6 @@
         </div>
     </main>
 
-    <!-- Modal de confirmação -->
     <div class="modal-overlay" id="logoutModal">
         <div class="modal-content">
             <h3>Deseja realmente sair?</h3>
@@ -412,8 +406,6 @@
                 return;
             }
 
-            console.log('Dados carregados:', data);
-
             const tbody = document.querySelector('#logsTable tbody');
             tbody.innerHTML = '';
 
@@ -430,7 +422,6 @@
                 tbody.appendChild(tr);
             });
 
-            console.log('Contagem de níveis:', contagem);
             document.getElementById('totalLogsCard').textContent = `Total de Logs: ${data.length}`;
             document.getElementById('ultimoNivelCard').textContent = `Último Nível: ${data[0]?.nivel || '--'}`;
             desenharGrafico(contagem);
@@ -439,15 +430,8 @@
         function desenharGrafico(contagem) {
             const ctx = document.getElementById('graficoNiveis').getContext('2d');
             const cores = [
-                '#ff0000',
-                '#ff4500',
-                '#ff7f00',
-                '#ffd700',
-                '#adff2f',
-                '#00fa9a',
-                '#1e90ff',
-                '#8a2be2',
-                '#ffffff'
+                '#ff0000', '#ff4500', '#ff7f00', '#ffd700',
+                '#adff2f', '#00fa9a', '#1e90ff', '#8a2be2', '#ffffff'
             ];
 
             const labels = Object.keys(contagem);
@@ -476,9 +460,7 @@
                     plugins: {
                         legend: {
                             position: 'bottom',
-                            labels: {
-                                color: 'white'
-                            }
+                            labels: { color: 'white' }
                         }
                     }
                 }
@@ -490,12 +472,21 @@
         }
 
         function confirmLogout() {
-            const confirm = window.confirm("Deseja realmente sair?");
-            if (confirm) {
-                supabase.auth.signOut().then(() => {
-                    window.location.href = 'index.html';
-                });
-            }
+            document.getElementById("logoutModal").style.display = "flex";
+        }
+
+        function fecharModal() {
+            document.getElementById("logoutModal").style.display = "none";
+        }
+
+        function logout() {
+            supabase.auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            });
+        }
+
+        function toggleMenu() {
+            document.getElementById("sidebar").classList.toggle("active");
         }
 
         window.onload = () => {
