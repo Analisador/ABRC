@@ -83,7 +83,7 @@
             background: rgba(255, 255, 255, 0.05);
             padding: 20px;
             border-radius: 15px;
-            display: none; /* Mantido como none, será exibido pelo JS */
+            display: none;
         }
         .info-caixa h2 { margin-bottom: 10px; }
         .info-caixa p { margin-bottom: 6px; }
@@ -200,42 +200,110 @@
 
     <script>
         const { createClient } = window.supabase;
-        const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
-        const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabaseUrl = 'https://epruvcgigotpcptjaqyr.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0Njk2MzcxMywiZXhwIjoyMDYyNTM5NzEzfQ.zIA2LO93He3kKRYhSv52w0GxoEFV9ILF7-uW196jb50';
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
-        // O NOVO MAPEMANTO DE DADOS PARA DESCRIÇÃO AMIGÁVEL
+        // MAPA DE DESCRIÇÕES COMPLETO
         const mapeamentoDados = {
-            "DNS": {
-                descricao: "Sistema de Nomes de Domínio, a 'agenda telefônica' da internet. Traduz o nome do site (ex: google.com) para o endereço IP.",
-                exemplos: ["Resolução de endereços web"],
-            },
-            "HTTP": {
-                descricao: "Protocolo de navegação **não segura**. Os dados trafegam abertos na rede, evite em sites com dados sensíveis.",
-                exemplos: ["Navegação web antiga ou de teste", "APIs HTTP"],
-            },
-            "HTTPS": {
-                descricao: "Protocolo de navegação **segura**. Criptografa seus dados para proteger sua informação (o 'S' de Segurança).",
-                exemplos: ["Sites de bancos", "Redes sociais", "APIs seguras"],
-            },
-            "VPNs": {
-                descricao: "Redes Virtuais Privadas. Criam um 'túnel' seguro e criptografado para proteger sua privacidade e mascarar sua localização.",
-                exemplos: ["Acesso remoto a redes empresariais"],
-            },
-            "OUTRO": {
-                descricao: "Tráfego que não se encaixa nas categorias principais. Pode ser protocolos específicos, desconhecidos ou de uso misto.",
-                exemplos: ["Protocolos menos comuns"],
-            },
-            // Se houver tipos de tráfego que não são os principais (ex: FTP, SMTP direto do BD), adicione aqui.
-            "FTP": {
-                descricao: "Protocolo de Transferência de Arquivos. Usado para enviar e receber arquivos grandes entre computadores.",
+            "FTP - Dados": {
+                descricao: "Transferência de arquivos via FTP.",
                 exemplos: ["Upload de sites", "Transferência de logs"],
             },
-            "SMTP": {
-                descricao: "Protocolo Simples de Transferência de Correio. Usado principalmente por servidores para **enviar** e-mails.",
-                exemplos: ["Envio de e-mails"],
+            "DHCPv6 Server": {
+                descricao: "Distribuição de endereços IPv6 em redes.",
+                exemplos: ["Configuração automática de IPs IPv6"],
             },
+            "Outro": {
+                descricao: "Tráfego que não se encaixa nas categorias conhecidas.",
+                exemplos: ["Protocolos incomuns"],
+            },
+            "TCMUX – TCP Port Service Multiplexer": {
+                descricao: "Multiplexador de serviços TCP (antigo).",
+                exemplos: ["Compatibilidade de sistemas legados"],
+            },
+            "VPNs stealth via TLS (OpenVPN, etc.)": {
+                descricao: "VPNs que usam TLS/HTTPS para mascarar tráfego.",
+                exemplos: ["OpenVPN disfarçado como HTTPS"],
+            },
+            "Porta inválida ou desconhecida": {
+                descricao: "Tentativas em portas não registradas.",
+                exemplos: ["Tráfego suspeito ou malformado"],
+            },
+            "NETBIOS-NS – NetBIOS Name Service": {
+                descricao: "Serviço de resolução de nomes em redes Windows antigas.",
+                exemplos: ["Descoberta de computadores em LAN"],
+            },
+            "DNS - Resolução de nomes": {
+                descricao: "Sistema de tradução de nomes de domínio para IP.",
+                exemplos: ["Resolução de sites como google.com"],
+            },
+            "DHCP BOOTP Server – DHCP servidor": {
+                descricao: "Servidor que distribui IPs automaticamente.",
+                exemplos: ["Rede corporativa"],
+            },
+            "HTTP - Navegação web padrão (insegura)": {
+                descricao: "Protocolo de navegação sem criptografia.",
+                exemplos: ["Sites antigos", "APIs sem HTTPS"],
+            },
+            "POP3 – Recebimento de e-mails POP3": {
+                descricao: "Protocolo para baixar emails do servidor.",
+                exemplos: ["Clientes de e-mail POP3"],
+            },
+            "mDNS - Multicast DNS": {
+                descricao: "Resolução de nomes em redes locais via multicast.",
+                exemplos: ["Apple Bonjour", "Impressoras locais"],
+            },
+            "GOPHER – Protocolo Gopher (antigo)": {
+                descricao: "Protocolo antigo de navegação pré-web.",
+                exemplos: ["Sistemas legados educacionais"],
+            },
+            "DHCP BOOTP Client – DHCP cliente": {
+                descricao: "Cliente que solicita IP automaticamente.",
+                exemplos: ["Computador recebendo IP da rede"],
+            },
+            "ECHO – Teste de conectividade (echo)": {
+                descricao: "Resposta de eco para testes.",
+                exemplos: ["Teste de conectividade de rede"],
+            },
+            "DCE/RPC – Microsoft endpoint mapper": {
+                descricao: "Comunicação entre aplicativos distribuídos Microsoft.",
+                exemplos: ["Serviços do Windows"],
+            },
+            "LLMNR - Link-Local Multicast Name Resolution": {
+                descricao: "Resolução de nomes em redes locais sem DNS.",
+                exemplos: ["Windows discovery em LAN"],
+            },
+            "SSH/SFTP - Acesso remoto seguro": {
+                descricao: "Acesso remoto seguro com criptografia.",
+                exemplos: ["Administração de servidores via SSH"],
+            },
+            "HOSTNAME – Resolução de nome de host (legacy)": {
+                descricao: "Protocolo antigo de resolução de nomes.",
+                exemplos: ["Compatibilidade com sistemas antigos"],
+            },
+            "DAYTIME – Data e hora do servidor": {
+                descricao: "Serviço que retorna data e hora.",
+                exemplos: ["Servidores de hora antigos"],
+            },
+            "SFTP – Secure File Transfer Protocol (legacy)": {
+                descricao: "Transferência de arquivos segura.",
+                exemplos: ["Envio seguro de arquivos"],
+            },
+            "RTELNET – Telnet remoto alternativo": {
+                descricao: "Variante do protocolo Telnet.",
+                exemplos: ["Administração de sistemas legados"],
+            },
+            "UPnP (SSDP) – Descoberta de dispositivos na rede (UDP)": {
+                descricao: "Protocolo de descoberta de dispositivos em redes locais.",
+                exemplos: ["Smart TVs", "Impressoras", "Câmeras de rede"],
+            }
         };
+
+        function normalizarCategoria(tipo) {
+            if (!tipo) return "Outro";
+            return tipo;
+        }
 
         let dadosAtuais = [];
 
@@ -256,14 +324,13 @@
         function desenharGrafico(data) {
             const contagem = {};
             data.forEach(registro => {
-                const tipo = registro.tipo || 'OUTRO'; // Fallback para 'OUTRO'
+                const tipo = normalizarCategoria(registro.tipo);
                 contagem[tipo] = (contagem[tipo] || 0) + 1;
             });
 
             const total = data.length;
             const ctx = document.getElementById('graficoTrafego').getContext('2d');
 
-            // Verifica se o gráfico já existe para evitar erro de re-inicialização
             if (window.trafegoChart) {
                 window.trafegoChart.destroy();
             }
@@ -274,7 +341,13 @@
                     labels: Object.keys(contagem),
                     datasets: [{
                         data: Object.values(contagem),
-                        backgroundColor: ['#4e9cff', '#f54291', '#33cc33', '#ffa500', '#cc33ff', '#ff3333', '#00cccc'],
+                        backgroundColor: [
+                            '#4e9cff', '#f54291', '#33cc33', '#ffa500', '#cc33ff',
+                            '#ff3333', '#00cccc', '#9966ff', '#ffcc00', '#ff6600',
+                            '#3399ff', '#66cc66', '#cc0066', '#990000', '#003366',
+                            '#6600cc', '#009999', '#999900', '#cc3300', '#006600',
+                            '#663300', '#009933', '#3333cc'
+                        ],
                         borderColor: 'white',
                         borderWidth: 2
                     }]
@@ -295,29 +368,23 @@
             });
         }
 
-        // FUNÇÃO AJUSTADA PARA USAR O NOVO MAPEMANTO
         function mostrarInfo(categoria, porcentagem) {
             const infoCaixa = document.getElementById("infoCaixa");
-            // Filtra os registros que pertencem a esta categoria
-            const registrosCategoria = dadosAtuais.filter(d => d.tipo === categoria);
+            const registrosCategoria = dadosAtuais.filter(d => normalizarCategoria(d.tipo) === categoria);
 
-            // Busca a informação no mapeamento, com fallback para um objeto vazio
             const infoMapeada = mapeamentoDados[categoria] || {
-                descricao: "Categoria sem descrição detalhada. Investigue os logs para mais informações.",
+                descricao: "Categoria sem descrição detalhada.",
                 exemplos: [],
             };
 
-            // Coleta as portas únicas usadas nos registros reais
             const portasRegistradas = [...new Set(registrosCategoria.map(r => r.porta).filter(Boolean))];
 
-            // Preenche os elementos
             document.getElementById("infoCategoria").innerText = categoria;
             document.getElementById("infoDescricao").innerText = infoMapeada.descricao;
             document.getElementById("infoPorcentagem").innerText = `Porcentagem do Total: ${porcentagem}`;
             document.getElementById("infoPortas").innerText = portasRegistradas.length ? portasRegistradas.join(', ') : "N/A";
             document.getElementById("infoExemplos").innerText = infoMapeada.exemplos.length ? infoMapeada.exemplos.join('; ') : "N/A";
 
-            // Preenche a lista de últimos registros
             const lista = document.getElementById("infoRegistros");
             lista.innerHTML = "";
             registrosCategoria.slice(0, 5).forEach(r => {
@@ -329,7 +396,6 @@
 
             infoCaixa.style.display = "block";
         }
-        // FIM DA FUNÇÃO AJUSTADA
 
         function toggleMenu() { document.getElementById("sidebar").classList.toggle("active"); }
         function goToHome() { window.location.href = 'base.html'; }
@@ -346,5 +412,4 @@
         };
     </script>
 </body>
-
 </html>
