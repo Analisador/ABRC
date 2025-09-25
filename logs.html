@@ -411,17 +411,20 @@
         .from('logs')
         .select('timestamp, mensagem, nivel')
         .order('timestamp', { ascending: false })
-        .limit(10);
+        .limit(10); 
 
       if (error) {
         console.error('Erro ao carregar logs:', error);
         return;
       }
 
+      console.log('Dados carregados:', data);  
+
       const tbody = document.querySelector('#logsTable tbody');
       tbody.innerHTML = '';
 
       const contagem = {};
+
       data.forEach(log => {
         const classe = nivelParaClasse(log.nivel);
         contagem[log.nivel] = (contagem[log.nivel] || 0) + 1;
@@ -436,6 +439,8 @@
         tbody.appendChild(tr);
       });
 
+      console.log('Contagem de níveis:', contagem); 
+
       document.getElementById('totalLogsCard').textContent = `Total de Logs: ${data.length}`;
       document.getElementById('ultimoNivelCard').textContent = `Último Nível: ${data[0]?.nivel || '--'}`;
 
@@ -444,20 +449,18 @@
 
     function desenharGrafico(contagem) {
       const ctx = document.getElementById('graficoNiveis').getContext('2d');
+
       const cores = [
-        '#ff0000', // Nível 1 - Crítico (vermelho brilhante)
-        '#ff4500', // Nível 2 - Alta gravidade (laranja)
-        '#ff7f00', // Nível 3 - Grave (laranja suave)
-        '#ffd700', // Nível 4 - Atenção (amarelo dourado)
-        '#adff2f', // Nível 5 - Aviso (verde limão)
-        '#00fa9a', // Nível 6 - Normal (verde azulado)
-        '#1e90ff', // Nível 7 - Info (azul)
-        '#8a2be2', // Nível 8 - Debug (roxo)
-        '#ffffff'  // Nível 9 - Outros (branco)
+        '#ff0000', '#ff4500', '#ff7f00', '#ffd700', '#adff2f', '#00fa9a', '#1e90ff', '#8a2be2', '#ffffff'
       ];
 
       const labels = Object.keys(contagem);
       const data = Object.values(contagem);
+
+      const coresUsadas = labels.map(nivel => {
+        const nivelIndex = parseInt(nivel) - 1;
+        return cores[nivelIndex];
+      });
 
       if (graficoInstance) {
         graficoInstance.destroy();
@@ -470,7 +473,7 @@
           datasets: [{
             label: 'Distribuição de Níveis',
             data: data,
-            backgroundColor: cores.slice(0, labels.length),
+            backgroundColor: coresUsadas,  
             borderWidth: 1
           }]
         },
@@ -483,32 +486,6 @@
           }
         }
       });
-    }
-
-    function goToHome() { window.location.href = 'base.html'; }
-    function verLogs() { window.location.href = 'logs.html'; }
-    function verClassificacao() { window.location.href = 'classificação.html'; }
-    function verPerfil() { window.location.href = 'perfil.html'; }
-
-    // Função para abrir modal
-    function confirmLogout() {
-      document.getElementById("logoutModal").style.display = "flex";
-    }
-
-    // Fechar modal
-    function fecharModal() {
-      document.getElementById("logoutModal").style.display = "none";
-    }
-
-    // Executar logout de fato
-    function logout() {
-      supabase.auth.signOut().then(() => {
-        window.location.href = 'index.html';
-      });
-    }
-
-    function toggleMenu() {
-      document.getElementById('sidebar').classList.toggle('active');
     }
 
     window.onload = () => {
