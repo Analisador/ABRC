@@ -9,7 +9,6 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* estilos mantidos iguais ao seu código */
         body {
             font-family: Arial, Helvetica, sans-serif;
             margin: 0;
@@ -394,6 +393,7 @@
 
         let graficoInstance = null;
 
+        // 🔹 Carrega apenas 10 para tabela
         async function carregarLogs() {
             const { data, error } = await supabase
                 .from('logs')
@@ -409,21 +409,40 @@
             const tbody = document.querySelector('#logsTable tbody');
             tbody.innerHTML = '';
 
-            const contagem = {};
             data.forEach(log => {
-                const classe = nivelParaClasse(log.nivel);
-                contagem[log.nivel] = (contagem[log.nivel] || 0) + 1;
-
                 const tr = document.createElement('tr');
-                tr.className = classe;
+                tr.className = nivelParaClasse(log.nivel);
                 tr.innerHTML = `<td>${new Date(log.timestamp).toLocaleString()}</td>
                                <td>${log.mensagem}</td>
                                <td>${log.nivel}</td>`;
                 tbody.appendChild(tr);
             });
 
-            document.getElementById('totalLogsCard').textContent = `Total de Logs: ${data.length}`;
             document.getElementById('ultimoNivelCard').textContent = `Último Nível: ${data[0]?.nivel || '--'}`;
+
+            // 🔹 Chama gráfico geral
+            carregarGraficoGeral();
+        }
+
+        // 🔹 Novo: busca todos os logs só para o gráfico
+        async function carregarGraficoGeral() {
+            const { data, error } = await supabase
+                .from('logs')
+                .select('nivel');
+
+            if (error) {
+                console.error('Erro ao carregar logs gerais:', error);
+                return;
+            }
+
+            const contagem = {};
+            data.forEach(log => {
+                contagem[log.nivel] = (contagem[log.nivel] || 0) + 1;
+            });
+
+            // Atualiza card de total com o valor real
+            document.getElementById('totalLogsCard').textContent = `Total de Logs: ${data.length}`;
+
             desenharGrafico(contagem);
         }
 
@@ -436,9 +455,11 @@
 
             const labels = Object.keys(contagem);
             const data = Object.values(contagem);
+            const total = data.reduce((a, b) => a + b, 0);
+
             const coresUsadas = labels.map(nivel => {
                 const nivelIndex = parseInt(nivel) - 1;
-                return cores[nivelIndex];
+                return cores[nivelIndex] || '#999';
             });
 
             if (graficoInstance) {
@@ -461,6 +482,15 @@
                         legend: {
                             position: 'bottom',
                             labels: { color: 'white' }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    const valor = context.raw;
+                                    const porcentagem = ((valor / total) * 100).toFixed(1);
+                                    return `${context.label}: ${valor} (${porcentagem}%)`;
+                                }
+                            }
                         }
                     }
                 }
