@@ -431,11 +431,10 @@
 
         const tr = document.createElement('tr');
         tr.className = classe;
-        tr.innerHTML = `
-          <td>${new Date(log.timestamp).toLocaleString()}</td>
+        tr.innerHTML = 
+          `<td>${new Date(log.timestamp).toLocaleString()}</td>
           <td>${log.mensagem}</td>
-          <td>${log.nivel}</td>
-        `;
+          <td>${log.nivel}</td>`;
         tbody.appendChild(tr);
       });
 
