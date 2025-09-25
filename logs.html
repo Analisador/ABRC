@@ -43,9 +43,9 @@
       display: flex;
       flex-direction: column;
       padding: 20px;
+      box-sizing: border-box;
       gap: 25px;
       transition: transform 0.3s ease;
-      justify-content: space-between;
     }
 
     nav.sidebar h2 {
@@ -59,18 +59,18 @@
       border: none;
       color: white;
       font-size: 18px;
-      text-align: left;
-      cursor: pointer;
       display: flex;
       align-items: center;
       gap: 12px;
       padding: 10px 12px;
       border-radius: 8px;
+      cursor: pointer;
       transition: background-color 0.3s ease;
+      text-align: left;
     }
 
     nav.sidebar button:hover {
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: #ff4e4e;
     }
 
     nav.sidebar button svg {
@@ -80,25 +80,16 @@
     }
 
     .sidebar-logo {
+      width: 120px;
       margin-top: auto;
-      text-align: center;
-    }
-
-    .sidebar-logo .logo {
-      max-width: 150px;
-      width: 100%;
-      height: auto;
-      opacity: 0.9;
-      transition: opacity 0.3s ease;
-    }
-
-    .sidebar-logo .logo:hover {
-      opacity: 1;
+      display: block;
+      margin-bottom: 20px;
+      align-self: center;
     }
 
     main.container {
       flex-grow: 1;
-      background-color: rgba(0, 0, 0, 0.75);
+      background-color: rgba(0, 0, 0, 0.85);
       margin: 40px;
       padding: 40px;
       border-radius: 20px;
@@ -114,10 +105,10 @@
 
     .card-container {
       display: flex;
-      justify-content: center;
       gap: 30px;
-      margin-bottom: 30px;
+      justify-content: center;
       flex-wrap: wrap;
+      margin-bottom: 30px;
     }
 
     .card {
@@ -128,18 +119,92 @@
       font-size: 20px;
       font-weight: bold;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-      transition: transform 0.3s ease;
-      cursor: pointer;
-      min-width: 180px;
-      text-align: center;
     }
 
-    .card:hover {
-      transform: scale(1.05);
+    table.vscode-style {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #1e1e1e;
+      color: #d4d4d4;
+      font-family: Consolas, 'Courier New', monospace;
+      border: 1px solid #3c3c3c;
+      border-radius: 8px;
+      margin-bottom: 20px;
     }
 
-    .chart-block {
+    table.vscode-style th,
+    table.vscode-style td {
+      border: 1px solid #3c3c3c;
+      padding: 10px;
+      text-align: left;
+    }
+
+    table.vscode-style th {
+      background-color: #333;
+      color: #fff;
+    }
+
+    table.vscode-style tr:nth-child(even) {
+      background-color: #252526;
+    }
+
+    table.vscode-style tr:hover {
+      background-color: #37373d;
+    }
+
+    .nivel-1 {
+      color: red;
+      font-weight: bold;
+    }
+
+    .nivel-2 {
+      color: orangered;
+    }
+
+    .nivel-3 {
+      color: orange;
+    }
+
+    .nivel-4 {
+      color: gold;
+    }
+
+    .nivel-5 {
+      color: yellowgreen;
+    }
+
+    .nivel-6 {
+      color: green;
+    }
+
+    .nivel-7 {
+      color: teal;
+    }
+
+    .nivel-8 {
+      color: skyblue;
+    }
+
+    .nivel-9 {
+      color: white;
+    }
+
+    .legenda {
       margin-top: 20px;
+      background-color: #333;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    .legenda span {
+      display: inline-block;
+      margin: 5px 15px 5px 0;
+    }
+
+    .grafico-container {
+      max-width: 400px;
+      margin: 0 auto 30px auto;
     }
 
     /* Botão hamburguer */
@@ -157,52 +222,62 @@
       z-index: 1000;
     }
 
-    /* Popup logout */
-    .popup-overlay {
+    /* Modal de confirmação */
+    .modal-overlay {
+      display: none; /* começa escondido */
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.6);
-      display: none;
       align-items: center;
       justify-content: center;
       z-index: 2000;
     }
 
-    .popup {
+    .modal-content {
       background: white;
       color: black;
-      padding: 20px;
+      padding: 25px;
       border-radius: 12px;
       text-align: center;
-      max-width: 300px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      max-width: 320px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
 
-    .popup h3 {
-      margin-bottom: 15px;
+    .modal-content h3 {
+      margin-bottom: 20px;
+      font-size: 18px;
     }
 
-    .popup button {
-      padding: 8px 14px;
-      margin: 0 8px;
+    .modal-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .btn-sim {
+      background: #c2142b;
+      color: white;
       border: none;
+      padding: 10px 20px;
       border-radius: 8px;
       cursor: pointer;
       font-weight: bold;
     }
 
-    .popup .yes {
-      background: #c2142b;
-      color: white;
+    .btn-nao {
+      background: #ccc;
+      color: black;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
     }
 
-    .popup .no {
-      background: #ddd;
-    }
-
+    /* Mobile */
     @media (max-width: 768px) {
       body {
         flex-direction: column;
@@ -229,20 +304,12 @@
         margin: 20px;
         padding: 20px;
       }
-
-      .card-container {
-        flex-direction: column;
-        align-items: center;
-      }
-
-      canvas {
-        max-height: 300px;
-      }
     }
   </style>
 </head>
 
 <body>
+  <!-- Botão hamburguer -->
   <button class="menu-toggle" onclick="toggleMenu()">
     <i data-lucide="menu"></i>
   </button>
@@ -250,14 +317,13 @@
   <nav class="sidebar" id="sidebar">
     <div>
       <h2>A.B.R.C</h2>
-      <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
+      <button onclick="goToPage('base.html')"><i data-lucide="gauge"></i> Speed Test</button>
+      <button onclick="goToPage('logs.html')"><i data-lucide="file-text"></i> Logs</button>
       <button onclick="goToPage('classificacao.html')"><i data-lucide="bar-chart-2"></i> Tráfego</button>
       <button onclick="goToPage('perfil.html')"><i data-lucide="user"></i> Perfil</button>
       <button onclick="confirmLogout()"><i data-lucide="log-out"></i> Logout</button>
     </div>
-    <div class="sidebar-logo">
-      <img src="images/logo-abrc.png" alt="Logo" class="logo">
-    </div>
+    <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
   </nav>
 
   <main class="container">
@@ -279,16 +345,32 @@
       <tbody></tbody>
     </table>
 
-    <div class="chart-block">
+    <div class="grafico-container">
       <canvas id="graficoNiveis"></canvas>
+    </div>
+
+    <div class="legenda">
+      <strong>Gravidade dos Logs:</strong><br />
+      <span class="nivel-1">1 - Crítico</span>
+      <span class="nivel-2">2 - Alta gravidade</span>
+      <span class="nivel-3">3 - Grave</span>
+      <span class="nivel-4">4 - Atenção</span>
+      <span class="nivel-5">5 - Aviso</span>
+      <span class="nivel-6">6 - Normal</span>
+      <span class="nivel-7">7 - Info</span>
+      <span class="nivel-8">8 - Debug</span>
+      <span class="nivel-9">9 - Outros</span>
     </div>
   </main>
 
-  <div class="popup-overlay" id="logoutPopup">
-    <div class="popup">
+  <!-- Modal de confirmação -->
+  <div class="modal-overlay" id="logoutModal">
+    <div class="modal-content">
       <h3>Deseja realmente sair?</h3>
-      <button class="yes" onclick="confirmLogout()">Sim</button>
-      <button class="no" onclick="closeLogoutPopup()">Não</button>
+      <div class="modal-buttons">
+        <button class="btn-sim" onclick="logout()">Sim</button>
+        <button class="btn-nao" onclick="fecharModal()">Não</button>
+      </div>
     </div>
   </div>
 
@@ -322,6 +404,8 @@
       return `nivel-${gravidade}`;
     }
 
+    let graficoInstance = null;
+
     async function carregarLogs() {
       const { data, error } = await supabase
         .from('logs')
@@ -333,6 +417,8 @@
         console.error('Erro ao carregar logs:', error);
         return;
       }
+
+      console.log('Dados carregados:', data);  
 
       const tbody = document.querySelector('#logsTable tbody');
       tbody.innerHTML = '';
@@ -352,6 +438,8 @@
         `;
         tbody.appendChild(tr);
       });
+
+      console.log('Contagem de níveis:', contagem); 
 
       document.getElementById('totalLogsCard').textContent = `Total de Logs: ${data.length}`;
       document.getElementById('ultimoNivelCard').textContent = `Último Nível: ${data[0]?.nivel || '--'}`;
@@ -374,7 +462,11 @@
         return cores[nivelIndex];
       });
 
-      new Chart(ctx, {
+      if (graficoInstance) {
+        graficoInstance.destroy();
+      }
+
+      graficoInstance = new Chart(ctx, {
         type: 'pie',
         data: {
           labels: labels,
@@ -396,14 +488,6 @@
       });
     }
 
-    function toggleMenu() {
-      document.getElementById("sidebar").classList.toggle("active");
-    }
-
-    function verLogs() {
-      window.location.href = 'logs.html';
-    }
-
     function goToPage(page) {
       window.location.href = page;
     }
@@ -411,12 +495,15 @@
     function confirmLogout() {
       const confirm = window.confirm("Deseja realmente sair?");
       if (confirm) {
-        window.location.href = 'index.html';
+        supabase.auth.signOut().then(() => {
+          window.location.href = 'index.html';
+        });
       }
     }
 
     window.onload = () => {
       carregarLogs();
+      lucide.createIcons();
     };
   </script>
 </body>
