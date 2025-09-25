@@ -381,18 +381,24 @@
     );
 
     const classificacaoGravidade = {
-      'CRITICAL': 1,
-      'FATAL': 1,
-      'ERROR': 2,
-      'ERRO': 2,
-      'WARNING': 4,
-      'WARN': 4,
-      'ALERTA': 4,
-      'NOTICE': 5,
-      'INFO': 7,
-      'INFORMAÇÃO': 7,
-      'DEBUG': 8,
-    };
+  'CRITICAL': 1,      // Crítico
+  'FATAL': 1,         // Crítico
+  'ERROR': 2,         // Alta gravidade
+  'ERRO': 2,          // Alta gravidade
+  'WARNING': 3,       // Grave
+  'WARN': 3,          // Grave
+  'ALERTA': 3,        // Grave
+  'NOTICE': 4,        // Atenção
+  'INFO': 5,          // Aviso
+  'INFORMAÇÃO': 5,    // Aviso
+  'DEBUG': 6,         // Normal
+  'DEBUGGING': 6,     // Normal
+  'TRACE': 7,         // Info
+  'INFORMATION': 7,   // Info
+  'LOG': 8,           // Debug
+  'OTHERS': 9         // Outros
+};
+
 
     function nivelParaClasse(nivel) {
       const gravidade = classificacaoGravidade[nivel?.toUpperCase()] ?? 9;
@@ -504,4 +510,5 @@
 </body>
 
 </html>
+
 
