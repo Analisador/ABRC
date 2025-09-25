@@ -317,16 +317,15 @@
   <nav class="sidebar" id="sidebar">
     <div>
       <h2>A.B.R.C</h2>
-      <button onclick="goToHome()"><i data-lucide="gauge"></i> Speed Test</button>
-      <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
-      <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Tráfego</button>
-      <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
-      <button onclick="showLogoutPopup()"><i data-lucide="log-out"></i> Logout</button>
+      <button onclick="goToPage('base.html')"><i data-lucide="gauge"></i> Speed Test</button>
+      <button onclick="goToPage('logs.html')"><i data-lucide="file-text"></i> Logs</button>
+      <button onclick="goToPage('classificacao.html')"><i data-lucide="bar-chart-2"></i> Tráfego</button>
+      <button onclick="goToPage('perfil.html')"><i data-lucide="user"></i> Perfil</button>
+      <button onclick="confirmLogout()"><i data-lucide="log-out"></i> Logout</button>
     </div>
-    <div class="sidebar-logo">
-      <img src="images/logo-abrc.png" alt="Logo" class="logo">
-    </div>
+    <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
   </nav>
+
   <main class="container">
     <h1>Logs</h1>
 
@@ -412,20 +411,17 @@
         .from('logs')
         .select('timestamp, mensagem, nivel')
         .order('timestamp', { ascending: false })
-        .limit(10); 
+        .limit(10);
 
       if (error) {
         console.error('Erro ao carregar logs:', error);
         return;
       }
 
-      console.log('Dados carregados:', data);  
-
       const tbody = document.querySelector('#logsTable tbody');
       tbody.innerHTML = '';
 
       const contagem = {};
-
       data.forEach(log => {
         const classe = nivelParaClasse(log.nivel);
         contagem[log.nivel] = (contagem[log.nivel] || 0) + 1;
@@ -440,8 +436,6 @@
         tbody.appendChild(tr);
       });
 
-      console.log('Contagem de níveis:', contagem); 
-
       document.getElementById('totalLogsCard').textContent = `Total de Logs: ${data.length}`;
       document.getElementById('ultimoNivelCard').textContent = `Último Nível: ${data[0]?.nivel || '--'}`;
 
@@ -450,18 +444,10 @@
 
     function desenharGrafico(contagem) {
       const ctx = document.getElementById('graficoNiveis').getContext('2d');
-
-      const cores = [
-        '#ff0000', '#ff4500', '#ff7f00', '#ffd700', '#adff2f', '#00fa9a', '#1e90ff', '#8a2be2', '#ffffff'
-      ];
+      const cores = ['#ff3b3b', '#ff7300', '#ffa500', '#ffd700', '#a5d608', '#1abc9c', '#3498db', '#9b59b6', '#ffffff'];
 
       const labels = Object.keys(contagem);
       const data = Object.values(contagem);
-
-      const coresUsadas = labels.map(nivel => {
-        const nivelIndex = parseInt(nivel) - 1;
-        return cores[nivelIndex];
-      });
 
       if (graficoInstance) {
         graficoInstance.destroy();
@@ -474,7 +460,7 @@
           datasets: [{
             label: 'Distribuição de Níveis',
             data: data,
-            backgroundColor: coresUsadas,  
+            backgroundColor: cores.slice(0, labels.length),
             borderWidth: 1
           }]
         },
@@ -493,15 +479,6 @@
       window.location.href = page;
     }
 
-    function confirmLogout() {
-      const confirm = window.confirm("Deseja realmente sair?");
-      if (confirm) {
-        supabase.auth.signOut().then(() => {
-          window.location.href = 'index.html';
-        });
-      }
-    }
-
     window.onload = () => {
       carregarLogs();
       lucide.createIcons();
@@ -510,4 +487,3 @@
 </body>
 
 </html>
-
