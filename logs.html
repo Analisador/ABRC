@@ -381,23 +381,23 @@
     );
 
     const classificacaoGravidade = {
-  'CRITICAL': 1,      // Crítico
-  'FATAL': 1,         // Crítico
-  'ERROR': 2,         // Alta gravidade
-  'ERRO': 2,          // Alta gravidade
-  'WARNING': 3,       // Grave
-  'WARN': 3,          // Grave
-  'ALERTA': 3,        // Grave
-  'NOTICE': 4,        // Atenção
-  'INFO': 5,          // Aviso
-  'INFORMAÇÃO': 5,    // Aviso
-  'DEBUG': 6,         // Normal
-  'DEBUGGING': 6,     // Normal
-  'TRACE': 7,         // Info
-  'INFORMATION': 7,   // Info
-  'LOG': 8,           // Debug
-  'OTHERS': 9         // Outros
-};
+      'CRITICAL': 1,      // Crítico
+      'FATAL': 1,         // Crítico
+      'ERROR': 2,         // Alta gravidade
+      'ERRO': 2,          // Alta gravidade
+      'WARNING': 3,       // Grave
+      'WARN': 3,          // Grave
+      'ALERTA': 3,        // Grave
+      'NOTICE': 4,        // Atenção
+      'INFO': 5,          // Aviso
+      'INFORMAÇÃO': 5,    // Aviso
+      'DEBUG': 6,         // Normal
+      'DEBUGGING': 6,     // Normal
+      'TRACE': 7,         // Info
+      'INFORMATION': 7,   // Info
+      'LOG': 8,           // Debug
+      'OTHERS': 9         // Outros
+    };
 
     function nivelParaClasse(nivel) {
       const gravidade = classificacaoGravidade[nivel?.toUpperCase()] ?? 9;
@@ -444,7 +444,17 @@
 
     function desenharGrafico(contagem) {
       const ctx = document.getElementById('graficoNiveis').getContext('2d');
-      const cores = ['#ff3b3b', '#ff7300', '#ffa500', '#ffd700', '#a5d608', '#1abc9c', '#3498db', '#9b59b6', '#ffffff'];
+      const cores = [
+        '#ff0000', // Nível 1 - Crítico (vermelho brilhante)
+        '#ff4500', // Nível 2 - Alta gravidade (laranja)
+        '#ff7f00', // Nível 3 - Grave (laranja suave)
+        '#ffd700', // Nível 4 - Atenção (amarelo dourado)
+        '#adff2f', // Nível 5 - Aviso (verde limão)
+        '#00fa9a', // Nível 6 - Normal (verde azulado)
+        '#1e90ff', // Nível 7 - Info (azul)
+        '#8a2be2', // Nível 8 - Debug (roxo)
+        '#ffffff'  // Nível 9 - Outros (branco)
+      ];
 
       const labels = Object.keys(contagem);
       const data = Object.values(contagem);
