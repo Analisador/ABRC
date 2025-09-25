@@ -317,15 +317,16 @@
   <nav class="sidebar" id="sidebar">
     <div>
       <h2>A.B.R.C</h2>
-      <button onclick="goToPage('base.html')"><i data-lucide="gauge"></i> Speed Test</button>
-      <button onclick="goToPage('logs.html')"><i data-lucide="file-text"></i> Logs</button>
-      <button onclick="goToPage('classificacao.html')"><i data-lucide="bar-chart-2"></i> Tráfego</button>
-      <button onclick="goToPage('perfil.html')"><i data-lucide="user"></i> Perfil</button>
-      <button onclick="confirmLogout()"><i data-lucide="log-out"></i> Logout</button>
+      <button onclick="goToHome()"><i data-lucide="gauge"></i> Speed Test</button>
+      <button onclick="verLogs()"><i data-lucide="file-text"></i> Logs</button>
+      <button onclick="verClassificacao()"><i data-lucide="bar-chart-2"></i> Tráfego</button>
+      <button onclick="verPerfil()"><i data-lucide="user"></i> Perfil</button>
+      <button onclick="showLogoutPopup()"><i data-lucide="log-out"></i> Logout</button>
     </div>
-    <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
+    <div class="sidebar-logo">
+      <img src="images/logo-abrc.png" alt="Logo" class="logo">
+    </div>
   </nav>
-
   <main class="container">
     <h1>Logs</h1>
 
@@ -509,3 +510,4 @@
 </body>
 
 </html>
+
