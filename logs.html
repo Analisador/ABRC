@@ -2,381 +2,507 @@
 <html lang="pt-BR">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Logs</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      margin: 0;
-      padding: 0;
-      color: white;
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
-      animation: gradientAnimation 12s ease infinite;
-      background-size: 300% 300%;
-      background-image: linear-gradient(-45deg, #c2142b, #2165ac, #f2c546, #c2142b);
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Logs</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: white;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            animation: gradientAnimation 12s ease infinite;
+            background-size: 300% 300%;
+            background-image: linear-gradient(-45deg, #c2142b, #2165ac, #f2c546, #c2142b);
+        }
 
-    @keyframes gradientAnimation {
-      0% {
-        background-position: 0% 50%;
-      }
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
 
-      50% {
-        background-position: 100% 50%;
-      }
+            50% {
+                background-position: 100% 50%;
+            }
 
-      100% {
-        background-position: 0% 50%;
-      }
-    }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
 
-    /* Sidebar */
-    nav.sidebar {
-      background: rgba(0, 0, 0, 0.8);
-      width: 220px;
-      display: flex;
-      flex-direction: column;
-      padding: 20px;
-      box-sizing: border-box;
-      gap: 25px;
-      transition: transform 0.3s ease;
-    }
+        /* Sidebar */
+        nav.sidebar {
+            background: rgba(0, 0, 0, 0.8);
+            width: 220px;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+            gap: 25px;
+            transition: transform 0.3s ease;
+        }
 
-    nav.sidebar h2 {
-      margin: 0 0 30px 0;
-      font-size: 22px;
-      text-align: center;
-    }
+        nav.sidebar h2 {
+            margin: 0 0 30px 0;
+            font-size: 22px;
+            text-align: center;
+        }
 
-    nav.sidebar button {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 18px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      text-align: left;
-    }
+        nav.sidebar button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-align: left;
+        }
 
-    nav.sidebar button:hover {
-      background-color: #ff4e4e;
-    }
+        nav.sidebar button:hover {
+            background-color: #ff4e4e;
+        }
 
-    nav.sidebar button svg {
-      stroke: white;
-      width: 20px;
-      height: 20px;
-    }
+        nav.sidebar button svg {
+            stroke: white;
+            width: 20px;
+            height: 20px;
+        }
 
-    .sidebar-logo {
-      width: 120px;
-      margin-top: auto;
-      display: block;
-      margin-bottom: 20px;
-      align-self: center;
-    }
+        .sidebar-logo {
+            width: 120px;
+            margin-top: auto;
+            display: block;
+            margin-bottom: 20px;
+            align-self: center;
+        }
 
-    main.container {
-      flex-grow: 1;
-      background-color: rgba(0, 0, 0, 0.85);
-      margin: 40px;
-      padding: 40px;
-      border-radius: 20px;
-      overflow-y: auto;
-      box-sizing: border-box;
-      position: relative;
-    }
+        main.container {
+            flex-grow: 1;
+            background-color: rgba(0, 0, 0, 0.85);
+            margin: 40px;
+            padding: 40px;
+            border-radius: 20px;
+            overflow-y: auto;
+            box-sizing: border-box;
+            position: relative;
+        }
 
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-    }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-    .card-container {
-      display: flex;
-      gap: 30px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 30px;
-    }
+        .card-container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
 
-    .card {
-      background-color: #ffffff;
-      color: black;
-      border-radius: 15px;
-      padding: 25px 30px;
-      font-size: 20px;
-      font-weight: bold;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    }
+        .card {
+            background-color: #ffffff;
+            color: black;
+            border-radius: 15px;
+            padding: 25px 30px;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
 
-    table.vscode-style {
-      width: 100%;
-      border-collapse: collapse;
-      background-color: #1e1e1e;
-      color: #d4d4d4;
-      font-family: Consolas, 'Courier New', monospace;
-      border: 1px solid #3c3c3c;
-      border-radius: 8px;
-      margin-bottom: 20px;
-    }
+        table.vscode-style {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: Consolas, 'Courier New', monospace;
+            border: 1px solid #3c3c3c;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
 
-    table.vscode-style th,
-    table.vscode-style td {
-      border: 1px solid #3c3c3c;
-      padding: 10px;
-      text-align: left;
-    }
+        table.vscode-style th,
+        table.vscode-style td {
+            border: 1px solid #3c3c3c;
+            padding: 10px;
+            text-align: left;
+        }
 
-    table.vscode-style th {
-      background-color: #333;
-      color: #fff;
-    }
+        table.vscode-style th {
+            background-color: #333;
+            color: #fff;
+        }
 
-    table.vscode-style tr:nth-child(even) {
-      background-color: #252526;
-    }
+        table.vscode-style tr:nth-child(even) {
+            background-color: #252526;
+        }
 
-    table.vscode-style tr:hover {
-      background-color: #37373d;
-    }
+        table.vscode-style tr:hover {
+            background-color: #37373d;
+        }
 
-    .nivel-1 {
-      color: red;
-      font-weight: bold;
-    }
+        .nivel-1 {
+            color: red;
+            font-weight: bold;
+        }
 
-    .nivel-2 {
-      color: orangered;
-    }
+        .nivel-2 {
+            color: orangered;
+        }
 
-    .nivel-3 {
-      color: orange;
-    }
+        .nivel-3 {
+            color: orange;
+        }
 
-    .nivel-4 {
-      color: gold;
-    }
+        .nivel-4 {
+            color: gold;
+        }
 
-    .nivel-5 {
-      color: yellowgreen;
-    }
+        .nivel-5 {
+            color: yellowgreen;
+        }
 
-    .nivel-6 {
-      color: green;
-    }
+        .nivel-6 {
+            color: green;
+        }
 
-    .nivel-7 {
-      color: teal;
-    }
+        .nivel-7 {
+            color: teal;
+        }
 
-    .nivel-8 {
-      color: skyblue;
-    }
+        .nivel-8 {
+            color: skyblue;
+        }
 
-    .nivel-9 {
-      color: white;
-    }
+        .nivel-9 {
+            color: white;
+        }
 
-    .legenda {
-      margin-top: 20px;
-      background-color: #333;
-      padding: 15px;
-      border-radius: 10px;
-      font-size: 14px;
-    }
+        .legenda {
+            margin-top: 20px;
+            background-color: #333;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
 
-    .legenda span {
-      display: inline-block;
-      margin: 5px 15px 5px 0;
-    }
+        .legenda span {
+            display: inline-block;
+            margin: 5px 15px 5px 0;
+        }
 
-    .grafico-container {
-      max-width: 400px;
-      margin: 0 auto 30px auto;
-    }
+        .grafico-container {
+            max-width: 400px;
+            margin: 0 auto 30px auto;
+        }
 
-    /* Botão hamburguer */
-    .menu-toggle {
-      display: none;
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      background: rgba(0, 0, 0, 0.8);
-      border: none;
-      color: white;
-      padding: 8px;
-      border-radius: 8px;
-      cursor: pointer;
-      z-index: 1000;
-    }
+        /* Botão hamburguer */
+        .menu-toggle {
+            display: none;
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            border: none;
+            color: white;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1000;
+        }
 
-    /* Modal de confirmação */
-    .modal-overlay {
-      display: none; /* começa escondido */
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-    }
+        /* Modal de confirmação */
+        .modal-overlay {
+            display: none;
+            /* começa escondido */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
 
-    .modal-content {
-      background: white;
-      color: black;
-      padding: 25px;
-      border-radius: 12px;
-      text-align: center;
-      max-width: 320px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    }
+        .modal-content {
+            background: white;
+            color: black;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 320px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
 
-    .modal-content h3 {
-      margin-bottom: 20px;
-      font-size: 18px;
-    }
+        .modal-content h3 {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
 
-    .modal-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-    }
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
 
-    .btn-sim {
-      background: #c2142b;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
+        .btn-sim {
+            background: #c2142b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
 
-    .btn-nao {
-      background: #ccc;
-      color: black;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
+        .btn-nao {
+            background: #ccc;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
 
-    /* Mobile */
-    @media (max-width: 768px) {
-      body {
-        flex-direction: column;
-      }
+        /* Mobile */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
 
-      nav.sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 100%;
-        transform: translateX(-100%);
-        z-index: 999;
-      }
+            nav.sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100%;
+                transform: translateX(-100%);
+                z-index: 999;
+            }
 
-      nav.sidebar.active {
-        transform: translateX(0);
-      }
+            nav.sidebar.active {
+                transform: translateX(0);
+            }
 
-      .menu-toggle {
-        display: block;
-      }
+            .menu-toggle {
+                display: block;
+            }
 
-      main.container {
-        margin: 20px;
-        padding: 20px;
-      }
-    }
-  </style>
+            main.container {
+                margin: 20px;
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
 
 <body>
-  <!-- Botão hamburguer -->
-  <button class="menu-toggle" onclick="toggleMenu()">
-    <i data-lucide="menu"></i>
-  </button>
+    <!-- Botão hamburguer -->
+    <button class="menu-toggle" onclick="toggleMenu()"> <i data-lucide="menu"></i> </button>
+    <nav class="sidebar" id="sidebar">
+        <div>
+            <h2>A.B.R.C</h2>
+            <button onclick="goToPage('base.html')"><i data-lucide="gauge"></i> Speed Test</button>
+            <button onclick="goToPage('logs.html')"><i data-lucide="file-text"></i> Logs</button>
+            <button onclick="goToPage('classificacao.html')"><i data-lucide="bar-chart-2"></i> Tráfego</button>
+            <button onclick="goToPage('perfil.html')"><i data-lucide="user"></i> Perfil</button>
+            <button onclick="confirmLogout()"><i data-lucide="log-out"></i> Logout</button>
+        </div>
+        <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
+    </nav>
 
-  <nav class="sidebar" id="sidebar">
-    <div>
-      <h2>A.B.R.C</h2>
-      <button onclick="goToPage('base.html')"><i data-lucide="gauge"></i> Speed Test</button>
-      <button onclick="goToPage('logs.html')"><i data-lucide="file-text"></i> Logs</button>
-      <button onclick="goToPage('classificacao.html')"><i data-lucide="bar-chart-2"></i> Tráfego</button>
-      <button onclick="goToPage('perfil.html')"><i data-lucide="user"></i> Perfil</button>
-      <button onclick="confirmLogout()"><i data-lucide="log-out"></i> Logout</button>
+    <main class="container">
+        <h1>Logs</h1>
+        <div class="card-container">
+            <div class="card" id="totalLogsCard">Total de Logs: --</div>
+            <div class="card" id="ultimoNivelCard">Último Nível: --</div>
+        </div>
+        <table class="vscode-style" id="logsTable">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Mensagem</th>
+                    <th>Nível</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <div class="grafico-container">
+            <canvas id="graficoNiveis"></canvas>
+        </div>
+        <div class="legenda">
+            <strong>Gravidade dos Logs:</strong><br />
+            <span class="nivel-1">1 - Crítico</span>
+            <span class="nivel-2">2 - Alta gravidade</span>
+            <span class="nivel-3">3 - Grave</span>
+            <span class="nivel-4">4 - Atenção</span>
+            <span class="nivel-5">5 - Aviso</span>
+            <span class="nivel-6">6 - Normal</span>
+            <span class="nivel-7">7 - Info</span>
+            <span class="nivel-8">8 - Debug</span>
+            <span class="nivel-9">9 - Outros</span>
+        </div>
+    </main>
+
+    <!-- Modal de confirmação -->
+    <div class="modal-overlay" id="logoutModal">
+        <div class="modal-content">
+            <h3>Deseja realmente sair?</h3>
+            <div class="modal-buttons">
+                <button class="btn-sim" onclick="logout()">Sim</button>
+                <button class="btn-nao" onclick="fecharModal()">Não</button>
+            </div>
+        </div>
     </div>
-    <img src="images/logo-abrc.png" alt="Logo" class="sidebar-logo">
-  </nav>
 
-  <main class="container">
-    <h1>Logs</h1>
+    <script>
+        const supabase = window.supabase.createClient(
+            'https://epruvcgigotpcptjaqyr.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcnV2Y2dpZ290cGNwdGphcXlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY5NjM3MTMsImV4cCI6MjA2MjUzOTcxM30.T-wYUDATWI9Iw-UXNDyjI7aCN5EF3306inlhlIDFGbs'
+        );
 
-    <div class="card-container">
-      <div class="card" id="totalLogsCard">Total de Logs: --</div>
-      <div class="card" id="ultimoNivelCard">Último Nível: --</div>
-    </div>
+        const classificacaoGravidade = {
+            'CRITICAL': 1,
+            'FATAL': 1,
+            'ERROR': 2,
+            'ERRO': 2,
+            'WARNING': 3,
+            'WARN': 3,
+            'ALERTA': 3,
+            'NOTICE': 4,
+            'INFO': 5,
+            'INFORMAÇÃO': 5,
+            'DEBUG': 6,
+            'DEBUGGING': 6,
+            'TRACE': 7,
+            'INFORMATION': 7,
+            'LOG': 8,
+            'OTHERS': 9
+        };
 
-    <table class="vscode-style" id="logsTable">
-      <thead>
-        <tr>
-          <th>Data</th>
-          <th>Mensagem</th>
-          <th>Nível</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+        function nivelParaClasse(nivel) {
+            const gravidade = classificacaoGravidade[nivel?.toUpperCase()] ?? 9;
+            return `nivel-${gravidade}`;
+        }
 
-    <div class="grafico-container">
-      <canvas id="graficoNiveis"></canvas>
-    </div>
+        let graficoInstance = null;
 
-    <div class="legenda">
-      <strong>Gravidade dos Logs:</strong><br />
-      <span class="nivel-1">1 - Crítico</span>
-      <span class="nivel-2">2 - Alta gravidade</span>
-      <span class="nivel-3">3 - Grave</span>
-      <span class="nivel-4">4 - Atenção</span>
-      <span class="nivel-5">5 - Aviso</span>
-      <span class="nivel-6">6 - Normal</span>
-      <span class="nivel-7">7 - Info</span>
-      <span class="nivel-8">8 - Debug</span>
-      <span class="nivel-9">9 - Outros</span>
-    </div>
-  </main>
+        async function carregarLogs() {
+            const { data, error } = await supabase
+                .from('logs')
+                .select('timestamp, mensagem, nivel')
+                .order('timestamp', { ascending: false })
+                .limit(10);
 
-  <!-- Modal de confirmação -->
-  <div class="modal-overlay" id="logoutModal">
-    <div class="modal-content">
-      <h3>Deseja realmente sair?</h3>
-      <div class="modal-buttons">
-        <button class="btn-sim" onclick="logout()">Sim</button>
-        <button class="btn-nao" onclick="fecharModal()">Não</button>
-      </div>
-    </div>
-  </div>
+            if (error) {
+                console.error('Erro ao carregar logs:', error);
+                return;
+            }
 
-  <script>
-    // Código JS permanece o mesmo
-  </script>
+            console.log('Dados carregados:', data);
+
+            const tbody = document.querySelector('#logsTable tbody');
+            tbody.innerHTML = '';
+
+            const contagem = {};
+            data.forEach(log => {
+                const classe = nivelParaClasse(log.nivel);
+                contagem[log.nivel] = (contagem[log.nivel] || 0) + 1;
+
+                const tr = document.createElement('tr');
+                tr.className = classe;
+                tr.innerHTML = `<td>${new Date(log.timestamp).toLocaleString()}</td>
+                               <td>${log.mensagem}</td>
+                               <td>${log.nivel}</td>`;
+                tbody.appendChild(tr);
+            });
+
+            console.log('Contagem de níveis:', contagem);
+            document.getElementById('totalLogsCard').textContent = `Total de Logs: ${data.length}`;
+            document.getElementById('ultimoNivelCard').textContent = `Último Nível: ${data[0]?.nivel || '--'}`;
+            desenharGrafico(contagem);
+        }
+
+        function desenharGrafico(contagem) {
+            const ctx = document.getElementById('graficoNiveis').getContext('2d');
+            const cores = [
+                '#ff0000',
+                '#ff4500',
+                '#ff7f00',
+                '#ffd700',
+                '#adff2f',
+                '#00fa9a',
+                '#1e90ff',
+                '#8a2be2',
+                '#ffffff'
+            ];
+
+            const labels = Object.keys(contagem);
+            const data = Object.values(contagem);
+            const coresUsadas = labels.map(nivel => {
+                const nivelIndex = parseInt(nivel) - 1;
+                return cores[nivelIndex];
+            });
+
+            if (graficoInstance) {
+                graficoInstance.destroy();
+            }
+
+            graficoInstance = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Distribuição de Níveis',
+                        data: data,
+                        backgroundColor: coresUsadas,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: 'white'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function goToPage(page) {
+            window.location.href = page;
+        }
+
+        function confirmLogout() {
+            const confirm = window.confirm("Deseja realmente sair?");
+            if (confirm) {
+                supabase.auth.signOut().then(() => {
+                    window.location.href = 'index.html';
+                });
+            }
+        }
+
+        window.onload = () => {
+            carregarLogs();
+            lucide.createIcons();
+        };
+    </script>
 </body>
 
 </html>
